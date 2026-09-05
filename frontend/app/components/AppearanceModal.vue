@@ -4,36 +4,28 @@
       id="appearance-morph-modal"
       target="#appearance-sidebar-btn"
       :open="isAppearanceModalOpen"
-      expanded-width="23rem"
+      expanded-width="24rem"
       expanded-height="auto"
       auto-height
       has-backdrop
       close-on-click-outside
       close-on-esc
+      show-close-button
       placement="center"
-      style="--surface-container-high: #18181B; --on-surface: #ffffff; --moni-morph-body-padding: 0; --moni-morph-panel-radius: 1.75rem; --scrim: rgba(0, 0, 0, 0.6);"
+      style="--surface-container-high: #18181B; --on-surface: #ffffff; --on-surface-variant: #a1a1aa; --scrim: rgba(0, 0, 0, 0.65); --outline-variant: #27272a; --moni-morph-panel-radius: 1.75rem;"
       class="appearance-morph-modal"
     >
-      <div class="bg-[#18181B] text-white p-5 sm:p-6 rounded-[28px] border border-zinc-800 shadow-2xl w-full select-none space-y-4 max-h-[85vh] overflow-y-auto">
-        <!-- Header -->
-        <div class="flex items-center justify-between pb-3 border-b border-zinc-800/80">
-          <div class="flex items-center space-x-2.5">
-            <AppIcon name="palette" class="w-5 h-5 text-white" />
-            <div>
-              <h3 class="text-base font-extrabold text-white tracking-tight leading-none">Apariencia</h3>
-              <p class="text-[10px] text-zinc-400 mt-0.5">Colores, navegación y titulares</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            @click="closeModal"
-            class="w-7 h-7 rounded-full bg-zinc-800/90 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center transition-colors cursor-pointer"
-            aria-label="Cerrar panel de apariencia"
-          >
-            <AppIcon name="close" class="w-3.5 h-3.5" />
-          </button>
+      <!-- Header Slot -->
+      <div slot="header" class="flex items-center space-x-2.5">
+        <AppIcon name="palette" class="w-5 h-5 text-white" />
+        <div>
+          <h3 class="text-base font-extrabold text-white tracking-tight leading-none">Apariencia</h3>
+          <p class="text-[10px] text-zinc-400 mt-0.5">Colores, navegación y titulares</p>
         </div>
+      </div>
 
+      <!-- Body Content (Default Slot) -->
+      <div class="space-y-4 py-2 text-white select-none">
         <!-- 1. Color Swatches (2 rows of 5 matching reference design) -->
         <div>
           <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-2">
@@ -168,14 +160,4 @@ const tickerAnimations: { id: TickerAnimation; label: string }[] = [
   { id: 'flip', label: 'Paginado' },
   { id: 'compact', label: 'Discreto' },
 ]
-
-const closeModal = () => {
-  isAppearanceModalOpen.value = false
-  if (import.meta.client) {
-    const modalEl = document.getElementById('appearance-morph-modal') as any
-    if (modalEl && typeof modalEl.hide === 'function') {
-      modalEl.hide()
-    }
-  }
-}
 </script>

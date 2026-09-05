@@ -85,8 +85,10 @@
         <moni-card
           v-for="boletin in boletines"
           :key="boletin.id"
+          :id="`boletin-btn-${boletin.id}`"
           variant="outlined"
-          class="p-6 rounded-[28px] bg-white border border-zinc-200/80 shadow-sm space-y-3 flex flex-col justify-between hover:shadow-md transition-all group"
+          class="p-6 rounded-[28px] bg-white border border-zinc-200/80 shadow-sm space-y-3 flex flex-col justify-between hover:shadow-md transition-all group cursor-pointer"
+          @click="openBoletin(boletin)"
         >
           <div class="space-y-2.5">
             <div class="flex items-center justify-between">
@@ -106,19 +108,92 @@
           </div>
           <div class="pt-3 flex items-center justify-between text-[11px] text-zinc-500 border-t border-zinc-100">
             <span class="font-medium">COE • INDOMET</span>
-            <span class="font-bold text-zinc-900 group-hover:underline">Leer boletín &rarr;</span>
+            <span class="font-bold text-zinc-900 group-hover:underline flex items-center space-x-1">
+              <span>Leer boletín</span>
+              <AppIcon name="arrow-right" class="w-3 h-3" />
+            </span>
           </div>
         </moni-card>
       </div>
     </div>
+
+    <!-- Bulletin Detail Morph Modal -->
+    <ClientOnly>
+      <moni-morph-modal
+        id="boletin-morph-modal"
+        :open="isBoletinModalOpen"
+        expanded-width="32rem"
+        expanded-height="auto"
+        auto-height
+        has-backdrop
+        close-on-click-outside
+        close-on-esc
+        show-close-button
+        placement="center"
+        style="--surface-container-high: #ffffff; --on-surface: #18181b; --moni-morph-panel-radius: 1.75rem;"
+      >
+        <!-- Header Slot -->
+        <div slot="header" class="flex items-center space-x-2.5">
+          <moni-shape name="12-sided-cookie" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small">
+            <AppIcon name="calendar" class="w-4 h-4 text-zinc-900" />
+          </moni-shape>
+          <div>
+            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
+              {{ activeBoletin?.fecha }}
+            </span>
+            <h3 class="font-black text-base text-zinc-950 mt-0.5">
+              Boletín Oficial COE / INDOMET
+            </h3>
+          </div>
+        </div>
+
+        <!-- Body Content -->
+        <div v-if="activeBoletin" class="space-y-4 py-2 text-xs">
+          <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 space-y-2">
+            <span class="text-[10px] font-black uppercase text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full">
+              {{ activeBoletin.estado }}
+            </span>
+            <h4 class="text-sm font-bold text-zinc-950">{{ activeBoletin.titulo }}</h4>
+            <p class="text-zinc-600 leading-relaxed font-normal">{{ activeBoletin.resumen }}</p>
+          </div>
+
+          <div class="space-y-2">
+            <h5 class="font-bold text-zinc-950 text-xs">Recomendaciones Oficiales de Protección Civil:</h5>
+            <ul class="space-y-2 text-zinc-600 list-disc list-inside leading-relaxed">
+              <li>Seguir estrictamente las orientaciones de los organismos de protección civil (COE, Defensa Civil, Bomberos).</li>
+              <li>Abstenerse de cruzar ríos, arroyos y cañadas con niveles de agua elevados.</li>
+              <li>A los operadores de frágiles embarcaciones en la costa Atlántica, navegar con precaución cerca del perímetro costero.</li>
+              <li>Ponerse en contacto con los organismos de auxilio ante cualquier síntoma de anegamiento o deslizamiento de tierra.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Footer Slot -->
+        <div slot="footer" class="flex items-center justify-between w-full">
+          <span class="text-[11px] text-zinc-500 font-medium">Línea de emergencia: 9-1-1</span>
+          <moni-button variant="filled" shape="round" size="small" @click="closeBoletin">
+            Entendido
+          </moni-button>
+        </div>
+      </moni-morph-modal>
+    </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
 import MiniMapaCOE from '~/components/mapa/MiniMapaCOE.vue'
 
-const boletines = [
+interface Boletin {
+  id: number
+  fecha: string
+  estado: string
+  titulo: string
+  resumen: string
+}
+
+const boletines: Boletin[] = [
   {
     id: 1,
     fecha: 'Hoy, 05:00 PM',
@@ -141,4 +216,22 @@ const boletines = [
     resumen: 'Oleaje de 6 a 8 pies cerca de la costa. Se instruye a los operadores de frágiles y pequeñas embarcaciones permanecer en puerto desde Cabo Engaño hasta Manzanillo.'
   }
 ]
+
+const isBoletinModalOpen = ref(false)
+const activeBoletin = ref<Boletin | null>(null)
+
+const openBoletin = (b: Boletin) => {
+  activeBoletin.value = b
+  isBoletinModalOpen.value = true
+}
+
+const closeBoletin = () => {
+  isBoletinModalOpen.value = false
+  if (import.meta.client) {
+    const el = document.getElementById('boletin-morph-modal') as any
+    if (el && typeof el.hide === 'function') {
+      el.hide()
+    }
+  }
+}
 </script>
