@@ -10,22 +10,29 @@
 
 <style>
 :root {
-  --moni-color-primary: #18181b;
-  --moni-color-on-primary: #ffffff;
-  --moni-color-primary-container: #EAEAEB;
-  --moni-color-on-primary-container: #18181b;
-  --moni-color-secondary: #27272a;
-  --moni-color-on-secondary: #ffffff;
-  --moni-color-secondary-container: #EAEAEB;
-  --moni-color-on-secondary-container: #18181b;
-  --moni-color-surface: #ffffff;
-  --moni-color-on-surface: #18181b;
-  --moni-color-surface-container: #F6F6F8;
-  --moni-color-surface-container-high: #EAEAEB;
-  --moni-color-outline: #e4e4e7;
-  --moni-color-outline-variant: #f4f4f5;
+  /* Direct M3 Tokens used by Moni UI */
+  --primary: #18181b;
+  --on-primary: #ffffff;
+  --primary-container: #EAEAEB;
+  --on-primary-container: #18181b;
+  --secondary: #27272a;
+  --on-secondary: #ffffff;
+  --secondary-container: #EAEAEB;
+  --on-secondary-container: #18181b;
+  --surface: #ffffff;
+  --on-surface: #18181b;
+  --surface-container: #F6F6F8;
+  --surface-container-high: #EAEAEB;
+  --outline: #e4e4e7;
+  --outline-variant: #e4e4e7;
   --_shape-bg: #EAEAEB;
   --_shape-fg: #18181B;
+
+  /* Moni Namespaced Tokens */
+  --moni-color-primary: #18181b;
+  --moni-color-on-primary: #ffffff;
+  --moni-color-secondary-container: #EAEAEB;
+  --moni-color-on-secondary-container: #18181b;
 }
 
 html, body {
@@ -39,5 +46,12 @@ html, body {
 moni-shape {
   --_shape-bg: #EAEAEB;
   --_shape-fg: #18181B;
+}
+
+moni-button {
+  --primary: #18181b;
+  --on-primary: #ffffff;
+  --secondary-container: #EAEAEB;
+  --on-secondary-container: #18181b;
 }
 </style>
