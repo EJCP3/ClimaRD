@@ -4,10 +4,10 @@
     <ClientOnly>
       <MapaOperativo @openReportModal="openModal" />
       <template #fallback>
-        <div class="w-full h-full flex items-center justify-center bg-slate-50">
+        <div class="w-full h-full flex items-center justify-center bg-zinc-50">
           <div class="text-center space-y-3">
-            <div class="w-12 h-12 rounded-full border-4 border-slate-200 border-t-slate-900 animate-spin mx-auto"></div>
-            <p class="text-xs font-bold text-slate-700 uppercase tracking-wider">Cargando mapa WebGL...</p>
+            <div class="w-12 h-12 rounded-full border-4 border-zinc-200 border-t-zinc-900 animate-spin mx-auto"></div>
+            <p class="text-xs font-bold text-zinc-700 uppercase tracking-wider">Cargando mapa WebGL...</p>
           </div>
         </div>
       </template>
@@ -19,16 +19,16 @@
         <!-- Header Slot -->
         <div slot="header" class="flex items-center justify-between w-full pb-2">
           <div>
-            <span class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
+            <span class="text-[11px] font-extrabold uppercase tracking-widest text-zinc-400">
               PASO {{ currentStep }} DE 2
             </span>
-            <h3 class="font-black text-xl text-slate-950 tracking-tight mt-0.5">
+            <h3 class="font-black text-xl text-zinc-950 tracking-tight mt-0.5">
               {{ currentStep === 1 ? 'Seleccionar Tipo de Incidencia' : 'Confirmar Reporte Ciudadano' }}
             </h3>
           </div>
           <button
             @click="closeModal"
-            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors"
+            class="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 flex items-center justify-center transition-colors"
           >
             <AppIcon name="close" class="w-4 h-4" />
           </button>
@@ -41,15 +41,15 @@
             :key="cat.id"
             @click="selectCategory(cat.id)"
             class="p-4 rounded-[24px] border-2 flex flex-col items-center text-center space-y-3 transition-all cursor-pointer group hover:scale-[1.02]"
-            :class="selectedCategory === cat.id ? 'border-slate-950 bg-slate-50 shadow-md' : 'border-slate-200/80 hover:border-slate-300 bg-white'"
+            :class="selectedCategory === cat.id ? 'border-zinc-950 bg-zinc-50 shadow-md' : 'border-zinc-200/80 hover:border-zinc-300 bg-white'"
           >
-            <!-- Moni UI Shape Container for Icons -->
-            <moni-shape :name="cat.shape" :color="cat.color" size="medium" class="shrink-0">
-              <AppIcon :name="cat.icon" class="w-6 h-6" />
+            <!-- Moni UI Shape Container for Icons (Neutral Gray matching screenshots) -->
+            <moni-shape :name="cat.shape" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0">
+              <AppIcon :name="cat.icon" class="w-6 h-6 text-zinc-900" />
             </moni-shape>
             <div>
-              <span class="text-xs font-bold text-slate-950 block">{{ cat.title }}</span>
-              <span class="text-[10px] text-slate-500 mt-0.5 block">{{ cat.subtitle }}</span>
+              <span class="text-xs font-bold text-zinc-950 block">{{ cat.title }}</span>
+              <span class="text-[10px] text-zinc-500 mt-0.5 block">{{ cat.subtitle }}</span>
             </div>
           </button>
         </div>
@@ -57,38 +57,38 @@
         <!-- Step 2: Confirmation & Details with Moni UI moni-card -->
         <div v-if="currentStep === 2" class="space-y-4 py-3">
           <!-- GPS Location Info with Moni Card -->
-          <moni-card variant="outlined" class="p-4 bg-slate-50 rounded-[20px] border border-slate-200/60 block">
-            <div class="flex items-center space-x-2 text-slate-500 font-medium text-xs">
-              <AppIcon name="map-pin" class="w-3.5 h-3.5 text-sky-600" />
+          <moni-card variant="outlined" class="p-4 bg-zinc-50 rounded-[20px] border border-zinc-200/60 block">
+            <div class="flex items-center space-x-2 text-zinc-500 font-medium text-xs">
+              <AppIcon name="map-pin" class="w-3.5 h-3.5 text-zinc-800" />
               <span>Coordenadas GPS de la Incidencia:</span>
             </div>
-            <p class="font-mono font-bold text-slate-950 text-sm mt-1">18.4764° N, 69.9652° W</p>
-            <p class="text-[11px] text-slate-600 mt-0.5">Aprox. Av. Luperón, Distrito Nacional</p>
+            <p class="font-mono font-bold text-zinc-950 text-sm mt-1">18.4764° N, 69.9652° W</p>
+            <p class="text-[11px] text-zinc-600 mt-0.5">Aprox. Av. Luperón, Distrito Nacional</p>
           </moni-card>
 
           <!-- Description Field -->
           <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-slate-800">Descripción u observación:</label>
+            <label class="block text-xs font-bold text-zinc-800">Descripción u observación:</label>
             <textarea
               v-model="reportDescription"
               rows="3"
               placeholder="Ej. El nivel del agua sube rápido y sobrepasa la acera..."
-              class="w-full text-xs p-3.5 bg-slate-50 border border-slate-200/80 rounded-[18px] focus:outline-none focus:ring-2 focus:ring-slate-950 focus:bg-white transition-all resize-none"
+              class="w-full text-xs p-3.5 bg-zinc-50 border border-zinc-200/80 rounded-[18px] focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:bg-white transition-all resize-none"
             ></textarea>
           </div>
 
           <!-- Photo Attachment Pill -->
           <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-slate-800">Evidencia fotográfica (Opcional):</label>
-            <div class="p-3 bg-slate-50 border border-dashed border-slate-300 rounded-[18px] flex items-center justify-center space-x-2 cursor-pointer hover:bg-slate-100 transition-colors">
-              <AppIcon name="camera" class="w-4 h-4 text-slate-500" />
-              <span class="text-xs font-semibold text-slate-600">Adjuntar foto o video</span>
+            <label class="block text-xs font-bold text-zinc-800">Evidencia fotográfica (Opcional):</label>
+            <div class="p-3 bg-zinc-50 border border-dashed border-zinc-300 rounded-[18px] flex items-center justify-center space-x-2 cursor-pointer hover:bg-zinc-100 transition-colors">
+              <AppIcon name="camera" class="w-4 h-4 text-zinc-500" />
+              <span class="text-xs font-semibold text-zinc-600">Adjuntar foto o video</span>
             </div>
           </div>
         </div>
 
         <!-- Footer Slot: Moni UI moni-button -->
-        <div slot="footer" class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 w-full">
+        <div slot="footer" class="flex items-center justify-end space-x-3 pt-3 border-t border-zinc-100 w-full">
           <moni-button
             v-if="currentStep === 2"
             variant="text"
@@ -137,7 +137,7 @@ const incidentCategories = [
     subtitle: 'Calles anegadas o cañadas',
     icon: 'water',
     shape: 'flower',
-    color: 'primary'
+    color: 'surface'
   },
   {
     id: 'ARBOL_CAIDO',
@@ -145,7 +145,7 @@ const incidentCategories = [
     subtitle: 'Vías obstaculizadas',
     icon: 'tree',
     shape: '12-sided-cookie',
-    color: 'secondary'
+    color: 'surface'
   },
   {
     id: 'VIA_BLOQUEADA',
@@ -153,7 +153,7 @@ const incidentCategories = [
     subtitle: 'Vehículos varados',
     icon: 'car',
     shape: 'soft-burst',
-    color: 'tertiary'
+    color: 'surface'
   },
   {
     id: 'DERRUMBE',
