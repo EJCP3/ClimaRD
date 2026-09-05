@@ -12,13 +12,13 @@
       </p>
     </div>
 
-    <!-- Alert Level Legend (Material 3 Cards) -->
+    <!-- Alert Level Legend (Material 3 Cards with Moni UI moni-shape) -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
       <!-- Roja -->
       <div class="p-5 bg-red-50/70 border border-red-200/80 rounded-[24px] flex items-center space-x-4 shadow-sm">
-        <div class="w-12 h-12 rounded-[16px] bg-red-500 text-white flex items-center justify-center shrink-0 shadow-md">
-          <AppIcon name="alert-triangle" class="w-6 h-6" />
-        </div>
+        <moni-shape name="burst" color="primary" size="medium" class="shrink-0">
+          <AppIcon name="alert-triangle" class="w-6 h-6 text-rose-600" />
+        </moni-shape>
         <div>
           <h4 class="text-sm font-extrabold text-red-950">Alerta Roja</h4>
           <p class="text-[11px] text-red-800 mt-0.5 leading-snug">Peligro extremo. Evacuación preventiva en zonas vulnerables.</p>
@@ -27,9 +27,9 @@
 
       <!-- Amarilla -->
       <div class="p-5 bg-amber-50/70 border border-amber-200/80 rounded-[24px] flex items-center space-x-4 shadow-sm">
-        <div class="w-12 h-12 rounded-[16px] bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md">
-          <AppIcon name="alert-triangle" class="w-6 h-6" />
-        </div>
+        <moni-shape name="12-sided-cookie" color="secondary" size="medium" class="shrink-0">
+          <AppIcon name="alert-triangle" class="w-6 h-6 text-amber-600" />
+        </moni-shape>
         <div>
           <h4 class="text-sm font-extrabold text-amber-950">Alerta Amarilla</h4>
           <p class="text-[11px] text-amber-800 mt-0.5 leading-snug">Preparación y vigilancia. Crecidas de ríos y cañadas.</p>
@@ -38,9 +38,9 @@
 
       <!-- Verde -->
       <div class="p-5 bg-emerald-50/70 border border-emerald-200/80 rounded-[24px] flex items-center space-x-4 shadow-sm">
-        <div class="w-12 h-12 rounded-[16px] bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md">
-          <AppIcon name="shield" class="w-6 h-6" />
-        </div>
+        <moni-shape name="flower" color="tertiary" size="medium" class="shrink-0">
+          <AppIcon name="shield" class="w-6 h-6 text-emerald-600" />
+        </moni-shape>
         <div>
           <h4 class="text-sm font-extrabold text-emerald-950">Alerta Verde</h4>
           <p class="text-[11px] text-emerald-800 mt-0.5 leading-snug">Atención ordinaria. Monitoreo ante cambios del tiempo.</p>
@@ -57,9 +57,9 @@
             <AppIcon name="map" class="w-4 h-4 text-sky-600" />
             <span>Matriz Provincial por Nivel</span>
           </h3>
-          <span class="text-[11px] font-mono font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">
+          <moni-chip variant="assist" shape="round">
             32 Provincias
-          </span>
+          </moni-chip>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2">
@@ -81,7 +81,7 @@
         </div>
       </div>
 
-      <!-- Right: Official Bulletins Feed -->
+      <!-- Right: Official Bulletins Feed using Moni UI moni-card -->
       <div class="lg:col-span-5 space-y-4">
         <h3 class="font-bold text-sm text-slate-950 flex items-center space-x-2">
           <AppIcon name="calendar" class="w-4 h-4 text-slate-700" />
@@ -89,10 +89,11 @@
         </h3>
 
         <div class="space-y-3">
-          <div
+          <moni-card
             v-for="boletin in boletines"
             :key="boletin.id"
-            class="bg-white p-5 rounded-[24px] border border-slate-200/80 shadow-sm space-y-2 hover:shadow-md transition-shadow"
+            variant="outlined"
+            class="p-5 rounded-[24px] bg-white border border-slate-200/80 shadow-sm space-y-2 block hover:shadow-md transition-shadow"
           >
             <div class="flex items-center justify-between">
               <span class="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
@@ -104,7 +105,7 @@
             </div>
             <h4 class="text-xs font-bold text-slate-950 leading-snug">{{ boletin.titulo }}</h4>
             <p class="text-xs text-slate-600 leading-relaxed">{{ boletin.resumen }}</p>
-          </div>
+          </moni-card>
         </div>
       </div>
     </div>

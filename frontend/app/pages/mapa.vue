@@ -13,14 +13,11 @@
       </template>
     </ClientOnly>
 
-    <!-- Incident Report Modal (Material 3 Expressive Dialog - Inspired by Screenshot 4) -->
-    <div
-      v-if="isModalOpen"
-      class="fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-    >
-      <div class="bg-white w-full sm:max-w-lg rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95 border border-slate-200/80">
-        <!-- Modal Header -->
-        <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+    <!-- Incident Report Modal using Moni UI moni-dialog & moni-shape -->
+    <ClientOnly>
+      <moni-dialog :open="isModalOpen" modal size="medium">
+        <!-- Header Slot -->
+        <div slot="header" class="flex items-center justify-between w-full pb-2">
           <div>
             <span class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
               PASO {{ currentStep }} DE 2
@@ -37,22 +34,19 @@
           </button>
         </div>
 
-        <!-- Step 1: Select Incident Category (Expressive Cards with SVG Icons) -->
-        <div v-if="currentStep === 1" class="grid grid-cols-2 gap-3.5">
+        <!-- Step 1: Select Incident Category with Moni UI moni-shape -->
+        <div v-if="currentStep === 1" class="grid grid-cols-2 gap-3.5 py-3">
           <button
             v-for="cat in incidentCategories"
             :key="cat.id"
             @click="selectCategory(cat.id)"
-            class="p-5 rounded-[24px] border-2 flex flex-col items-center text-center space-y-3 transition-all cursor-pointer group hover:scale-[1.02]"
+            class="p-4 rounded-[24px] border-2 flex flex-col items-center text-center space-y-3 transition-all cursor-pointer group hover:scale-[1.02]"
             :class="selectedCategory === cat.id ? 'border-slate-950 bg-slate-50 shadow-md' : 'border-slate-200/80 hover:border-slate-300 bg-white'"
           >
-            <!-- Expressive Squircle Container (From Screenshot 2 & 3) -->
-            <div
-              class="w-14 h-14 rounded-[20px] flex items-center justify-center transition-colors"
-              :class="cat.bgClass"
-            >
-              <AppIcon :name="cat.icon" class="w-7 h-7" :class="cat.iconClass" />
-            </div>
+            <!-- Moni UI Shape Container for Icons -->
+            <moni-shape :name="cat.shape" :color="cat.color" size="medium" class="shrink-0">
+              <AppIcon :name="cat.icon" class="w-6 h-6" />
+            </moni-shape>
             <div>
               <span class="text-xs font-bold text-slate-950 block">{{ cat.title }}</span>
               <span class="text-[10px] text-slate-500 mt-0.5 block">{{ cat.subtitle }}</span>
@@ -60,17 +54,17 @@
           </button>
         </div>
 
-        <!-- Step 2: Confirmation & Details -->
-        <div v-if="currentStep === 2" class="space-y-4">
-          <!-- GPS Location Info Pill -->
-          <div class="p-4 bg-slate-50 rounded-[20px] border border-slate-200/60 text-xs space-y-1.5">
-            <div class="flex items-center space-x-2 text-slate-500 font-medium">
+        <!-- Step 2: Confirmation & Details with Moni UI moni-card -->
+        <div v-if="currentStep === 2" class="space-y-4 py-3">
+          <!-- GPS Location Info with Moni Card -->
+          <moni-card variant="outlined" class="p-4 bg-slate-50 rounded-[20px] border border-slate-200/60 block">
+            <div class="flex items-center space-x-2 text-slate-500 font-medium text-xs">
               <AppIcon name="map-pin" class="w-3.5 h-3.5 text-sky-600" />
               <span>Coordenadas GPS de la Incidencia:</span>
             </div>
-            <p class="font-mono font-bold text-slate-950 text-sm">18.4764° N, 69.9652° W</p>
-            <p class="text-[11px] text-slate-600">Aprox. Av. Luperón, Distrito Nacional</p>
-          </div>
+            <p class="font-mono font-bold text-slate-950 text-sm mt-1">18.4764° N, 69.9652° W</p>
+            <p class="text-[11px] text-slate-600 mt-0.5">Aprox. Av. Luperón, Distrito Nacional</p>
+          </moni-card>
 
           <!-- Description Field -->
           <div class="space-y-1.5">
@@ -91,28 +85,38 @@
               <span class="text-xs font-semibold text-slate-600">Adjuntar foto o video</span>
             </div>
           </div>
-
-          <!-- Material 3 Action Buttons (Moni UI moni-button) -->
-          <div class="flex items-center justify-end space-x-3 pt-2">
-            <moni-button
-              variant="text"
-              shape="round"
-              @click="currentStep = 1"
-            >
-              Atrás
-            </moni-button>
-            <moni-button
-              variant="filled"
-              shape="round"
-              @click="submitReport"
-            >
-              <AppIcon slot="icon" name="check" class="w-4 h-4 mr-1.5" />
-              Publicar Reporte
-            </moni-button>
-          </div>
         </div>
-      </div>
-    </div>
+
+        <!-- Footer Slot: Moni UI moni-button -->
+        <div slot="footer" class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 w-full">
+          <moni-button
+            v-if="currentStep === 2"
+            variant="text"
+            shape="round"
+            @click="currentStep = 1"
+          >
+            Atrás
+          </moni-button>
+          <moni-button
+            v-if="currentStep === 1"
+            variant="text"
+            shape="round"
+            @click="closeModal"
+          >
+            Cancelar
+          </moni-button>
+          <moni-button
+            v-if="currentStep === 2"
+            variant="filled"
+            shape="round"
+            @click="submitReport"
+          >
+            <AppIcon slot="icon" name="check" class="w-4 h-4 mr-1.5" />
+            Publicar Reporte
+          </moni-button>
+        </div>
+      </moni-dialog>
+    </ClientOnly>
   </div>
 </template>
 
@@ -132,32 +136,32 @@ const incidentCategories = [
     title: 'Inundación Callejera',
     subtitle: 'Calles anegadas o cañadas',
     icon: 'water',
-    bgClass: 'bg-sky-50 text-sky-700',
-    iconClass: 'text-sky-600'
+    shape: 'flower',
+    color: 'primary'
   },
   {
     id: 'ARBOL_CAIDO',
     title: 'Árbol Caído / Cables',
     subtitle: 'Vías obstaculizadas',
     icon: 'tree',
-    bgClass: 'bg-emerald-50 text-emerald-700',
-    iconClass: 'text-emerald-600'
+    shape: '12-sided-cookie',
+    color: 'secondary'
   },
   {
     id: 'VIA_BLOQUEADA',
     title: 'Vía Bloqueada',
     subtitle: 'Vehículos varados',
     icon: 'car',
-    bgClass: 'bg-orange-50 text-orange-700',
-    iconClass: 'text-orange-600'
+    shape: 'soft-burst',
+    color: 'tertiary'
   },
   {
     id: 'DERRUMBE',
     title: 'Derrumbe / Grieta',
     subtitle: 'Deslizamiento estructural',
     icon: 'alert-triangle',
-    bgClass: 'bg-red-50 text-red-700',
-    iconClass: 'text-red-600'
+    shape: 'arch',
+    color: 'surface'
   }
 ]
 

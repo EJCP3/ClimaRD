@@ -37,22 +37,27 @@
       </moni-chip>
     </div>
 
-    <!-- Cards Grid -->
+    <!-- Cards Grid with Moni UI moni-card and moni-shape -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-      <div
+      <moni-card
         v-for="item in filteredEvidencias"
         :key="item.id"
-        class="bg-white rounded-[28px] border border-slate-150 shadow-sm overflow-hidden flex flex-col hover:shadow-md hover:border-slate-300 transition-all duration-300 group"
+        variant="outlined"
+        class="bg-white rounded-[28px] border border-slate-150 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-all duration-300 group block"
       >
         <!-- Card Header Banner -->
         <div class="h-44 relative bg-slate-900 overflow-hidden flex items-center justify-center">
           <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-slate-800/40"></div>
           
-          <!-- Abstract Pattern / Large Watermark Icon -->
-          <AppIcon
-            :name="item.icon"
-            class="w-24 h-24 text-white/10 group-hover:scale-110 transition-transform duration-500"
-          />
+          <!-- Moni UI Expressive Shape Watermark -->
+          <moni-shape
+            :name="item.shape"
+            color="surface"
+            size="large"
+            class="opacity-20 group-hover:scale-110 transition-transform duration-500 scale-110"
+          >
+            <AppIcon :name="item.icon" class="w-10 h-10" />
+          </moni-shape>
 
           <!-- Floating Badges Top -->
           <div class="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between">
@@ -85,19 +90,17 @@
             {{ item.descripcion }}
           </p>
 
-          <!-- Footer Actions & Verification -->
+          <!-- Footer Actions & Verification with Moni UI Button -->
           <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
-            <button
+            <moni-button
+              variant="tonal"
+              shape="round"
+              size="small"
               @click="toggleVote(item.id)"
-              class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
-              :class="userVotes.includes(item.id)
-                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200'"
             >
-              <AppIcon name="thumbs-up" class="w-3.5 h-3.5" />
-              <span>{{ item.votos + (userVotes.includes(item.id) ? 1 : 0) }}</span>
-              <span class="text-[11px] font-normal text-slate-400">confirmados</span>
-            </button>
+              <AppIcon slot="icon" name="thumbs-up" class="w-3.5 h-3.5 mr-1" />
+              {{ item.votos + (userVotes.includes(item.id) ? 1 : 0) }} confirmados
+            </moni-button>
 
             <button
               @click="shareReport(item)"
@@ -108,7 +111,7 @@
             </button>
           </div>
         </div>
-      </div>
+      </moni-card>
     </div>
   </div>
 </template>
@@ -133,6 +136,7 @@ const evidencias = [
     tipo: 'Inundación Callejera',
     badgeClass: 'bg-sky-600/90',
     icon: 'water',
+    shape: 'flower',
     ubicacion: 'Av. Luperón esq. Gustavo Mejía Ricart, D.N.',
     tiempo: 'Hace 14 min',
     descripcion: 'Agua acumulada cubre media rueda de vehículos ligeros. Se recomienda tomar vías alternas hacia el sur.',
@@ -144,6 +148,7 @@ const evidencias = [
     tipo: 'Árbol Caído',
     badgeClass: 'bg-emerald-600/90',
     icon: 'tree',
+    shape: '12-sided-cookie',
     ubicacion: 'Calle El Conde, Zona Colonial',
     tiempo: 'Hace 28 min',
     descripcion: 'Rama grande obstaculiza el paso peatonal. Cables del tendido eléctrico están comprometidos en la esquina.',
@@ -155,6 +160,7 @@ const evidencias = [
     tipo: 'Vía Bloqueada',
     badgeClass: 'bg-orange-500/90',
     icon: 'car',
+    shape: 'soft-burst',
     ubicacion: 'Av. 27 de Febrero casi Winston Churchill',
     tiempo: 'Hace 45 min',
     descripcion: 'Vehículo varado en carril derecho por falla mecánica bajo lluvia persistente. Tránsito muy lento.',

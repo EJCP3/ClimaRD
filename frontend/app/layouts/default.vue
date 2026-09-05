@@ -2,11 +2,11 @@
   <div class="min-h-screen flex flex-col md:flex-row bg-[#FBFBFE] text-slate-900 font-sans antialiased selection:bg-sky-100">
     <!-- Desktop Sidebar / Nav Rail (Material 3 Expressive) -->
     <aside class="hidden md:flex flex-col w-72 border-r border-slate-200/80 bg-white p-5 space-y-6">
-      <!-- App Brand -->
+      <!-- App Brand with Moni UI moni-shape -->
       <div class="flex items-center space-x-3 px-2">
-        <div class="w-11 h-11 rounded-[16px] bg-slate-950 flex items-center justify-center text-white shadow-md">
-          <AppIcon name="cloud-rain" class="w-6 h-6 text-white" />
-        </div>
+        <moni-shape name="flower" color="primary" size="small" class="shrink-0">
+          <AppIcon name="cloud-rain" class="w-5 h-5 text-white" />
+        </moni-shape>
         <div>
           <h1 class="font-extrabold text-lg text-slate-950 tracking-tight leading-tight">Clima RD</h1>
           <p class="text-[11px] text-sky-600 font-semibold uppercase tracking-wider">Sistema Nacional de Alerta</p>
@@ -88,12 +88,11 @@
         </div>
 
         <div class="flex items-center space-x-2">
-          <NuxtLink
-            to="/mapa"
-            class="px-4 py-2 bg-slate-950 hover:bg-slate-800 active:scale-95 text-white rounded-full text-xs font-semibold shadow-sm transition-all flex items-center space-x-2"
-          >
-            <AppIcon name="alert-triangle" class="w-3.5 h-3.5 text-amber-400" />
-            <span>Reportar Incidencia</span>
+          <NuxtLink to="/mapa">
+            <moni-button variant="filled" shape="round" size="small">
+              <AppIcon slot="icon" name="alert-triangle" class="w-3.5 h-3.5 text-amber-400 mr-1.5" />
+              Reportar Incidencia
+            </moni-button>
           </NuxtLink>
         </div>
       </header>

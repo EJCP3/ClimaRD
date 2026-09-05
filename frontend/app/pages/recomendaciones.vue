@@ -12,16 +12,16 @@
       </p>
     </div>
 
-    <!-- Direct Emergency Calling Hub (M3 Elevated Cards) -->
+    <!-- Direct Emergency Calling Hub (Moni UI moni-card, moni-shape & moni-button) -->
     <div class="space-y-3">
       <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Líneas Telefónicas Directas</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- 911 -->
-        <div class="p-5 rounded-[28px] bg-white border border-rose-150 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+        <moni-card variant="elevated" class="p-5 rounded-[28px] bg-white border border-rose-150 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 block">
           <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shadow-inner">
-              <AppIcon name="siren" class="w-6 h-6" />
-            </div>
+            <moni-shape name="burst" color="primary" size="medium" class="shrink-0">
+              <AppIcon name="siren" class="w-6 h-6 text-rose-600" />
+            </moni-shape>
             <span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-extrabold uppercase">24 Horas</span>
           </div>
           <div>
@@ -29,21 +29,23 @@
             <p class="text-xs font-bold text-slate-700 mt-0.5">Emergencias Nacional</p>
             <p class="text-[11px] text-slate-500 mt-1 leading-snug">Policía, ambulancias y auxilio vial inmediato.</p>
           </div>
-          <a
+          <moni-button
             href="tel:911"
-            class="inline-flex items-center justify-center space-x-2 w-full py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors shadow-sm"
+            variant="filled"
+            shape="round"
+            class="w-full"
           >
-            <AppIcon name="phone" class="w-3.5 h-3.5" />
-            <span>Llamar al 911</span>
-          </a>
-        </div>
+            <AppIcon slot="icon" name="phone" class="w-3.5 h-3.5 mr-2" />
+            Llamar al 911
+          </moni-button>
+        </moni-card>
 
         <!-- COE -->
-        <div class="p-5 rounded-[28px] bg-white border border-amber-150 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+        <moni-card variant="elevated" class="p-5 rounded-[28px] bg-white border border-amber-150 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 block">
           <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shadow-inner">
-              <AppIcon name="alert-triangle" class="w-6 h-6" />
-            </div>
+            <moni-shape name="12-sided-cookie" color="secondary" size="medium" class="shrink-0">
+              <AppIcon name="alert-triangle" class="w-6 h-6 text-amber-600" />
+            </moni-shape>
             <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-extrabold uppercase">Oficial</span>
           </div>
           <div>
@@ -51,21 +53,23 @@
             <p class="text-xs font-bold text-slate-700 mt-0.5">Operaciones Emergencias</p>
             <p class="text-[11px] text-slate-500 mt-1 leading-snug">Reporte y coordinación de alertas provinciales.</p>
           </div>
-          <a
+          <moni-button
             href="tel:8094720909"
-            class="inline-flex items-center justify-center space-x-2 w-full py-2.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-colors shadow-sm"
+            variant="filled"
+            shape="round"
+            class="w-full"
           >
-            <AppIcon name="phone" class="w-3.5 h-3.5" />
-            <span>(809) 472-0909</span>
-          </a>
-        </div>
+            <AppIcon slot="icon" name="phone" class="w-3.5 h-3.5 mr-2" />
+            (809) 472-0909
+          </moni-button>
+        </moni-card>
 
         <!-- Defensa Civil -->
-        <div class="p-5 rounded-[28px] bg-white border border-sky-150 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+        <moni-card variant="elevated" class="p-5 rounded-[28px] bg-white border border-sky-150 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 block">
           <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shadow-inner">
-              <AppIcon name="life-buoy" class="w-6 h-6" />
-            </div>
+            <moni-shape name="flower" color="tertiary" size="medium" class="shrink-0">
+              <AppIcon name="life-buoy" class="w-6 h-6 text-sky-600" />
+            </moni-shape>
             <span class="px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[10px] font-extrabold uppercase">Rescate</span>
           </div>
           <div>
@@ -73,21 +77,23 @@
             <p class="text-xs font-bold text-slate-700 mt-0.5">Albergues y Evacuación</p>
             <p class="text-[11px] text-slate-500 mt-1 leading-snug">Ubicación de albergues y brigadas de rescate.</p>
           </div>
-          <a
+          <moni-button
             href="tel:8094728614"
-            class="inline-flex items-center justify-center space-x-2 w-full py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-colors shadow-sm"
+            variant="filled"
+            shape="round"
+            class="w-full"
           >
-            <AppIcon name="phone" class="w-3.5 h-3.5" />
-            <span>(809) 472-8614</span>
-          </a>
-        </div>
+            <AppIcon slot="icon" name="phone" class="w-3.5 h-3.5 mr-2" />
+            (809) 472-8614
+          </moni-button>
+        </moni-card>
 
         <!-- Cuerpo de Bomberos -->
-        <div class="p-5 rounded-[28px] bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+        <moni-card variant="elevated" class="p-5 rounded-[28px] bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 block">
           <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800 shadow-inner">
-              <AppIcon name="flame" class="w-6 h-6" />
-            </div>
+            <moni-shape name="sunny" color="surface" size="medium" class="shrink-0">
+              <AppIcon name="flame" class="w-6 h-6 text-slate-800" />
+            </moni-shape>
             <span class="px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-800 text-[10px] font-extrabold uppercase">Central</span>
           </div>
           <div>
@@ -95,16 +101,20 @@
             <p class="text-xs font-bold text-slate-700 mt-0.5">Rescate Urbano</p>
             <p class="text-[11px] text-slate-500 mt-1 leading-snug">Árboles caídos, cables eléctricos y desagües.</p>
           </div>
-          <a
+          <moni-button
             href="tel:8096822000"
-            class="inline-flex items-center justify-center space-x-2 w-full py-2.5 rounded-full bg-slate-950 hover:bg-slate-800 text-white text-xs font-bold transition-colors shadow-sm"
+            variant="filled"
+            shape="round"
+            class="w-full"
           >
-            <AppIcon name="phone" class="w-3.5 h-3.5" />
-            <span>(809) 682-2000</span>
-          </a>
-        </div>
+            <AppIcon slot="icon" name="phone" class="w-3.5 h-3.5 mr-2" />
+            (809) 682-2000
+          </moni-button>
+        </moni-card>
       </div>
     </div>
+
+    <moni-divider inset="none" class="opacity-40"></moni-divider>
 
     <!-- Protocols & Safety Guidelines -->
     <div class="space-y-4">
@@ -112,11 +122,11 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Protocol 1: Driving -->
-        <div class="bg-white p-6 rounded-[28px] border border-slate-150 shadow-sm space-y-3">
+        <moni-card variant="outlined" class="p-6 rounded-[28px] border border-slate-150 shadow-sm space-y-3 block">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0">
-              <AppIcon name="car" class="w-5 h-5" />
-            </div>
+            <moni-shape name="arch" color="primary" size="small" class="shrink-0">
+              <AppIcon name="car" class="w-4 h-4" />
+            </moni-shape>
             <h4 class="text-sm font-bold text-slate-900 leading-snug">
               Si te encuentras conduciendo durante aguaceros
             </h4>
@@ -128,14 +138,14 @@
             <AppIcon name="shield" class="w-3.5 h-3.5" />
             <span>Mantén las luces intermitentes y distancia prudente.</span>
           </div>
-        </div>
+        </moni-card>
 
         <!-- Protocol 2: Vulnerable Home -->
-        <div class="bg-white p-6 rounded-[28px] border border-slate-150 shadow-sm space-y-3">
+        <moni-card variant="outlined" class="p-6 rounded-[28px] border border-slate-150 shadow-sm space-y-3 block">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-              <AppIcon name="home" class="w-5 h-5" />
-            </div>
+            <moni-shape name="puffy" color="secondary" size="small" class="shrink-0">
+              <AppIcon name="home" class="w-4 h-4" />
+            </moni-shape>
             <h4 class="text-sm font-bold text-slate-900 leading-snug">
               Si habitas cerca de cañadas, ríos o zonas de ladera
             </h4>
@@ -147,14 +157,14 @@
             <AppIcon name="shield" class="w-3.5 h-3.5" />
             <span>Ubica con antelación el albergue oficial de tu sector.</span>
           </div>
-        </div>
+        </moni-card>
 
         <!-- Protocol 3: Electrical & Tree Hazards -->
-        <div class="bg-white p-6 rounded-[28px] border border-slate-150 shadow-sm space-y-3">
+        <moni-card variant="outlined" class="p-6 rounded-[28px] border border-slate-150 shadow-sm space-y-3 block">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
-              <AppIcon name="tree" class="w-5 h-5" />
-            </div>
+            <moni-shape name="12-sided-cookie" color="tertiary" size="small" class="shrink-0">
+              <AppIcon name="tree" class="w-4 h-4" />
+            </moni-shape>
             <h4 class="text-sm font-bold text-slate-900 leading-snug">
               Cables del tendido eléctrico y árboles caídos
             </h4>
@@ -166,14 +176,14 @@
             <AppIcon name="shield" class="w-3.5 h-3.5" />
             <span>No manipules ramas caídas sobre líneas eléctricas.</span>
           </div>
-        </div>
+        </moni-card>
 
         <!-- Protocol 4: Flash Floods & Drainage -->
-        <div class="bg-white p-6 rounded-[28px] border border-slate-150 shadow-sm space-y-3">
+        <moni-card variant="outlined" class="p-6 rounded-[28px] border border-slate-150 shadow-sm space-y-3 block">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
-              <AppIcon name="water" class="w-5 h-5" />
-            </div>
+            <moni-shape name="flower" color="surface" size="small" class="shrink-0">
+              <AppIcon name="water" class="w-4 h-4" />
+            </moni-shape>
             <h4 class="text-sm font-bold text-slate-900 leading-snug">
               Colaboración comunitaria con imbornales y desechos
             </h4>
@@ -185,7 +195,7 @@
             <AppIcon name="shield" class="w-3.5 h-3.5" />
             <span>Colabora reportando alcantarillas obstruidas en Clima RD.</span>
           </div>
-        </div>
+        </moni-card>
       </div>
     </div>
   </div>

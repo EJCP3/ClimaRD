@@ -70,72 +70,73 @@
         </NuxtLink>
       </div>
 
-      <!-- Cards with M3 Expressive Flower/Squircle Shapes & Pill Action -->
+      <!-- Cards with Moni UI Expressive Shapes & Pill Action (Matching Moni UI moni-shape) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <!-- Metric Card 1: Temperatura & Clima -->
         <div class="bg-white p-5 rounded-[24px] border border-slate-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div class="flex items-center space-x-4">
-            <!-- Expressive Flower/Squircle Shape container (like in screenshots 1 & 2) -->
-            <div class="w-14 h-14 rounded-[20px] bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0">
-              <AppIcon name="cloud-rain" class="w-7 h-7" />
-            </div>
+            <!-- Moni UI Flower Shape Container -->
+            <moni-shape name="flower" color="primary" size="medium" class="shrink-0">
+              <AppIcon name="cloud-rain" class="w-6 h-6" />
+            </moni-shape>
             <div>
               <h4 class="font-bold text-sm text-slate-950">Aguaceros Moderados</h4>
               <p class="text-xs text-slate-500">Sensación 33°C / Humedad 84%</p>
               <p class="text-base font-extrabold text-slate-950 mt-0.5">29°C</p>
             </div>
           </div>
-          <NuxtLink
-            to="/mapa"
-            class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-full text-xs font-bold transition-colors flex items-center space-x-1"
-          >
-            <AppIcon name="plus" class="w-3 h-3" />
-            <span>Ver mapa</span>
+          <NuxtLink to="/mapa">
+            <moni-button variant="tonal" shape="round" size="small">
+              <AppIcon slot="icon" name="plus" class="w-3 h-3 mr-1" />
+              Mapa
+            </moni-button>
           </NuxtLink>
         </div>
 
         <!-- Metric Card 2: Viento & Presión -->
         <div class="bg-white p-5 rounded-[24px] border border-slate-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 rounded-[20px] bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-700 shrink-0">
-              <AppIcon name="wind" class="w-7 h-7" />
-            </div>
+            <!-- Moni UI 12-Sided-Cookie Shape Container -->
+            <moni-shape name="12-sided-cookie" color="secondary" size="medium" class="shrink-0">
+              <AppIcon name="wind" class="w-6 h-6" />
+            </moni-shape>
             <div>
               <h4 class="font-bold text-sm text-slate-950">Viento del Este</h4>
               <p class="text-xs text-slate-500">Ráfagas ocasionales</p>
               <p class="text-base font-extrabold text-slate-950 mt-0.5">18 km/h</p>
             </div>
           </div>
-          <NuxtLink
-            to="/alertas"
-            class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-full text-xs font-bold transition-colors flex items-center space-x-1"
-          >
-            <AppIcon name="plus" class="w-3 h-3" />
-            <span>Detalle</span>
+          <NuxtLink to="/alertas">
+            <moni-button variant="tonal" shape="round" size="small">
+              <AppIcon slot="icon" name="plus" class="w-3 h-3 mr-1" />
+              Detalle
+            </moni-button>
           </NuxtLink>
         </div>
 
         <!-- Metric Card 3: Nivel de Alerta -->
         <div class="bg-white p-5 rounded-[24px] border border-slate-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 rounded-[20px] bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-              <AppIcon name="alert-triangle" class="w-7 h-7" />
-            </div>
+            <!-- Moni UI Soft-Burst Shape Container -->
+            <moni-shape name="soft-burst" color="tertiary" size="medium" class="shrink-0">
+              <AppIcon name="alert-triangle" class="w-6 h-6 text-amber-500" />
+            </moni-shape>
             <div>
               <h4 class="font-bold text-sm text-slate-950">Alerta Amarilla</h4>
               <p class="text-xs text-slate-500">Vaguada activa en D.N.</p>
               <p class="text-xs font-extrabold text-amber-700 mt-0.5">Vigilancia continua</p>
             </div>
           </div>
-          <NuxtLink
-            to="/alertas"
-            class="px-3.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-full text-xs font-bold transition-colors flex items-center space-x-1"
-          >
-            <span>COE</span>
+          <NuxtLink to="/alertas">
+            <moni-button variant="tonal" shape="round" size="small">
+              COE
+            </moni-button>
           </NuxtLink>
         </div>
       </div>
     </div>
+
+    <moni-divider inset="none" class="opacity-40"></moni-divider>
 
     <!-- Section 3: Official Shifts / Turnos Horarios -->
     <div class="bg-white p-6 md:p-8 rounded-[32px] border border-slate-200/80 shadow-sm space-y-4">
@@ -151,9 +152,9 @@
             <p class="text-lg font-extrabold text-slate-950 mt-0.5">27°C</p>
             <p class="text-xs text-slate-500">Chubascos aislados</p>
           </div>
-          <div class="w-11 h-11 rounded-full bg-white flex items-center justify-center text-sky-600 shadow-sm">
-            <AppIcon name="sun" class="w-6 h-6" />
-          </div>
+          <moni-shape name="sunny" color="surface" size="small" class="shrink-0">
+            <AppIcon name="sun" class="w-4 h-4 text-amber-500" />
+          </moni-shape>
         </div>
 
         <div class="p-4 rounded-[20px] bg-sky-50/60 border border-sky-100 flex items-center justify-between">
@@ -162,9 +163,9 @@
             <p class="text-lg font-extrabold text-slate-950 mt-0.5">30°C</p>
             <p class="text-xs text-sky-700">Aguaceros y tronadas</p>
           </div>
-          <div class="w-11 h-11 rounded-full bg-white flex items-center justify-center text-sky-600 shadow-sm">
-            <AppIcon name="cloud-rain" class="w-6 h-6" />
-          </div>
+          <moni-shape name="flower" color="primary" size="small" class="shrink-0">
+            <AppIcon name="cloud-rain" class="w-4 h-4 text-sky-600" />
+          </moni-shape>
         </div>
 
         <div class="p-4 rounded-[20px] bg-slate-50 border border-slate-200/60 flex items-center justify-between">
@@ -173,9 +174,9 @@
             <p class="text-lg font-extrabold text-slate-950 mt-0.5">25°C</p>
             <p class="text-xs text-slate-500">Lloviznas dispersas</p>
           </div>
-          <div class="w-11 h-11 rounded-full bg-white flex items-center justify-center text-slate-600 shadow-sm">
-            <AppIcon name="droplets" class="w-6 h-6" />
-          </div>
+          <moni-shape name="puffy" color="secondary" size="small" class="shrink-0">
+            <AppIcon name="droplets" class="w-4 h-4 text-indigo-600" />
+          </moni-shape>
         </div>
       </div>
     </div>
