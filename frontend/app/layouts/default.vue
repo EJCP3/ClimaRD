@@ -159,7 +159,10 @@
       <BulletinTicker v-if="tickerPosition === 'top'" />
 
       <!-- Floating Quick Controls (Top-right unobtrusive floating island) -->
-      <div class="fixed top-3.5 right-4 z-30 flex items-center space-x-2 pointer-events-auto">
+      <div
+        class="fixed z-30 flex items-center space-x-2 pointer-events-auto transition-all duration-300"
+        :class="tickerPosition === 'top' ? 'top-[52px] right-4' : 'top-3.5 right-4'"
+      >
         <!-- Tasks Toggle Button (when in tasks mode) -->
         <button
           v-if="navStyle === 'tasks'"
@@ -195,7 +198,8 @@
       <!-- Bonita Mode Floating Nav Island on Desktop -->
       <div
         v-if="navStyle === 'bonita'"
-        class="hidden md:flex fixed top-3.5 left-4 z-30 items-center space-x-1.5 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md"
+        class="hidden md:flex fixed z-30 items-center space-x-1.5 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300"
+        :class="tickerPosition === 'top' ? 'top-[52px] left-4' : 'top-3.5 left-4'"
       >
         <div class="flex items-center space-x-2 mr-2">
           <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small">
@@ -216,7 +220,14 @@
       </div>
 
       <!-- Page View Content -->
-      <main class="flex-1 pb-24 md:pb-8 pt-4">
+      <main
+        class="flex-1 pb-24 md:pb-8 transition-all"
+        :class="[
+          navStyle === 'bonita'
+            ? (tickerPosition === 'top' ? 'pt-20 md:pt-24' : 'pt-14 md:pt-16')
+            : (tickerPosition === 'top' ? 'pt-2 md:pt-4' : 'pt-4 md:pt-6')
+        ]"
+      >
         <slot />
       </main>
 

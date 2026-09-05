@@ -7,7 +7,7 @@
       tickerAnimation === 'compact' ? 'h-9' : 'h-10 sm:h-11'
     ]"
   >
-    <div class="h-full flex items-center justify-between px-3 sm:px-4 max-w-7xl mx-auto relative">
+    <div class="h-full flex items-center justify-between px-3 sm:px-5 w-full relative">
       <!-- Left Tag: Live Bulletin Indicator -->
       <div class="flex items-center space-x-2 shrink-0 z-10 bg-[#111113] pr-2">
         <span class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-black uppercase tracking-wider">
@@ -17,7 +17,7 @@
       </div>
 
       <!-- Left Gradient Fade Mask -->
-      <div class="hidden sm:block w-6 h-full bg-gradient-to-r from-[#111113] to-transparent pointer-events-none z-10 shrink-0"></div>
+      <div class="hidden sm:block w-8 h-full bg-gradient-to-r from-[#111113] to-transparent pointer-events-none z-10 shrink-0"></div>
 
       <!-- Center Animation Modes -->
       <!-- 1. Mode: Continuous Marquee (Slow, Smooth, Calm) -->
@@ -32,7 +32,7 @@
           :style="{ animationDuration: marqueeDuration }"
         >
           <!-- Duplicated track for seamless continuous infinite loop -->
-          <div class="flex items-center space-x-8">
+          <div class="flex items-center space-x-8 pl-4">
             <template v-for="(item, idx) in tickerItems" :key="`track1-${idx}`">
               <div class="flex items-center space-x-2">
                 <span
@@ -134,7 +134,7 @@
       </div>
 
       <!-- Right Gradient Fade Mask -->
-      <div class="hidden sm:block w-6 h-full bg-gradient-to-l from-[#111113] to-transparent pointer-events-none z-10 shrink-0"></div>
+      <div class="hidden sm:block w-8 h-full bg-gradient-to-l from-[#111113] to-transparent pointer-events-none z-10 shrink-0"></div>
 
       <!-- Right Controls: Appearance & Full Map Link -->
       <div class="flex items-center space-x-1.5 shrink-0 z-10 bg-[#111113] pl-2">
