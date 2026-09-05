@@ -1,104 +1,189 @@
 <template>
-  <div class="p-4 md:p-6 max-w-6xl mx-auto space-y-6">
-    <!-- Hero Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div>
-        <div class="inline-flex items-center space-x-2 px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-semibold">
-          <span>⚠️</span>
-          <span>Boletín Oficial INDOMET N° 24 - Vaguada Activa</span>
-        </div>
-        <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mt-2">Condiciones en Santo Domingo</h2>
-        <p class="text-sm text-slate-500">Última actualización: Hoy, 05:30 PM (Caché local)</p>
+  <div class="p-4 md:p-8 max-w-5xl mx-auto space-y-8">
+    <!-- Hero Card (Styled directly from Material 3 Expressive Mobile-First screenshots) -->
+    <div class="bg-white rounded-[32px] p-6 md:p-10 border border-slate-200/80 shadow-sm space-y-6">
+      <!-- Location Header Pill -->
+      <div class="inline-flex items-center space-x-2 text-slate-700 bg-slate-100/80 px-3.5 py-1.5 rounded-full border border-slate-200/60">
+        <AppIcon name="map-pin" class="w-4 h-4 text-sky-600" />
+        <span class="text-xs font-semibold">Monitoreo en tu ubicación: Gran Santo Domingo</span>
       </div>
 
-      <div class="flex items-center space-x-2">
+      <!-- Big Bold Headline -->
+      <div class="space-y-3">
+        <h2 class="text-3xl md:text-5xl font-black text-slate-950 tracking-tight leading-[1.15]">
+          El clima oficial y las vías, cerca de ti.
+        </h2>
+        <p class="text-sm md:text-base text-slate-600 max-w-xl leading-relaxed">
+          Consulta alertas meteorológicas en tiempo real y reporta incidentes urbanos causados por lluvias torrenciales o vaguadas.
+        </p>
+      </div>
+
+      <!-- Pill Buttons (From Screenshot 1: Black Pill & Tonal Pill) -->
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <NuxtLink
+          to="/mapa"
+          class="w-full sm:w-auto px-7 py-4 bg-slate-950 hover:bg-slate-800 active:scale-[0.98] text-white font-bold rounded-full text-sm shadow-md flex items-center justify-center space-x-2.5 transition-all"
+        >
+          <AppIcon name="map" class="w-4 h-4" />
+          <span>Ver mapa interactivo</span>
+        </NuxtLink>
+
         <NuxtLink
           to="/alertas"
-          class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-all"
+          class="w-full sm:w-auto px-7 py-4 bg-slate-100 hover:bg-slate-200/80 active:scale-[0.98] text-slate-900 font-bold rounded-full text-sm flex items-center justify-center space-x-2.5 transition-all"
         >
-          Ver Alertas Provinciales
+          <AppIcon name="bell" class="w-4 h-4 text-amber-600" />
+          <span>Alertas COE / INDOMET</span>
         </NuxtLink>
       </div>
+
+      <!-- Pill Search Bar with Circular Action Button (From Screenshot 1) -->
+      <div class="pt-2">
+        <div class="relative flex items-center">
+          <div class="absolute left-4 text-slate-400">
+            <AppIcon name="search" class="w-5 h-5" />
+          </div>
+          <input
+            type="text"
+            placeholder="Buscar sectores o códigos postales (ej. Piantini, 10100)..."
+            @focus="$router.push('/mapa')"
+            class="w-full pl-12 pr-14 py-3.5 bg-slate-50 border border-slate-200/90 rounded-full text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:bg-white transition-all cursor-pointer shadow-inner"
+          />
+          <button
+            @click="$router.push('/mapa')"
+            class="absolute right-1.5 w-10 h-10 rounded-full bg-slate-950 hover:bg-slate-800 text-white flex items-center justify-center shadow-md transition-transform active:scale-95"
+          >
+            <AppIcon name="arrow-right" class="w-4 h-4" />
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Weather Hero Card -->
-    <div class="bg-gradient-to-br from-sky-600 to-sky-800 text-white rounded-3xl p-6 md:p-8 shadow-lg relative overflow-hidden">
-      <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <!-- Section 2: Explore Conditions (M3 Expressive Shapes from Screenshot 1 & 2) -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between px-1">
         <div>
-          <span class="text-sky-200 text-sm font-medium">Tiempo Actual</span>
-          <div class="flex items-baseline space-x-3 mt-1">
-            <span class="text-6xl font-extrabold tracking-tight">29°</span>
-            <span class="text-xl text-sky-100">C</span>
-            <span class="text-sm text-sky-200">/ Sensación 33°C</span>
+          <span class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">EXPLORA</span>
+          <h3 class="text-xl font-bold text-slate-950 tracking-tight">Condiciones del Momento</h3>
+        </div>
+        <NuxtLink to="/alertas" class="text-xs font-bold text-slate-950 flex items-center space-x-1 hover:underline">
+          <span>Ver todo</span>
+          <AppIcon name="arrow-right" class="w-3.5 h-3.5" />
+        </NuxtLink>
+      </div>
+
+      <!-- Cards with M3 Expressive Flower/Squircle Shapes & Pill Action -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Metric Card 1: Temperatura & Clima -->
+        <div class="bg-white p-5 rounded-[24px] border border-slate-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+          <div class="flex items-center space-x-4">
+            <!-- Expressive Flower/Squircle Shape container (like in screenshots 1 & 2) -->
+            <div class="w-14 h-14 rounded-[20px] bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0">
+              <AppIcon name="cloud-rain" class="w-7 h-7" />
+            </div>
+            <div>
+              <h4 class="font-bold text-sm text-slate-950">Aguaceros Moderados</h4>
+              <p class="text-xs text-slate-500">Sensación 33°C / Humedad 84%</p>
+              <p class="text-base font-extrabold text-slate-950 mt-0.5">29°C</p>
+            </div>
           </div>
-          <p class="text-lg font-semibold text-white mt-2">Nublado con aguaceros y tronadas</p>
-          <p class="text-xs text-sky-200 mt-1">Alerta amarilla por posibles inundaciones urbanas repentinas</p>
+          <NuxtLink
+            to="/mapa"
+            class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-full text-xs font-bold transition-colors flex items-center space-x-1"
+          >
+            <AppIcon name="plus" class="w-3 h-3" />
+            <span>Ver mapa</span>
+          </NuxtLink>
         </div>
 
-        <div class="text-6xl md:text-8xl">
-          🌧️
+        <!-- Metric Card 2: Viento & Presión -->
+        <div class="bg-white p-5 rounded-[24px] border border-slate-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 rounded-[20px] bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-700 shrink-0">
+              <AppIcon name="wind" class="w-7 h-7" />
+            </div>
+            <div>
+              <h4 class="font-bold text-sm text-slate-950">Viento del Este</h4>
+              <p class="text-xs text-slate-500">Ráfagas ocasionales</p>
+              <p class="text-base font-extrabold text-slate-950 mt-0.5">18 km/h</p>
+            </div>
+          </div>
+          <NuxtLink
+            to="/alertas"
+            class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-full text-xs font-bold transition-colors flex items-center space-x-1"
+          >
+            <AppIcon name="plus" class="w-3 h-3" />
+            <span>Detalle</span>
+          </NuxtLink>
+        </div>
+
+        <!-- Metric Card 3: Nivel de Alerta -->
+        <div class="bg-white p-5 rounded-[24px] border border-slate-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 rounded-[20px] bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+              <AppIcon name="alert-triangle" class="w-7 h-7" />
+            </div>
+            <div>
+              <h4 class="font-bold text-sm text-slate-950">Alerta Amarilla</h4>
+              <p class="text-xs text-slate-500">Vaguada activa en D.N.</p>
+              <p class="text-xs font-extrabold text-amber-700 mt-0.5">Vigilancia continua</p>
+            </div>
+          </div>
+          <NuxtLink
+            to="/alertas"
+            class="px-3.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-full text-xs font-bold transition-colors flex items-center space-x-1"
+          >
+            <span>COE</span>
+          </NuxtLink>
         </div>
       </div>
     </div>
 
-    <!-- Secondary Metrics 3-Column Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <span class="text-xs text-slate-400 font-medium">Humedad</span>
-        <p class="text-xl font-bold text-slate-800 mt-1">84%</p>
-        <span class="text-[11px] text-sky-600">Ambiente húmedo</span>
+    <!-- Section 3: Official Shifts / Turnos Horarios -->
+    <div class="bg-white p-6 md:p-8 rounded-[32px] border border-slate-200/80 shadow-sm space-y-4">
+      <div class="flex items-center space-x-2 text-slate-900">
+        <AppIcon name="clock" class="w-5 h-5 text-sky-600" />
+        <h3 class="font-bold text-base">Pronóstico Oficial por Turnos (INDOMET)</h3>
       </div>
 
-      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <span class="text-xs text-slate-400 font-medium">Viento</span>
-        <p class="text-xl font-bold text-slate-800 mt-1">18 km/h</p>
-        <span class="text-[11px] text-slate-500">Del Este-Noreste</span>
-      </div>
-
-      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <span class="text-xs text-slate-400 font-medium">Precipitación</span>
-        <p class="text-xl font-bold text-slate-800 mt-1">75%</p>
-        <span class="text-[11px] text-amber-600">Lluvia moderada/fuerte</span>
-      </div>
-
-      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <span class="text-xs text-slate-400 font-medium">Índice UV</span>
-        <p class="text-xl font-bold text-slate-800 mt-1">3 (Bajo)</p>
-        <span class="text-[11px] text-emerald-600">Cielo cubierto</span>
-      </div>
-    </div>
-
-    <!-- Hourly / Shift Forecast Carousel -->
-    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-      <h3 class="font-bold text-slate-800 text-base">Pronóstico por Turnos Oficiales</h3>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+        <div class="p-4 rounded-[20px] bg-slate-50 border border-slate-200/60 flex items-center justify-between">
           <div>
-            <span class="text-xs text-slate-500 font-medium">Mañana</span>
-            <p class="text-base font-bold text-slate-800 mt-0.5">27°C</p>
-            <p class="text-xs text-slate-500">Chubascos dispersos</p>
+            <span class="text-xs text-slate-500 font-semibold">Turno Mañana</span>
+            <p class="text-lg font-extrabold text-slate-950 mt-0.5">27°C</p>
+            <p class="text-xs text-slate-500">Chubascos aislados</p>
           </div>
-          <span class="text-3xl">🌦️</span>
+          <div class="w-11 h-11 rounded-full bg-white flex items-center justify-center text-sky-600 shadow-sm">
+            <AppIcon name="sun" class="w-6 h-6" />
+          </div>
         </div>
 
-        <div class="p-4 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-between">
+        <div class="p-4 rounded-[20px] bg-sky-50/60 border border-sky-100 flex items-center justify-between">
           <div>
-            <span class="text-xs text-sky-700 font-medium">Tarde</span>
-            <p class="text-base font-bold text-slate-800 mt-0.5">30°C</p>
+            <span class="text-xs text-sky-800 font-semibold">Turno Tarde</span>
+            <p class="text-lg font-extrabold text-slate-950 mt-0.5">30°C</p>
             <p class="text-xs text-sky-700">Aguaceros y tronadas</p>
           </div>
-          <span class="text-3xl">⛈️</span>
+          <div class="w-11 h-11 rounded-full bg-white flex items-center justify-center text-sky-600 shadow-sm">
+            <AppIcon name="cloud-rain" class="w-6 h-6" />
+          </div>
         </div>
 
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+        <div class="p-4 rounded-[20px] bg-slate-50 border border-slate-200/60 flex items-center justify-between">
           <div>
-            <span class="text-xs text-slate-500 font-medium">Noche</span>
-            <p class="text-base font-bold text-slate-800 mt-0.5">25°C</p>
-            <p class="text-xs text-slate-500">Nublado con lloviznas</p>
+            <span class="text-xs text-slate-500 font-semibold">Turno Noche</span>
+            <p class="text-lg font-extrabold text-slate-950 mt-0.5">25°C</p>
+            <p class="text-xs text-slate-500">Lloviznas dispersas</p>
           </div>
-          <span class="text-3xl">🌧️</span>
+          <div class="w-11 h-11 rounded-full bg-white flex items-center justify-center text-slate-600 shadow-sm">
+            <AppIcon name="droplets" class="w-6 h-6" />
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import AppIcon from '~/components/AppIcon.vue'
+</script>

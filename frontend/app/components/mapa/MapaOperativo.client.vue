@@ -1,52 +1,57 @@
 <template>
-  <div class="relative w-full h-full min-h-[calc(100vh-8rem)]">
-    <!-- Search Bar & Filters Header -->
-    <div class="absolute top-4 left-4 right-4 md:right-auto md:w-96 z-20 space-y-2">
-      <div class="bg-white/95 backdrop-blur shadow-md rounded-2xl p-2 border border-slate-200 flex items-center space-x-2">
-        <span class="text-slate-400 pl-2">🔍</span>
+  <div class="relative w-full h-full min-h-[calc(100vh-4rem)]">
+    <!-- Material 3 Pill Search Bar (From Screenshot 1) -->
+    <div class="absolute top-4 left-4 right-4 md:right-auto md:w-[420px] z-20 space-y-2">
+      <div class="bg-white/95 backdrop-blur-md shadow-lg rounded-full p-1.5 pl-4 border border-slate-200/80 flex items-center space-x-3 transition-all">
+        <AppIcon name="search" class="w-5 h-5 text-slate-400 shrink-0" />
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Buscar sector o código postal (ej. Piantini, 10100)..."
-          class="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 focus:outline-none"
+          class="w-full bg-transparent text-xs md:text-sm text-slate-900 placeholder-slate-400 focus:outline-none font-medium"
         />
         <button
           v-if="searchQuery"
           @click="searchQuery = ''"
-          class="text-xs text-slate-400 hover:text-slate-600 px-2"
+          class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center shrink-0 transition-colors"
         >
-          ✕
+          <AppIcon name="close" class="w-3.5 h-3.5" />
         </button>
       </div>
 
-      <!-- Autocomplete Dropdown -->
+      <!-- Autocomplete Dropdown (MD3 Card Container) -->
       <ul
         v-if="filteredPlaces.length > 0"
-        class="bg-white rounded-xl shadow-lg border border-slate-200 max-h-56 overflow-y-auto divide-y divide-slate-100 text-xs"
+        class="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/80 max-h-60 overflow-y-auto divide-y divide-slate-100 text-xs p-1"
       >
         <li
           v-for="item in filteredPlaces"
           :key="`${item.zipcode}-${item.place}`"
           @click="goToLocation(item.lng, item.lat, item.place)"
-          class="p-2.5 hover:bg-sky-50 cursor-pointer flex justify-between items-center transition-colors"
+          class="p-3 hover:bg-sky-50 rounded-xl cursor-pointer flex justify-between items-center transition-colors"
         >
-          <span class="font-medium text-slate-800">{{ item.place }}</span>
-          <span class="text-slate-400 font-mono bg-slate-100 px-1.5 py-0.5 rounded">{{ item.zipcode }}</span>
+          <div class="flex items-center space-x-2">
+            <AppIcon name="map-pin" class="w-3.5 h-3.5 text-sky-600 shrink-0" />
+            <span class="font-bold text-slate-900">{{ item.place }}</span>
+          </div>
+          <span class="text-slate-600 font-mono text-[11px] bg-slate-100 px-2 py-0.5 rounded-full font-bold">
+            {{ item.zipcode }}
+          </span>
         </li>
       </ul>
     </div>
 
     <!-- Map Container -->
-    <div ref="mapContainer" class="w-full h-full min-h-[calc(100vh-8rem)] rounded-2xl overflow-hidden shadow-inner"></div>
+    <div ref="mapContainer" class="w-full h-full min-h-[calc(100vh-4rem)]"></div>
 
-    <!-- Floating Action Button for Report -->
+    <!-- Material 3 Floating Action Button (FAB) (Pill Button Style from Screenshot 1) -->
     <div class="absolute bottom-6 right-6 z-20">
       <button
         @click="$emit('openReportModal')"
-        class="px-5 py-3.5 bg-sky-600 hover:bg-sky-700 active:scale-95 text-white font-bold rounded-2xl shadow-xl flex items-center space-x-2 transition-all"
+        class="px-6 py-4 bg-slate-950 hover:bg-slate-800 active:scale-95 text-white font-bold rounded-full shadow-2xl flex items-center space-x-2.5 transition-all text-sm tracking-wide"
       >
-        <span class="text-lg">🚨</span>
-        <span>¡Reportar Incidencia!</span>
+        <AppIcon name="alert-triangle" class="w-4 h-4 text-amber-400" />
+        <span>Reportar Incidencia</span>
       </button>
     </div>
   </div>
@@ -55,6 +60,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, markRaw } from 'vue'
 import maplibregl from 'maplibre-gl'
+import AppIcon from '~/components/AppIcon.vue'
 import postalCodes from '~/assets/data/codigos-postales-rd.json'
 
 defineEmits(['openReportModal'])
@@ -85,7 +91,7 @@ function goToLocation(lng: number, lat: number, name: string) {
 onMounted(() => {
   if (!mapContainer.value) return
 
-  // Standard OpenStreetMap / CARTO Positron tile style for clear road & flood visibility
+  // Free, open, unwatermarked OpenStreetMap Standard Tiles
   const map = new maplibregl.Map({
     container: mapContainer.value,
     style: {
@@ -111,17 +117,17 @@ onMounted(() => {
       ]
     },
     center: [-69.942, 18.485], // Santo Domingo (Gran Santo Domingo)
-    zoom: 11
+    zoom: 12
   })
 
-  // Add Navigation Controls (Zoom / Pitch)
+  // Add Navigation Controls
   map.addControl(new maplibregl.NavigationControl(), 'top-right')
   map.addControl(new maplibregl.GeolocateControl({
     positionOptions: { enableHighAccuracy: true },
     trackUserLocation: true
   }), 'top-right')
 
-  // Example Markers for Incident Demonstrations (Avenidas clave de RD)
+  // Clean SVG Incident Markers (NO EMOJIS)
   const mockIncidents = [
     { lng: -69.965, lat: 18.476, title: 'Inundación Vía', desc: 'Av. Luperón esq. Gustavo Mejía Ricart' },
     { lng: -69.940, lat: 18.468, title: 'Tránsito Detenido', desc: 'Av. 27 de Febrero esq. Winston Churchill' },
@@ -130,11 +136,12 @@ onMounted(() => {
 
   mockIncidents.forEach(inc => {
     const el = document.createElement('div')
-    el.className = 'w-8 h-8 rounded-full bg-orange-500 border-2 border-white shadow-lg flex items-center justify-center text-white text-xs cursor-pointer'
-    el.innerHTML = '⚠️'
+    el.className = 'w-9 h-9 rounded-full bg-slate-950 border-2 border-white shadow-xl flex items-center justify-center text-amber-400 cursor-pointer hover:scale-110 transition-transform'
+    // SVG warning icon inside marker instead of emoji
+    el.innerHTML = `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`
 
     const popup = new maplibregl.Popup({ offset: 25 })
-      .setHTML(`<div class="p-2"><h4 class="font-bold text-slate-900">${inc.title}</h4><p class="text-xs text-slate-600">${inc.desc}</p></div>`)
+      .setHTML(`<div class="p-3 space-y-1"><h4 class="font-bold text-xs text-slate-950">${inc.title}</h4><p class="text-[11px] text-slate-600 leading-tight">${inc.desc}</p></div>`)
 
     new maplibregl.Marker(el)
       .setLngLat([inc.lng, inc.lat])
@@ -142,7 +149,7 @@ onMounted(() => {
       .addTo(map)
   })
 
-  // Wrap in markRaw to avoid Vue reactivity performance penalty on WebGL instance (RNF-02)
+  // Wrap in markRaw to avoid Vue reactivity overhead on WebGL (RNF-02)
   mapInstance = markRaw(map)
 })
 
