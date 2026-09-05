@@ -13,109 +13,125 @@
       </template>
     </ClientOnly>
 
-    <!-- Incident Report Modal using Moni UI moni-dialog & moni-shape -->
+    <!-- Incident Report Modal using Moni UI moni-morph-modal & moni-shape -->
     <ClientOnly>
-      <moni-dialog :open="isModalOpen" modal size="medium">
-        <!-- Header Slot -->
-        <div slot="header" class="flex items-center justify-between w-full pb-2">
-          <div>
-            <span class="text-[11px] font-extrabold uppercase tracking-widest text-zinc-400">
-              PASO {{ currentStep }} DE 2
-            </span>
-            <h3 class="font-black text-xl text-zinc-950 tracking-tight mt-0.5">
-              {{ currentStep === 1 ? 'Seleccionar Tipo de Incidencia' : 'Confirmar Reporte Ciudadano' }}
-            </h3>
-          </div>
-          <button
-            @click="closeModal"
-            class="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 flex items-center justify-center transition-colors"
-          >
-            <AppIcon name="close" class="w-4 h-4" />
-          </button>
-        </div>
-
-        <!-- Step 1: Select Incident Category with Moni UI moni-shape -->
-        <div v-if="currentStep === 1" class="grid grid-cols-2 gap-3.5 py-3">
-          <button
-            v-for="cat in incidentCategories"
-            :key="cat.id"
-            @click="selectCategory(cat.id)"
-            class="p-4 rounded-[24px] border-2 flex flex-col items-center text-center space-y-3 transition-all cursor-pointer group hover:scale-[1.02]"
-            :class="selectedCategory === cat.id ? 'border-zinc-950 bg-zinc-50 shadow-md' : 'border-zinc-200/80 hover:border-zinc-300 bg-white'"
-          >
-            <!-- Moni UI Shape Container for Icons (Neutral Gray matching screenshots) -->
-            <moni-shape :name="cat.shape" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0">
-              <AppIcon :name="cat.icon" class="w-6 h-6 text-zinc-900" />
-            </moni-shape>
+      <moni-morph-modal
+        id="report-incident-modal"
+        target="#report-incident-fab"
+        :open="isModalOpen"
+        expanded-width="32rem"
+        expanded-height="auto"
+        auto-height
+        has-backdrop
+        close-on-click-outside
+        close-on-esc
+        placement="center"
+        style="--surface-container-high: #ffffff; --on-surface: #18181b; --moni-morph-body-padding: 0; --moni-morph-panel-radius: 1.75rem;"
+      >
+        <div class="bg-white p-6 sm:p-7 rounded-[28px] border border-zinc-200/80 shadow-2xl w-full">
+          <!-- Header -->
+          <div class="flex items-center justify-between w-full pb-3 border-b border-zinc-100">
             <div>
-              <span class="text-xs font-bold text-zinc-950 block">{{ cat.title }}</span>
-              <span class="text-[10px] text-zinc-500 mt-0.5 block">{{ cat.subtitle }}</span>
+              <span class="text-[11px] font-extrabold uppercase tracking-widest text-zinc-400">
+                PASO {{ currentStep }} DE 2
+              </span>
+              <h3 class="font-black text-xl text-zinc-950 tracking-tight mt-0.5">
+                {{ currentStep === 1 ? 'Seleccionar Tipo de Incidencia' : 'Confirmar Reporte Ciudadano' }}
+              </h3>
             </div>
-          </button>
-        </div>
-
-        <!-- Step 2: Confirmation & Details with Moni UI moni-card -->
-        <div v-if="currentStep === 2" class="space-y-4 py-3">
-          <!-- GPS Location Info with Moni Card -->
-          <moni-card variant="outlined" class="p-4 bg-zinc-50 rounded-[20px] border border-zinc-200/60 block">
-            <div class="flex items-center space-x-2 text-zinc-500 font-medium text-xs">
-              <AppIcon name="map-pin" class="w-3.5 h-3.5 text-zinc-800" />
-              <span>Coordenadas GPS de la Incidencia:</span>
-            </div>
-            <p class="font-mono font-bold text-zinc-950 text-sm mt-1">18.4764° N, 69.9652° W</p>
-            <p class="text-[11px] text-zinc-600 mt-0.5">Aprox. Av. Luperón, Distrito Nacional</p>
-          </moni-card>
-
-          <!-- Description Field -->
-          <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-zinc-800">Descripción u observación:</label>
-            <textarea
-              v-model="reportDescription"
-              rows="3"
-              placeholder="Ej. El nivel del agua sube rápido y sobrepasa la acera..."
-              class="w-full text-xs p-3.5 bg-zinc-50 border border-zinc-200/80 rounded-[18px] focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:bg-white transition-all resize-none"
-            ></textarea>
+            <button
+              type="button"
+              @click="closeModal"
+              class="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 flex items-center justify-center transition-colors cursor-pointer"
+              aria-label="Cerrar modal de reporte"
+            >
+              <AppIcon name="close" class="w-4 h-4" />
+            </button>
           </div>
 
-          <!-- Photo Attachment Pill -->
-          <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-zinc-800">Evidencia fotográfica (Opcional):</label>
-            <div class="p-3 bg-zinc-50 border border-dashed border-zinc-300 rounded-[18px] flex items-center justify-center space-x-2 cursor-pointer hover:bg-zinc-100 transition-colors">
-              <AppIcon name="camera" class="w-4 h-4 text-zinc-500" />
-              <span class="text-xs font-semibold text-zinc-600">Adjuntar foto o video</span>
+          <!-- Step 1: Select Incident Category with Moni UI moni-shape -->
+          <div v-if="currentStep === 1" class="grid grid-cols-2 gap-3.5 py-4">
+            <button
+              v-for="cat in incidentCategories"
+              :key="cat.id"
+              @click="selectCategory(cat.id)"
+              class="p-4 rounded-[24px] border-2 flex flex-col items-center text-center space-y-3 transition-all cursor-pointer group hover:scale-[1.02]"
+              :class="selectedCategory === cat.id ? 'border-zinc-950 bg-zinc-50 shadow-md' : 'border-zinc-200/80 hover:border-zinc-300 bg-white'"
+            >
+              <!-- Moni UI Shape Container for Icons (Neutral Gray matching screenshots) -->
+              <moni-shape :name="cat.shape" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0">
+                <AppIcon :name="cat.icon" class="w-6 h-6 text-zinc-900" />
+              </moni-shape>
+              <div>
+                <span class="text-xs font-bold text-zinc-950 block">{{ cat.title }}</span>
+                <span class="text-[10px] text-zinc-500 mt-0.5 block">{{ cat.subtitle }}</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- Step 2: Confirmation & Details with Moni UI moni-card -->
+          <div v-if="currentStep === 2" class="space-y-4 py-4">
+            <!-- GPS Location Info with Moni Card -->
+            <moni-card variant="outlined" class="p-4 bg-zinc-50 rounded-[20px] border border-zinc-200/60 block">
+              <div class="flex items-center space-x-2 text-zinc-500 font-medium text-xs">
+                <AppIcon name="map-pin" class="w-3.5 h-3.5 text-zinc-800" />
+                <span>Coordenadas GPS de la Incidencia:</span>
+              </div>
+              <p class="font-mono font-bold text-zinc-950 text-sm mt-1">18.4764° N, 69.9652° W</p>
+              <p class="text-[11px] text-zinc-600 mt-0.5">Aprox. Av. Luperón, Distrito Nacional</p>
+            </moni-card>
+
+            <!-- Description Field -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-zinc-800">Descripción u observación:</label>
+              <textarea
+                v-model="reportDescription"
+                rows="3"
+                placeholder="Ej. El nivel del agua sube rápido y sobrepasa la acera..."
+                class="w-full text-xs p-3.5 bg-zinc-50 border border-zinc-200/80 rounded-[18px] focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:bg-white transition-all resize-none"
+              ></textarea>
+            </div>
+
+            <!-- Photo Attachment Pill -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-zinc-800">Evidencia fotográfica (Opcional):</label>
+              <div class="p-3 bg-zinc-50 border border-dashed border-zinc-300 rounded-[18px] flex items-center justify-center space-x-2 cursor-pointer hover:bg-zinc-100 transition-colors">
+                <AppIcon name="camera" class="w-4 h-4 text-zinc-500" />
+                <span class="text-xs font-semibold text-zinc-600">Adjuntar foto o video</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Footer Slot: Moni UI moni-button -->
-        <div slot="footer" class="flex items-center justify-end space-x-3 pt-3 border-t border-zinc-100 w-full">
-          <moni-button
-            v-if="currentStep === 2"
-            variant="text"
-            shape="round"
-            @click="currentStep = 1"
-          >
-            Atrás
-          </moni-button>
-          <moni-button
-            v-if="currentStep === 1"
-            variant="text"
-            shape="round"
-            @click="closeModal"
-          >
-            Cancelar
-          </moni-button>
-          <moni-button
-            v-if="currentStep === 2"
-            variant="filled"
-            shape="round"
-            @click="submitReport"
-          >
-            <AppIcon slot="icon" name="check" class="w-4 h-4 mr-1.5" />
-            Publicar Reporte
-          </moni-button>
+          <!-- Footer Actions: Moni UI moni-button -->
+          <div class="flex items-center justify-end space-x-3 pt-3 border-t border-zinc-100 w-full">
+            <moni-button
+              v-if="currentStep === 2"
+              variant="text"
+              shape="round"
+              @click="currentStep = 1"
+            >
+              Atrás
+            </moni-button>
+            <moni-button
+              v-if="currentStep === 1"
+              variant="text"
+              shape="round"
+              @click="closeModal"
+            >
+              Cancelar
+            </moni-button>
+            <moni-button
+              v-if="currentStep === 2"
+              variant="filled"
+              shape="round"
+              @click="submitReport"
+            >
+              <AppIcon slot="icon" name="check" class="w-4 h-4 mr-1.5" />
+              Publicar Reporte
+            </moni-button>
+          </div>
         </div>
-      </moni-dialog>
+      </moni-morph-modal>
     </ClientOnly>
   </div>
 </template>
@@ -174,6 +190,12 @@ function openModal() {
 
 function closeModal() {
   isModalOpen.value = false
+  if (import.meta.client) {
+    const modalEl = document.getElementById('report-incident-modal') as any
+    if (modalEl && typeof modalEl.hide === 'function') {
+      modalEl.hide()
+    }
+  }
 }
 
 function selectCategory(id: string) {

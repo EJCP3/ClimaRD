@@ -1,0 +1,95 @@
+export interface ColorOption {
+  id: string
+  name: string
+  hex: string
+  onColor: string
+  container: string
+  onContainer: string
+}
+
+export const COLOR_PALETTE: ColorOption[] = [
+  { id: 'silver', name: 'Gris Claro', hex: '#E4E4E7', onColor: '#18181B', container: '#F4F4F5', onContainer: '#18181B' },
+  { id: 'dark', name: 'Negro', hex: '#18181B', onColor: '#FFFFFF', container: '#EAEAEB', onContainer: '#18181B' },
+  { id: 'red', name: 'Rojo', hex: '#EF4444', onColor: '#FFFFFF', container: '#FEE2E2', onContainer: '#991B1B' },
+  { id: 'orange', name: 'Naranja', hex: '#F97316', onColor: '#FFFFFF', container: '#FFEDD5', onContainer: '#9A3412' },
+  { id: 'green', name: 'Verde', hex: '#22C55E', onColor: '#FFFFFF', container: '#DCFCE7', onContainer: '#166534' },
+  { id: 'blue', name: 'Azul', hex: '#3B82F6', onColor: '#FFFFFF', container: '#DBEAFE', onContainer: '#1E40AF' },
+  { id: 'indigo', name: 'Índigo', hex: '#6366F1', onColor: '#FFFFFF', container: '#E0E7FF', onContainer: '#3730A3' },
+  { id: 'purple', name: 'Violeta', hex: '#8B5CF6', onColor: '#FFFFFF', container: '#EDE9FE', onContainer: '#5B21B6' },
+  { id: 'magenta', name: 'Fucsia', hex: '#D946EF', onColor: '#FFFFFF', container: '#FAE8FF', onContainer: '#86198F' },
+  { id: 'pink', name: 'Rosa', hex: '#EC4899', onColor: '#FFFFFF', container: '#FCE7F3', onContainer: '#9D174D' },
+]
+
+export type NavStyle = 'clasica' | 'bonita' | 'guapa' | 'tasks'
+
+export function useAppearance() {
+  const primaryColor = useState<string>('appearance_primary_color', () => '#18181B')
+  const navStyle = useState<NavStyle>('appearance_nav_style', () => 'bonita')
+  const isAppearanceModalOpen = useState<boolean>('appearance_modal_open', () => false)
+
+  const applyColor = (colorHex: string) => {
+    primaryColor.value = colorHex
+    const found = COLOR_PALETTE.find(c => c.hex.toLowerCase() === colorHex.toLowerCase())
+    const onColor = found ? found.onColor : '#FFFFFF'
+    const container = found ? found.container : '#EAEAEB'
+    const onContainer = found ? found.onContainer : '#18181B'
+
+    if (import.meta.client) {
+      try {
+        localStorage.setItem('climard_primary_color', colorHex)
+        const root = document.documentElement
+        root.style.setProperty('--primary', colorHex)
+        root.style.setProperty('--moni-color-primary', colorHex)
+        root.style.setProperty('--on-primary', onColor)
+        root.style.setProperty('--moni-color-on-primary', onColor)
+        root.style.setProperty('--primary-container', container)
+        root.style.setProperty('--moni-color-primary-container', container)
+        root.style.setProperty('--secondary-container', container)
+        root.style.setProperty('--moni-color-secondary-container', container)
+        root.style.setProperty('--on-secondary-container', onContainer)
+      } catch (e) {
+        console.warn('Could not persist theme color:', e)
+      }
+    }
+  }
+
+  const setNavStyle = (style: NavStyle) => {
+    navStyle.value = style
+    if (import.meta.client) {
+      try {
+        localStorage.setItem('climard_nav_style', style)
+      } catch (e) {
+        console.warn('Could not persist nav style:', e)
+      }
+    }
+  }
+
+  const initAppearance = () => {
+    if (import.meta.client) {
+      try {
+        const savedColor = localStorage.getItem('climard_primary_color')
+        if (savedColor) {
+          applyColor(savedColor)
+        } else {
+          applyColor('#18181B')
+        }
+        const savedNav = localStorage.getItem('climard_nav_style') as NavStyle | null
+        if (savedNav && ['clasica', 'bonita', 'guapa', 'tasks'].includes(savedNav)) {
+          navStyle.value = savedNav
+        }
+      } catch (e) {
+        console.warn('Error reading stored appearance:', e)
+      }
+    }
+  }
+
+  return {
+    primaryColor,
+    navStyle,
+    isAppearanceModalOpen,
+    COLOR_PALETTE,
+    applyColor,
+    setNavStyle,
+    initAppearance,
+  }
+}

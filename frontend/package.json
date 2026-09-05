@@ -12,6 +12,7 @@
   "dependencies": {
     "@moni-labs/moni-ui": "^0.4.11",
     "@pinia/nuxt": "^1.0.2",
+    "gsap": "^3.15.0",
     "maplibre-gl": "^5.1.0",
     "nuxt": "^4.0.0",
     "pinia": "^3.0.1",

@@ -47,6 +47,7 @@
     <!-- Moni UI Floating Action Button (M3 moni-button) -->
     <div class="absolute bottom-6 right-6 z-20">
       <moni-button
+        id="report-incident-fab"
         variant="filled"
         shape="round"
         size="large"

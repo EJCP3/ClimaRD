@@ -49,9 +49,9 @@ moni-shape {
 }
 
 moni-button {
-  --primary: #18181b;
-  --on-primary: #ffffff;
-  --secondary-container: #EAEAEB;
-  --on-secondary-container: #18181b;
+  --primary: var(--primary, #18181b);
+  --on-primary: var(--on-primary, #ffffff);
+  --secondary-container: var(--secondary-container, #EAEAEB);
+  --on-secondary-container: var(--on-secondary-container, #18181b);
 }
 </style>
