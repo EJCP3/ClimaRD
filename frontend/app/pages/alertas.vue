@@ -59,47 +59,9 @@
 
     <!-- 2-Column Split: Interactive Provincial Map & Bulletins Feed -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <!-- Left: Provincial Matrix -->
-      <div class="lg:col-span-7 bg-white p-6 md:p-7 rounded-[32px] border border-zinc-200/80 shadow-sm space-y-4">
-        <div class="flex items-center justify-between">
-          <h3 class="font-bold text-sm text-zinc-950 flex items-center space-x-2">
-            <AppIcon name="map" class="w-4 h-4 text-zinc-800" />
-            <span>Matriz Provincial por Nivel</span>
-          </h3>
-          <moni-chip variant="assist" shape="round">
-            32 Provincias
-          </moni-chip>
-        </div>
-
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2">
-          <div
-            v-for="prov in provinciasMuestra"
-            :key="prov.nombre"
-            class="p-3.5 rounded-[20px] border border-zinc-200/80 bg-zinc-50/60 hover:bg-zinc-100/80 hover:border-zinc-300 transition-all cursor-pointer"
-          >
-            <div class="flex items-center justify-between">
-              <p class="font-bold text-xs text-zinc-950 truncate">{{ prov.nombre }}</p>
-              <span
-                class="w-2 h-2 rounded-full shrink-0"
-                :class="{
-                  'bg-rose-600': prov.alerta === 'ROJA',
-                  'bg-amber-500': prov.alerta === 'AMARILLA',
-                  'bg-emerald-500': prov.alerta === 'VERDE'
-                }"
-              ></span>
-            </div>
-            <span
-              class="text-[10px] uppercase tracking-wider font-extrabold mt-1.5 block"
-              :class="{
-                'text-rose-700': prov.alerta === 'ROJA',
-                'text-amber-700': prov.alerta === 'AMARILLA',
-                'text-emerald-700': prov.alerta === 'VERDE'
-              }"
-            >
-              {{ prov.alerta }}
-            </span>
-          </div>
-        </div>
+      <!-- Left: Official COE Alert Map (Matches uploaded bulletin screenshot) -->
+      <div class="lg:col-span-7">
+        <MiniMapaCOE />
       </div>
 
       <!-- Right: Official Bulletins Feed using Moni UI moni-card -->
@@ -135,21 +97,7 @@
 
 <script setup lang="ts">
 import AppIcon from '~/components/AppIcon.vue'
-
-const provinciasMuestra = [
-  { nombre: 'Dist. Nacional', alerta: 'AMARILLA' },
-  { nombre: 'Santo Domingo', alerta: 'AMARILLA' },
-  { nombre: 'San Cristóbal', alerta: 'AMARILLA' },
-  { nombre: 'Santiago', alerta: 'AMARILLA' },
-  { nombre: 'La Vega', alerta: 'AMARILLA' },
-  { nombre: 'Monseñor Nouel', alerta: 'ROJA' },
-  { nombre: 'Duarte', alerta: 'ROJA' },
-  { nombre: 'Sánchez Ramírez', alerta: 'AMARILLA' },
-  { nombre: 'Monte Plata', alerta: 'AMARILLA' },
-  { nombre: 'Puerto Plata', alerta: 'VERDE' },
-  { nombre: 'La Altagracia', alerta: 'VERDE' },
-  { nombre: 'Barahona', alerta: 'VERDE' }
-]
+import MiniMapaCOE from '~/components/mapa/MiniMapaCOE.vue'
 
 const boletines = [
   {
