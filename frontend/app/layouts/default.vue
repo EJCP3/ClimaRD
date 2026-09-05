@@ -31,15 +31,34 @@
         </moni-nav-item>
       </moni-nav>
 
+      <!-- Sidebar Actions: Reportar & Apariencia -->
+      <div class="space-y-2 pt-2 border-t border-zinc-100">
+        <NuxtLink to="/mapa" class="block w-full">
+          <moni-button variant="filled" shape="round" size="medium" class="w-full">
+            <AppIcon slot="icon" name="alert-triangle" class="w-4 h-4 mr-2" />
+            Reportar Incidencia
+          </moni-button>
+        </NuxtLink>
+
+        <button
+          id="appearance-sidebar-btn"
+          type="button"
+          @click="isAppearanceModalOpen = true"
+          class="w-full flex items-center justify-center space-x-2 py-2.5 px-3 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold transition-all cursor-pointer"
+          title="Personalizar Apariencia y Color"
+        >
+          <AppIcon name="palette" class="w-4 h-4 text-zinc-800" />
+          <span>Apariencia y Titulares</span>
+        </button>
+      </div>
+
       <!-- Institutional Footer Badge -->
-      <div class="mt-auto pt-4 border-t border-zinc-100">
-        <div class="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200/60">
-          <div class="flex items-center space-x-2 text-zinc-800">
-            <AppIcon name="check" class="w-4 h-4 text-zinc-900" />
-            <span class="text-xs font-bold">Fuente Oficial</span>
-          </div>
-          <p class="text-[11px] text-zinc-500 mt-1 leading-snug">INDOMET & COE Nacional</p>
+      <div class="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200/60">
+        <div class="flex items-center space-x-2 text-zinc-800">
+          <AppIcon name="check" class="w-4 h-4 text-zinc-900" />
+          <span class="text-xs font-bold">Fuente Oficial</span>
         </div>
+        <p class="text-[11px] text-zinc-500 mt-1 leading-snug">INDOMET & COE Nacional</p>
       </div>
     </aside>
 
@@ -64,9 +83,21 @@
           <AppIcon slot="icon" :name="item.icon" class="w-5 h-5" />
         </moni-nav-item>
       </moni-nav>
+
+      <div class="space-y-3 flex flex-col items-center pt-2">
+        <button
+          id="appearance-sidebar-btn"
+          type="button"
+          @click="isAppearanceModalOpen = true"
+          class="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 flex items-center justify-center transition-all cursor-pointer"
+          title="Apariencia"
+        >
+          <AppIcon name="palette" class="w-4 h-4" />
+        </button>
+      </div>
     </aside>
 
-    <!-- 3. Tasks: Cajón Modal M3 para tareas y alertas operativas (M3 Modal Navigation Drawer) -->
+    <!-- 3. Tasks: Cajón Modal M3 para tareas y alertas operativas -->
     <ClientOnly>
       <moni-nav
         v-if="navStyle === 'tasks'"
@@ -108,87 +139,89 @@
           <moni-badge v-if="item.badge" :value="item.badge"></moni-badge>
         </moni-nav-item>
 
-        <div slot="footer" class="p-4 border-t border-zinc-100 w-full">
-          <div class="p-3 bg-zinc-100 rounded-2xl text-[11px] text-zinc-600 font-medium space-y-1">
-            <p class="font-bold text-zinc-900">Estado Operativo:</p>
-            <p>15 Provincias en Alerta Activa</p>
-          </div>
+        <div slot="footer" class="p-4 border-t border-zinc-100 w-full space-y-3">
+          <button
+            id="appearance-sidebar-btn"
+            type="button"
+            @click="isAppearanceModalOpen = true; isTasksDrawerOpen = false"
+            class="w-full flex items-center justify-center space-x-2 py-2 px-3 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold transition-all cursor-pointer"
+          >
+            <AppIcon name="palette" class="w-4 h-4" />
+            <span>Apariencia</span>
+          </button>
         </div>
       </moni-nav>
     </ClientOnly>
 
-    <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col min-w-0">
-      <!-- Top App Bar (Neutral M3 style) -->
-      <header class="h-16 border-b border-zinc-200/80 bg-white/90 backdrop-blur-md px-4 md:px-6 flex items-center justify-between sticky top-0 z-30">
-        <div class="flex items-center space-x-3">
-          <!-- Tasks Drawer Trigger (when in tasks mode) -->
-          <button
-            v-if="navStyle === 'tasks'"
-            type="button"
-            @click="isTasksDrawerOpen = !isTasksDrawerOpen"
-            class="w-9 h-9 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 flex items-center justify-center transition-colors cursor-pointer mr-1"
-            title="Abrir Centro de Tareas M3"
-            aria-label="Abrir tareas"
-          >
-            <AppIcon name="filter" class="w-4 h-4" />
-          </button>
+    <!-- Main Content Area (Header removed completely per user request) -->
+    <div class="flex-1 flex flex-col min-w-0 relative">
+      <!-- Animated Bulletin Ticker (Top Position) -->
+      <BulletinTicker v-if="tickerPosition === 'top'" />
 
-          <!-- App Brand in Bonita mode on Desktop -->
-          <NuxtLink v-if="navStyle === 'bonita'" to="/" class="hidden md:flex items-center space-x-2.5 mr-3">
-            <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small" class="shrink-0">
-              <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
-            </moni-shape>
-            <span class="font-black text-base text-zinc-950 tracking-tight">Clima RD</span>
-          </NuxtLink>
+      <!-- Floating Quick Controls (Top-right unobtrusive floating island) -->
+      <div class="fixed top-3.5 right-4 z-30 flex items-center space-x-2 pointer-events-auto">
+        <!-- Tasks Toggle Button (when in tasks mode) -->
+        <button
+          v-if="navStyle === 'tasks'"
+          type="button"
+          @click="isTasksDrawerOpen = !isTasksDrawerOpen"
+          class="w-9 h-9 rounded-full bg-white/95 backdrop-blur-md shadow-md hover:bg-white text-zinc-900 border border-zinc-200 flex items-center justify-center transition-all cursor-pointer"
+          title="Abrir Tareas M3"
+          aria-label="Abrir tareas"
+        >
+          <AppIcon name="filter" class="w-4 h-4" />
+        </button>
 
-          <!-- Bonita Desktop Horizontal Links -->
-          <div v-if="navStyle === 'bonita'" class="hidden lg:flex items-center space-x-1 bg-zinc-100/80 p-1 rounded-full border border-zinc-200/60">
-            <NuxtLink
-              v-for="item in navItems"
-              :key="item.path"
-              :to="item.path"
-              class="px-3.5 py-1 rounded-full text-xs font-bold transition-all"
-              :class="$route.path === item.path ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200/60'"
-            >
-              {{ item.label }}
-            </NuxtLink>
-          </div>
+        <!-- Quick Reportar Button -->
+        <NuxtLink to="/mapa">
+          <moni-button variant="filled" shape="round" size="small" class="shadow-md">
+            <AppIcon slot="icon" name="alert-triangle" class="w-3.5 h-3.5 text-zinc-200 mr-1.5" />
+            Reportar
+          </moni-button>
+        </NuxtLink>
 
-          <div class="flex items-center space-x-1.5 bg-zinc-100/90 px-3.5 py-1.5 rounded-full border border-zinc-200/60">
-            <AppIcon name="map-pin" class="w-3.5 h-3.5 text-zinc-700" />
-            <span class="text-xs font-semibold text-zinc-800">Distrito Nacional, RD</span>
-          </div>
+        <!-- Quick Appearance Button -->
+        <button
+          type="button"
+          @click="isAppearanceModalOpen = true"
+          class="w-8 h-8 rounded-full bg-white/95 backdrop-blur-md hover:bg-white border border-zinc-200/80 shadow-md text-zinc-800 flex items-center justify-center transition-all cursor-pointer group"
+          title="Personalizar Apariencia y Titular"
+          aria-label="Personalizar apariencia"
+        >
+          <AppIcon name="palette" class="w-4 h-4 text-zinc-900 group-hover:rotate-12 transition-transform" />
+        </button>
+      </div>
+
+      <!-- Bonita Mode Floating Nav Island on Desktop -->
+      <div
+        v-if="navStyle === 'bonita'"
+        class="hidden md:flex fixed top-3.5 left-4 z-30 items-center space-x-1.5 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md"
+      >
+        <div class="flex items-center space-x-2 mr-2">
+          <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small">
+            <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
+          </moni-shape>
+          <span class="font-extrabold text-xs text-zinc-950">Clima RD</span>
         </div>
 
-        <div class="flex items-center space-x-2.5">
-          <!-- Appearance Panel Trigger Button (Target for morph-modal) -->
-          <button
-            id="appearance-trigger-btn"
-            type="button"
-            @click="isAppearanceModalOpen = true"
-            class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200/80 text-zinc-800 text-xs font-bold transition-all cursor-pointer group shadow-sm"
-            title="Personalizar Apariencia y Color"
-            aria-label="Abrir panel de apariencia"
-          >
-            <AppIcon name="palette" class="w-4 h-4 text-zinc-900 group-hover:rotate-12 transition-transform" />
-            <span class="hidden sm:inline">Apariencia</span>
-          </button>
+        <NuxtLink
+          v-for="item in navItems"
+          :key="item.path"
+          :to="item.path"
+          class="px-3 py-1 rounded-full text-xs font-bold transition-all"
+          :class="$route.path === item.path ? 'bg-zinc-950 text-white shadow-sm' : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'"
+        >
+          {{ item.shortLabel }}
+        </NuxtLink>
+      </div>
 
-          <!-- Report Incident Button -->
-          <NuxtLink to="/mapa">
-            <moni-button variant="filled" shape="round" size="small">
-              <AppIcon slot="icon" name="alert-triangle" class="w-3.5 h-3.5 text-zinc-200 mr-1.5" />
-              Reportar
-            </moni-button>
-          </NuxtLink>
-        </div>
-      </header>
-
-      <!-- Page View -->
-      <main class="flex-1 pb-24 md:pb-8">
+      <!-- Page View Content -->
+      <main class="flex-1 pb-24 md:pb-8 pt-4">
         <slot />
       </main>
+
+      <!-- Animated Bulletin Ticker (Bottom Position) -->
+      <BulletinTicker v-if="tickerPosition === 'bottom'" />
     </div>
 
     <!-- Mobile Bottom Navigation Bar (Powered by moni-nav) -->
@@ -216,9 +249,10 @@
 import { ref, onMounted } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
 import AppearanceModal from '~/components/AppearanceModal.vue'
+import BulletinTicker from '~/components/BulletinTicker.vue'
 import { useAppearance } from '~/composables/useAppearance'
 
-const { isAppearanceModalOpen, navStyle, initAppearance } = useAppearance()
+const { isAppearanceModalOpen, navStyle, tickerPosition, initAppearance } = useAppearance()
 const isTasksDrawerOpen = ref(false)
 
 const navItems = [

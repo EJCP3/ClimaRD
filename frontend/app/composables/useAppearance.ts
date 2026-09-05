@@ -21,11 +21,15 @@ export const COLOR_PALETTE: ColorOption[] = [
 ]
 
 export type NavStyle = 'clasica' | 'bonita' | 'guapa' | 'tasks'
+export type TickerPosition = 'top' | 'bottom' | 'hidden'
+export type TickerAnimation = 'marquee' | 'flip' | 'compact'
 
 export function useAppearance() {
   const primaryColor = useState<string>('appearance_primary_color', () => '#18181B')
   const navStyle = useState<NavStyle>('appearance_nav_style', () => 'bonita')
   const isAppearanceModalOpen = useState<boolean>('appearance_modal_open', () => false)
+  const tickerPosition = useState<TickerPosition>('appearance_ticker_position', () => 'top')
+  const tickerAnimation = useState<TickerAnimation>('appearance_ticker_animation', () => 'marquee')
 
   const applyColor = (colorHex: string) => {
     primaryColor.value = colorHex
@@ -64,6 +68,28 @@ export function useAppearance() {
     }
   }
 
+  const setTickerPosition = (pos: TickerPosition) => {
+    tickerPosition.value = pos
+    if (import.meta.client) {
+      try {
+        localStorage.setItem('climard_ticker_position', pos)
+      } catch (e) {
+        console.warn('Could not persist ticker position:', e)
+      }
+    }
+  }
+
+  const setTickerAnimation = (anim: TickerAnimation) => {
+    tickerAnimation.value = anim
+    if (import.meta.client) {
+      try {
+        localStorage.setItem('climard_ticker_animation', anim)
+      } catch (e) {
+        console.warn('Could not persist ticker animation:', e)
+      }
+    }
+  }
+
   const initAppearance = () => {
     if (import.meta.client) {
       try {
@@ -77,6 +103,14 @@ export function useAppearance() {
         if (savedNav && ['clasica', 'bonita', 'guapa', 'tasks'].includes(savedNav)) {
           navStyle.value = savedNav
         }
+        const savedTickerPos = localStorage.getItem('climard_ticker_position') as TickerPosition | null
+        if (savedTickerPos && ['top', 'bottom', 'hidden'].includes(savedTickerPos)) {
+          tickerPosition.value = savedTickerPos
+        }
+        const savedTickerAnim = localStorage.getItem('climard_ticker_animation') as TickerAnimation | null
+        if (savedTickerAnim && ['marquee', 'flip', 'compact'].includes(savedTickerAnim)) {
+          tickerAnimation.value = savedTickerAnim
+        }
       } catch (e) {
         console.warn('Error reading stored appearance:', e)
       }
@@ -87,9 +121,13 @@ export function useAppearance() {
     primaryColor,
     navStyle,
     isAppearanceModalOpen,
+    tickerPosition,
+    tickerAnimation,
     COLOR_PALETTE,
     applyColor,
     setNavStyle,
+    setTickerPosition,
+    setTickerAnimation,
     initAppearance,
   }
 }
