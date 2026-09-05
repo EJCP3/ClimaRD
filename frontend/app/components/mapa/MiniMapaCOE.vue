@@ -56,7 +56,7 @@
       </div>
 
       <!-- SVG Map Canvas Container -->
-      <div class="relative w-full aspect-[800/520] max-h-[460px] mx-auto select-none">
+      <div class="relative w-full aspect-[800/520] max-h-[520px] mx-auto select-none">
         <svg
           viewBox="0 0 800 550"
           class="w-full h-full drop-shadow-sm filter"
