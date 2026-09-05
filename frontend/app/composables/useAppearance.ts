@@ -23,6 +23,7 @@ export const COLOR_PALETTE: ColorOption[] = [
 export type NavStyle = 'clasica' | 'bonita' | 'guapa' | 'tasks'
 export type TickerPosition = 'top' | 'bottom' | 'hidden'
 export type TickerAnimation = 'marquee' | 'flip' | 'compact'
+export type TickerSpeed = 'slow' | 'normal' | 'fast'
 
 export function useAppearance() {
   const primaryColor = useState<string>('appearance_primary_color', () => '#18181B')
@@ -30,6 +31,7 @@ export function useAppearance() {
   const isAppearanceModalOpen = useState<boolean>('appearance_modal_open', () => false)
   const tickerPosition = useState<TickerPosition>('appearance_ticker_position', () => 'top')
   const tickerAnimation = useState<TickerAnimation>('appearance_ticker_animation', () => 'marquee')
+  const tickerSpeed = useState<TickerSpeed>('appearance_ticker_speed', () => 'slow')
 
   const applyColor = (colorHex: string) => {
     primaryColor.value = colorHex
@@ -90,6 +92,17 @@ export function useAppearance() {
     }
   }
 
+  const setTickerSpeed = (spd: TickerSpeed) => {
+    tickerSpeed.value = spd
+    if (import.meta.client) {
+      try {
+        localStorage.setItem('climard_ticker_speed', spd)
+      } catch (e) {
+        console.warn('Could not persist ticker speed:', e)
+      }
+    }
+  }
+
   const initAppearance = () => {
     if (import.meta.client) {
       try {
@@ -111,6 +124,10 @@ export function useAppearance() {
         if (savedTickerAnim && ['marquee', 'flip', 'compact'].includes(savedTickerAnim)) {
           tickerAnimation.value = savedTickerAnim
         }
+        const savedTickerSpeed = localStorage.getItem('climard_ticker_speed') as TickerSpeed | null
+        if (savedTickerSpeed && ['slow', 'normal', 'fast'].includes(savedTickerSpeed)) {
+          tickerSpeed.value = savedTickerSpeed
+        }
       } catch (e) {
         console.warn('Error reading stored appearance:', e)
       }
@@ -123,11 +140,13 @@ export function useAppearance() {
     isAppearanceModalOpen,
     tickerPosition,
     tickerAnimation,
+    tickerSpeed,
     COLOR_PALETTE,
     applyColor,
     setNavStyle,
     setTickerPosition,
     setTickerAnimation,
+    setTickerSpeed,
     initAppearance,
   }
 }

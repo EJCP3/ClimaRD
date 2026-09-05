@@ -115,6 +115,27 @@
             </button>
           </div>
         </div>
+
+        <!-- 5. Ticker Speed Section -->
+        <div class="pt-1">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-2">
+            Velocidad del Titular Animado
+          </label>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              v-for="spd in tickerSpeeds"
+              :key="spd.id"
+              type="button"
+              @click="setTickerSpeed(spd.id)"
+              class="py-2 px-2.5 rounded-full text-[11px] font-bold transition-all text-center cursor-pointer"
+              :class="tickerSpeed === spd.id
+                ? 'bg-[#EAEAEB] text-zinc-950 shadow-sm'
+                : 'bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300'"
+            >
+              {{ spd.label }}
+            </button>
+          </div>
+        </div>
       </div>
     </moni-morph-modal>
   </ClientOnly>
@@ -126,7 +147,8 @@ import {
   useAppearance,
   type NavStyle,
   type TickerPosition,
-  type TickerAnimation
+  type TickerAnimation,
+  type TickerSpeed
 } from '~/composables/useAppearance'
 
 const {
@@ -134,12 +156,14 @@ const {
   navStyle,
   tickerPosition,
   tickerAnimation,
+  tickerSpeed,
   isAppearanceModalOpen,
   COLOR_PALETTE,
   applyColor,
   setNavStyle,
   setTickerPosition,
   setTickerAnimation,
+  setTickerSpeed,
 } = useAppearance()
 
 const navModes: { id: NavStyle; label: string }[] = [
@@ -159,5 +183,11 @@ const tickerAnimations: { id: TickerAnimation; label: string }[] = [
   { id: 'marquee', label: 'Continuo' },
   { id: 'flip', label: 'Paginado' },
   { id: 'compact', label: 'Discreto' },
+]
+
+const tickerSpeeds: { id: TickerSpeed; label: string }[] = [
+  { id: 'slow', label: 'Lenta (Legible)' },
+  { id: 'normal', label: 'Normal' },
+  { id: 'fast', label: 'Rápida' },
 ]
 </script>
