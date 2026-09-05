@@ -18,22 +18,20 @@
         </p>
       </div>
 
-      <!-- Pill Buttons (From Screenshot 1: Black Pill & Tonal Pill) -->
+      <!-- Moni UI M3 Buttons (From Screenshot 1: Black Pill & Tonal Pill) -->
       <div class="flex flex-col sm:flex-row gap-3 pt-2">
-        <NuxtLink
-          to="/mapa"
-          class="w-full sm:w-auto px-7 py-4 bg-slate-950 hover:bg-slate-800 active:scale-[0.98] text-white font-bold rounded-full text-sm shadow-md flex items-center justify-center space-x-2.5 transition-all"
-        >
-          <AppIcon name="map" class="w-4 h-4" />
-          <span>Ver mapa interactivo</span>
+        <NuxtLink to="/mapa" class="w-full sm:w-auto">
+          <moni-button variant="filled" shape="round" size="large" class="w-full sm:w-auto">
+            <AppIcon slot="icon" name="map" class="w-4 h-4 mr-2" />
+            Ver mapa interactivo
+          </moni-button>
         </NuxtLink>
 
-        <NuxtLink
-          to="/alertas"
-          class="w-full sm:w-auto px-7 py-4 bg-slate-100 hover:bg-slate-200/80 active:scale-[0.98] text-slate-900 font-bold rounded-full text-sm flex items-center justify-center space-x-2.5 transition-all"
-        >
-          <AppIcon name="bell" class="w-4 h-4 text-amber-600" />
-          <span>Alertas COE / INDOMET</span>
+        <NuxtLink to="/alertas" class="w-full sm:w-auto">
+          <moni-button variant="tonal" shape="round" size="large" class="w-full sm:w-auto">
+            <AppIcon slot="icon" name="bell" class="w-4 h-4 mr-2 text-amber-600" />
+            Alertas COE / INDOMET
+          </moni-button>
         </NuxtLink>
       </div>
 

@@ -44,15 +44,17 @@
     <!-- Map Container -->
     <div ref="mapContainer" class="w-full h-full min-h-[calc(100vh-4rem)]"></div>
 
-    <!-- Material 3 Floating Action Button (FAB) (Pill Button Style from Screenshot 1) -->
+    <!-- Moni UI Floating Action Button (M3 moni-button) -->
     <div class="absolute bottom-6 right-6 z-20">
-      <button
+      <moni-button
+        variant="filled"
+        shape="round"
+        size="large"
         @click="$emit('openReportModal')"
-        class="px-6 py-4 bg-slate-950 hover:bg-slate-800 active:scale-95 text-white font-bold rounded-full shadow-2xl flex items-center space-x-2.5 transition-all text-sm tracking-wide"
       >
-        <AppIcon name="alert-triangle" class="w-4 h-4 text-amber-400" />
-        <span>Reportar Incidencia</span>
-      </button>
+        <AppIcon slot="icon" name="alert-triangle" class="w-4 h-4 mr-2 text-amber-400" />
+        Reportar Incidencia
+      </moni-button>
     </div>
   </div>
 </template>

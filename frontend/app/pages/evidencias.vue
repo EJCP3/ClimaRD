@@ -13,35 +13,28 @@
         </p>
       </div>
 
-      <NuxtLink
-        to="/mapa"
-        class="inline-flex items-center space-x-2 px-5 py-2.5 bg-slate-950 hover:bg-slate-800 text-white rounded-full text-xs font-bold shadow-sm hover:shadow-md transition-all self-start sm:self-auto group"
-      >
-        <AppIcon name="plus" class="w-4 h-4 transition-transform group-hover:rotate-90" />
-        <span>Subir Nueva Evidencia</span>
+      <NuxtLink to="/mapa" class="self-start sm:self-auto">
+        <moni-button variant="filled" shape="round">
+          <AppIcon slot="icon" name="plus" class="w-4 h-4 mr-1.5" />
+          Subir Nueva Evidencia
+        </moni-button>
       </NuxtLink>
     </div>
 
-    <!-- M3 Filter Chips -->
+    <!-- Moni UI M3 Filter Chips -->
     <div class="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none">
-      <button
+      <moni-chip
         v-for="filter in filters"
         :key="filter.id"
+        variant="filter"
+        shape="round"
+        :selected="activeFilter === filter.id"
         @click="activeFilter = filter.id"
-        class="px-4 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 flex items-center space-x-1.5"
-        :class="activeFilter === filter.id
-          ? 'bg-slate-950 text-white shadow-sm'
-          : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'"
+        class="cursor-pointer shrink-0"
       >
-        <AppIcon v-if="filter.icon" :name="filter.icon" class="w-3.5 h-3.5" />
-        <span>{{ filter.label }}</span>
-        <span
-          class="px-1.5 py-0.2 rounded-full text-[10px]"
-          :class="activeFilter === filter.id ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-500'"
-        >
-          {{ filter.count }}
-        </span>
-      </button>
+        <AppIcon v-if="filter.icon" slot="icon" :name="filter.icon" class="w-3.5 h-3.5 mr-1" />
+        {{ filter.label }} ({{ filter.count }})
+      </moni-chip>
     </div>
 
     <!-- Cards Grid -->

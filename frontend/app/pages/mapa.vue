@@ -92,21 +92,23 @@
             </div>
           </div>
 
-          <!-- Material 3 Action Buttons (Screenshot 4 Style: Text/Tonal Cancel + Dark Pill Confirm) -->
+          <!-- Material 3 Action Buttons (Moni UI moni-button) -->
           <div class="flex items-center justify-end space-x-3 pt-2">
-            <button
+            <moni-button
+              variant="text"
+              shape="round"
               @click="currentStep = 1"
-              class="px-5 py-3.5 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
             >
               Atrás
-            </button>
-            <button
+            </moni-button>
+            <moni-button
+              variant="filled"
+              shape="round"
               @click="submitReport"
-              class="px-7 py-3.5 bg-slate-950 hover:bg-slate-800 active:scale-95 text-white font-bold rounded-full text-xs shadow-md transition-all flex items-center space-x-2"
             >
-              <AppIcon name="check" class="w-4 h-4" />
-              <span>Publicar Reporte</span>
-            </button>
+              <AppIcon slot="icon" name="check" class="w-4 h-4 mr-1.5" />
+              Publicar Reporte
+            </moni-button>
           </div>
         </div>
       </div>
