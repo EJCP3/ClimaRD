@@ -162,6 +162,7 @@ moni-morph-modal#appearance-morph-modal::part(backdrop),
 /* Layout Persistent Elements across View Transitions */
 .bulletin-ticker-elem {
   view-transition-name: bulletin-ticker;
+  z-index: 1050 !important;
 }
 
 .app-sidebar-elem {
