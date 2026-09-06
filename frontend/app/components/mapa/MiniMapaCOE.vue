@@ -86,18 +86,19 @@
             />
           </g>
 
-          <!-- Province Names Labels on Map (like in the bulletin image) -->
-          <g class="pointer-events-none labels-group">
+          <!-- Province Names Labels on Map (All 32 Provincias COE) -->
+          <g class="pointer-events-none labels-group select-none">
             <template v-for="prov in provincesList" :key="`lbl-${prov.code}`">
               <text
-                v-if="shouldShowLabel(prov.code)"
-                :x="prov.centroid[0]"
-                :y="prov.centroid[1]"
+                :x="getCentroid(prov)[0]"
+                :y="getCentroid(prov)[1]"
                 text-anchor="middle"
                 dominant-baseline="central"
-                class="font-extrabold uppercase tracking-tight text-[8px] sm:text-[9.5px] fill-zinc-900 drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"
+                class="font-black uppercase tracking-tight fill-zinc-950"
+                :class="getLabelFontSize(prov.code)"
+                style="paint-order: stroke fill; stroke: #ffffff; stroke-width: 2.2px; stroke-linejoin: round;"
               >
-                {{ getShortLabel(prov.name) }}
+                {{ getShortLabel(prov.code, prov.name) }}
               </text>
             </template>
           </g>
@@ -349,20 +350,94 @@ function getProvinceAdvice(alerta: string, name: string): string {
   }
 }
 
-function shouldShowLabel(code: string): boolean {
-  // Show labels on medium/large provinces for clean visual balance
-  const visibleCodes = ['02', '24', '04', '03', '06', '07', '18', '26', '29', '11', '01']
-  return visibleCodes.includes(code)
+const customLabels: Record<string, string> = {
+  '01': 'D.N.',
+  '02': 'AZUA',
+  '03': 'BAORUCO',
+  '04': 'BARAHONA',
+  '05': 'DAJABÓN',
+  '06': 'DUARTE',
+  '07': 'ELÍAS PIÑA',
+  '08': 'EL SEIBO',
+  '09': 'ESPAILLAT',
+  '10': 'INDEP.',
+  '11': 'ALTAGRACIA',
+  '12': 'LA ROMANA',
+  '13': 'LA VEGA',
+  '14': 'M.T. SÁNCHEZ',
+  '15': 'MTE. CRISTI',
+  '16': 'PEDERNALES',
+  '17': 'PERAVIA',
+  '18': 'PTO. PLATA',
+  '19': 'H. MIRABAL',
+  '20': 'SAMANÁ',
+  '21': 'S. CRISTÓBAL',
+  '22': 'SAN JUAN',
+  '23': 'S.P.M.',
+  '24': 'S. RAMÍREZ',
+  '25': 'SANTIAGO',
+  '26': 'STGO. RGUEZ.',
+  '27': 'VALVERDE',
+  '28': 'M. NOUEL',
+  '29': 'MONTE PLATA',
+  '30': 'HATO MAYOR',
+  '31': 'S.J. OCOA',
+  '32': 'STO. DGO.',
 }
 
-function getShortLabel(name: string): string {
-  if (name === 'DISTRITO NACIONAL') return 'D.N.'
-  if (name === 'SAN JUAN') return 'SAN JUAN'
-  if (name === 'MONTE CRISTI') return 'MONTE CRISTI'
-  if (name === 'LA ALTAGRACIA') return 'ALTAGRACIA'
-  if (name === 'SAN CRISTOBAL') return 'S. CRISTOBAL'
-  if (name === 'SAN PEDRO DE MACORIS') return 'S.P.M.'
-  return name.split(' ')[0]
+const centroidOverrides: Record<string, [number, number]> = {
+  '32': [474, 298], // Santo Domingo: outer ring northeast of D.N.
+  '01': [442, 321], // Distrito Nacional
+  '09': [348, 92],  // Espaillat: northern coastline away from Hermanas Mirabal
+  '19': [360, 130], // Hermanas Mirabal (Salcedo)
+  '27': [216, 98],  // Valverde (Mao)
+  '25': [250, 142], // Santiago
+  '26': [167, 136], // Santiago Rodríguez
+  '05': [104, 127], // Dajabón
+  '07': [97, 206],  // Elías Piña
+  '22': [168, 239], // San Juan
+  '10': [99, 326],  // Independencia
+  '03': [175, 318], // Baoruco
+  '16': [118, 442], // Pedernales
+  '04': [188, 373], // Barahona
+  '02': [260, 304], // Azua
+  '31': [336, 296], // San José de Ocoa
+  '17': [360, 347], // Peravia
+  '21': [387, 313], // San Cristóbal
+  '28': [348, 230], // Monseñor Nouel
+  '13': [313, 196], // La Vega
+  '24': [403, 204], // Sánchez Ramírez
+  '06': [424, 166], // Duarte
+  '14': [438, 122], // María Trinidad Sánchez
+  '20': [538, 171], // Samaná
+  '29': [468, 249], // Monte Plata
+  '30': [553, 224], // Hato Mayor
+  '23': [568, 298], // San Pedro de Macorís
+  '08': [625, 250], // El Seibo
+  '12': [664, 340], // La Romana
+  '11': [696, 301], // La Altagracia
+  '18': [270, 58],  // Puerto Plata
+  '15': [118, 52],  // Monte Cristi
+}
+
+function getCentroid(prov: any): [number, number] {
+  if (centroidOverrides[prov.code]) {
+    return centroidOverrides[prov.code]
+  }
+  return prov.centroid
+}
+
+function getShortLabel(code: string, name: string): string {
+  if (customLabels[code]) return customLabels[code]
+  return name
+}
+
+function getLabelFontSize(code: string): string {
+  // Ultra-compact labels for smaller geographic areas
+  if (['01', '19', '27', '31', '24', '10', '28'].includes(code)) {
+    return 'text-[6px] sm:text-[6.8px]'
+  }
+  return 'text-[7px] sm:text-[8px]'
 }
 
 function onHover(prov: any, evt: MouseEvent) {
