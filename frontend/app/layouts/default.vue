@@ -85,6 +85,17 @@
       </moni-nav>
 
       <div class="space-y-3 flex flex-col items-center pt-2">
+        <NuxtLink to="/mapa" title="Reportar Incidencia">
+          <button
+            type="button"
+            class="w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-sm"
+            :style="{ backgroundColor: 'var(--primary)', color: 'var(--on-primary)' }"
+            title="Reportar Incidencia"
+          >
+            <AppIcon name="alert-triangle" class="w-4 h-4" />
+          </button>
+        </NuxtLink>
+
         <button
           id="appearance-sidebar-btn"
           type="button"
@@ -158,60 +169,47 @@
       <!-- Animated Bulletin Ticker (Top Position) -->
       <BulletinTicker v-if="tickerPosition === 'top'" />
 
-      <!-- Floating Quick Controls (Top-right unobtrusive floating island) -->
+      <!-- Tasks Mode Brand & Actions Pill on Desktop -->
       <div
-        class="fixed z-30 flex items-center space-x-2 pointer-events-auto transition-all duration-300"
-        :class="tickerPosition === 'top' ? 'top-[52px] right-4' : 'top-3.5 right-4'"
+        v-if="navStyle === 'tasks'"
+        class="hidden md:flex fixed z-30 items-center space-x-2 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300"
+        :class="tickerPosition === 'top' ? 'top-[52px] left-4' : 'top-3.5 left-4'"
       >
-        <!-- Tasks Toggle Button (when in tasks mode) -->
         <button
-          v-if="navStyle === 'tasks'"
           type="button"
-          @click.stop="isTasksDrawerOpen = !isTasksDrawerOpen"
-          class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold shadow-md transition-all cursor-pointer"
-          :style="{ backgroundColor: 'var(--primary)', color: 'var(--on-primary)' }"
-          title="Abrir Centro de Tareas M3"
-          aria-label="Abrir tareas"
+          @click="isTasksDrawerOpen = true"
+          class="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
         >
-          <AppIcon name="filter" class="w-4 h-4" />
-          <span>Tareas M3</span>
+          <moni-shape name="flower" color="surface" :style="{ '--_shape-bg': 'var(--primary-container, #EAEAEB)', '--_shape-fg': 'var(--on-primary-container, #18181B)' }" size="small">
+            <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
+          </moni-shape>
+          <span class="font-extrabold text-xs text-zinc-950">Clima RD</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" :style="{ backgroundColor: 'var(--primary)', color: 'var(--on-primary)' }">
+            Tareas M3
+          </span>
         </button>
 
-        <!-- Quick Reportar Button -->
+        <span class="w-px h-4 bg-zinc-200/80 mx-1"></span>
+
+        <!-- Quick Reportar Button inside Nav -->
         <NuxtLink to="/mapa">
-          <moni-button variant="filled" shape="round" size="small" class="shadow-md">
-            <AppIcon slot="icon" name="alert-triangle" class="w-3.5 h-3.5 text-zinc-200 mr-1.5" />
+          <moni-button variant="filled" shape="round" size="small">
+            <AppIcon slot="icon" name="alert-triangle" class="w-3.5 h-3.5 mr-1" />
             Reportar
           </moni-button>
         </NuxtLink>
 
-        <!-- Quick Appearance Button -->
+        <!-- Quick Appearance Button inside Nav -->
         <button
-          id="appearance-trigger-btn"
+          id="appearance-tasks-trigger-btn"
           type="button"
           @click.stop="openAppearanceModal($event)"
-          class="w-8 h-8 rounded-full bg-white/95 backdrop-blur-md hover:bg-white border border-zinc-200/80 shadow-md text-zinc-800 flex items-center justify-center transition-all cursor-pointer group"
+          class="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 flex items-center justify-center transition-all cursor-pointer group"
           title="Personalizar Apariencia y Titular"
           aria-label="Personalizar apariencia"
         >
-          <AppIcon name="palette" class="w-4 h-4 text-zinc-900 group-hover:rotate-12 transition-transform" />
+          <AppIcon name="palette" class="w-3.5 h-3.5 text-zinc-900 group-hover:rotate-12 transition-transform" />
         </button>
-      </div>
-
-      <!-- Tasks Mode Brand Pill on Desktop -->
-      <div
-        v-if="navStyle === 'tasks'"
-        class="hidden md:flex fixed z-30 items-center space-x-2 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md cursor-pointer hover:bg-zinc-50 transition-all duration-300"
-        :class="tickerPosition === 'top' ? 'top-[52px] left-4' : 'top-3.5 left-4'"
-        @click="isTasksDrawerOpen = true"
-      >
-        <moni-shape name="flower" color="surface" :style="{ '--_shape-bg': 'var(--primary-container, #EAEAEB)', '--_shape-fg': 'var(--on-primary-container, #18181B)' }" size="small">
-          <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
-        </moni-shape>
-        <span class="font-extrabold text-xs text-zinc-950">Clima RD</span>
-        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" :style="{ backgroundColor: 'var(--secondary-container, #EAEAEB)', color: 'var(--on-secondary-container, #18181B)' }">
-          Abrir Tareas
-        </span>
       </div>
 
       <!-- Bonita Mode Floating Nav Island on Desktop -->
@@ -237,6 +235,29 @@
         >
           {{ item.shortLabel }}
         </NuxtLink>
+
+        <!-- Divider inside Nav -->
+        <span class="w-px h-4 bg-zinc-200/80 mx-1"></span>
+
+        <!-- Quick Reportar Button inside Nav -->
+        <NuxtLink to="/mapa">
+          <moni-button variant="filled" shape="round" size="small">
+            <AppIcon slot="icon" name="alert-triangle" class="w-3.5 h-3.5 mr-1" />
+            Reportar
+          </moni-button>
+        </NuxtLink>
+
+        <!-- Quick Appearance Button inside Nav -->
+        <button
+          id="appearance-trigger-btn"
+          type="button"
+          @click.stop="openAppearanceModal($event)"
+          class="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 flex items-center justify-center transition-all cursor-pointer group ml-0.5"
+          title="Personalizar Apariencia y Titular"
+          aria-label="Personalizar apariencia"
+        >
+          <AppIcon name="palette" class="w-3.5 h-3.5 text-zinc-900 group-hover:rotate-12 transition-transform" />
+        </button>
       </div>
 
       <!-- Page View Content -->
@@ -267,6 +288,13 @@
           @click.prevent="navigateTo(item.path)"
         >
           <AppIcon slot="icon" :name="item.icon" class="w-5 h-5" />
+        </moni-nav-item>
+        <moni-nav-item
+          id="appearance-mobile-trigger-btn"
+          label="Tema"
+          @click.prevent="openAppearanceModal($event)"
+        >
+          <AppIcon slot="icon" name="palette" class="w-5 h-5" />
         </moni-nav-item>
       </moni-nav>
     </div>

@@ -180,6 +180,8 @@ export function useAppearance() {
         const modal = document.getElementById('appearance-morph-modal') as any
         const target = el
           || document.getElementById('appearance-trigger-btn')
+          || document.getElementById('appearance-tasks-trigger-btn')
+          || document.getElementById('appearance-mobile-trigger-btn')
           || document.getElementById('appearance-sidebar-btn')
           || document.body
         if (modal) {
