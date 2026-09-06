@@ -247,11 +247,15 @@
       <!-- Selected Province Inspector Drawer -->
       <div v-if="selectedProvince" class="mt-4 p-4 rounded-2xl bg-white border border-zinc-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
         <div class="space-y-1">
-          <div class="flex items-center space-x-2">
-            <span
-              class="w-3 h-3 rounded-full"
-              :class="getBadgeColorClass(selectedProvince.alerta)"
-            ></span>
+          <div class="flex items-center space-x-2.5">
+            <moni-shape
+              :name="getProvinceShape(selectedProvince.alerta)"
+              size="small"
+              class="shrink-0"
+              :style="getShapeColorStyle(selectedProvince.alerta)"
+            >
+              <AppIcon :name="getProvinceIcon(selectedProvince.alerta)" class="w-3.5 h-3.5" />
+            </moni-shape>
             <h4 class="font-black text-sm text-zinc-950">{{ selectedProvince.name }}</h4>
             <span
               class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase text-white tracking-wider"
@@ -288,7 +292,7 @@
       </div>
     </div>
 
-    <!-- View 2: Grid Table Matrix (Original list, updated to 32 provinces) -->
+    <!-- View 2: Grid Table Matrix (32 provinces with organic moni-shape indicators) -->
     <div v-show="activeView === 'tabla'" class="p-5 md:p-6 space-y-4">
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 max-h-[460px] overflow-y-auto pr-1">
         <div
@@ -296,22 +300,30 @@
           :key="`grid-${prov.code}`"
           :id="`grid-${prov.code}`"
           @click="selectProvince(prov, $event)"
-          class="p-3 rounded-2xl border transition-all cursor-pointer hover:shadow-md block no-underline"
+          class="p-3 rounded-2xl border transition-all cursor-pointer hover:shadow-md flex items-center justify-between gap-2.5 group select-none"
           :class="[
             getGridCardClass(prov.alerta),
             isProvinceDimmed(prov.alerta) ? 'opacity-30' : 'opacity-100'
           ]"
         >
-          <div class="flex items-center justify-between">
-            <p class="font-bold text-xs truncate">{{ prov.name }}</p>
-            <span
-              class="w-2 h-2 rounded-full shrink-0 ml-1"
-              :class="getDotColorClass(prov.alerta)"
-            ></span>
+          <div class="min-w-0 flex-1">
+            <p class="font-bold text-xs truncate text-zinc-900 group-hover:text-zinc-950">
+              {{ prov.name }}
+            </p>
+            <span class="text-[10px] uppercase tracking-wider font-extrabold mt-0.5 block" :class="getAlertSubtextColor(prov.alerta)">
+              {{ prov.alerta === 'NORMAL' ? 'SIN ALERTA' : `ALERTA ${prov.alerta}` }}
+            </span>
           </div>
-          <span class="text-[10px] uppercase tracking-wider font-extrabold mt-1 block opacity-90">
-            {{ prov.alerta === 'NORMAL' ? 'SIN ALERTA' : prov.alerta }}
-          </span>
+
+          <!-- Organic Moni-Shape replacing circular dot -->
+          <moni-shape
+            :name="getProvinceShape(prov.alerta)"
+            size="small"
+            class="shrink-0 transition-transform duration-300 group-hover:scale-110"
+            :style="getShapeColorStyle(prov.alerta)"
+          >
+            <AppIcon :name="getProvinceIcon(prov.alerta)" class="w-3.5 h-3.5" />
+          </moni-shape>
         </div>
       </div>
     </div>
@@ -336,8 +348,13 @@
       >
         <!-- Header Slot -->
         <div slot="header" class="flex items-center space-x-3" v-if="selectedProvince">
-          <moni-shape :name="getProvinceShape(selectedProvince.alerta)" color="surface" size="small">
-            <AppIcon :name="getProvinceIcon(selectedProvince.alerta)" class="w-4 h-4 text-zinc-900" />
+          <moni-shape
+            :name="getProvinceShape(selectedProvince.alerta)"
+            size="small"
+            class="shrink-0"
+            :style="getShapeColorStyle(selectedProvince.alerta)"
+          >
+            <AppIcon :name="getProvinceIcon(selectedProvince.alerta)" class="w-4 h-4" />
           </moni-shape>
           <div>
             <div class="flex items-center space-x-2">
@@ -518,25 +535,25 @@ function getBadgeColorClass(alerta: string): string {
   }
 }
 
-function getDotColorClass(alerta: string): string {
+function getAlertSubtextColor(alerta: string): string {
   switch (alerta) {
-    case 'ROJA': return 'bg-[#E11D48]'
-    case 'AMARILLA': return 'bg-[#F59E0B]'
-    case 'VERDE': return 'bg-[#10B981]'
-    default: return 'bg-zinc-300'
+    case 'ROJA': return 'text-rose-700'
+    case 'AMARILLA': return 'text-amber-800'
+    case 'VERDE': return 'text-emerald-800'
+    default: return 'text-zinc-500'
   }
 }
 
 function getGridCardClass(alerta: string): string {
   switch (alerta) {
     case 'ROJA':
-      return 'bg-rose-50/80 border-rose-200 text-rose-950 hover:bg-rose-100'
+      return 'bg-rose-50/70 border-rose-200/90 text-rose-950 hover:bg-rose-100/80 hover:border-rose-300 shadow-xs'
     case 'AMARILLA':
-      return 'bg-amber-50/80 border-amber-200 text-amber-950 hover:bg-amber-100'
+      return 'bg-amber-50/70 border-amber-200/90 text-amber-950 hover:bg-amber-100/80 hover:border-amber-300 shadow-xs'
     case 'VERDE':
-      return 'bg-emerald-50/80 border-emerald-200 text-emerald-950 hover:bg-emerald-100'
+      return 'bg-emerald-50/70 border-emerald-200/90 text-emerald-950 hover:bg-emerald-100/80 hover:border-emerald-300 shadow-xs'
     default:
-      return 'bg-zinc-50 border-zinc-200/80 text-zinc-700 hover:bg-zinc-100'
+      return 'bg-zinc-50/70 border-zinc-200/80 text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300'
   }
 }
 
@@ -785,7 +802,36 @@ function getProvinceShape(alerta: string): string {
     case 'ROJA': return 'burst'
     case 'AMARILLA': return 'soft-burst'
     case 'VERDE': return 'flower'
-    default: return '12-sided-cookie'
+    default: return 'sunny'
+  }
+}
+
+function getShapeColorStyle(alerta: string): Record<string, string> {
+  switch (alerta) {
+    case 'ROJA':
+      return {
+        '--_shape-bg': '#FFE4E6', // soft crimson background
+        '--_shape-fg': '#E11D48', // vibrant crimson icon
+        '--_shape-size': '2rem'
+      }
+    case 'AMARILLA':
+      return {
+        '--_shape-bg': '#FEF3C7', // warm amber background
+        '--_shape-fg': '#D97706', // warm amber icon
+        '--_shape-size': '2rem'
+      }
+    case 'VERDE':
+      return {
+        '--_shape-bg': '#D1FAE5', // fresh emerald background
+        '--_shape-fg': '#059669', // fresh emerald icon
+        '--_shape-size': '2rem'
+      }
+    default: // NORMAL / SIN ALERTA
+      return {
+        '--_shape-bg': '#F1F5F9', // light slate background
+        '--_shape-fg': '#64748B', // subtle slate icon
+        '--_shape-size': '2rem'
+      }
   }
 }
 
