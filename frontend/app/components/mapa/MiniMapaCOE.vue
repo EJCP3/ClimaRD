@@ -17,29 +17,54 @@
         </div>
       </div>
 
-      <!-- View Mode Selector -->
-      <div class="flex items-center space-x-1 self-end sm:self-auto bg-zinc-100 p-1 rounded-full border border-zinc-200/80 text-xs">
-        <button
-          @click="activeView = 'mapa'"
-          class="px-3 py-1.5 rounded-full transition-all text-xs font-bold cursor-pointer"
-          :class="activeView === 'mapa' ? 'bg-zinc-950 text-white shadow-sm font-black' : 'text-zinc-600 hover:text-zinc-950'"
-        >
-          Mapa Gráfico
-        </button>
-        <button
-          @click="activeView = 'tabla'"
-          class="px-3 py-1.5 rounded-full transition-all text-xs font-bold cursor-pointer"
-          :class="activeView === 'tabla' ? 'bg-zinc-950 text-white shadow-sm font-black' : 'text-zinc-600 hover:text-zinc-950'"
-        >
-          Cuadrícula
-        </button>
+      <!-- Controls: Color Mode & View Mode Selector -->
+      <div class="flex flex-wrap items-center gap-2 self-end sm:self-auto">
+        <!-- Palette Mode Switch -->
+        <div class="flex items-center space-x-1 bg-zinc-100 p-1 rounded-full border border-zinc-200/80 text-xs">
+          <button
+            @click="mapColorMode = 'alertas'"
+            type="button"
+            class="px-2.5 py-1 rounded-full transition-all text-[11px] font-bold cursor-pointer"
+            :class="mapColorMode === 'alertas' ? 'bg-zinc-950 text-white shadow-xs' : 'text-zinc-600 hover:text-zinc-950'"
+          >
+            Alertas COE
+          </button>
+          <button
+            @click="mapColorMode = 'dominicango'"
+            type="button"
+            class="px-2.5 py-1 rounded-full transition-all text-[11px] font-bold cursor-pointer"
+            :class="mapColorMode === 'dominicango' ? 'bg-zinc-950 text-white shadow-xs' : 'text-zinc-600 hover:text-zinc-950'"
+          >
+            Pastel Geográfico
+          </button>
+        </div>
+
+        <!-- View Mode Selector -->
+        <div class="flex items-center space-x-1 bg-zinc-100 p-1 rounded-full border border-zinc-200/80 text-xs">
+          <button
+            @click="activeView = 'mapa'"
+            type="button"
+            class="px-2.5 py-1 rounded-full transition-all text-[11px] font-bold cursor-pointer"
+            :class="activeView === 'mapa' ? 'bg-zinc-950 text-white shadow-xs' : 'text-zinc-600 hover:text-zinc-950'"
+          >
+            Mapa
+          </button>
+          <button
+            @click="activeView = 'tabla'"
+            type="button"
+            class="px-2.5 py-1 rounded-full transition-all text-[11px] font-bold cursor-pointer"
+            :class="activeView === 'tabla' ? 'bg-zinc-950 text-white shadow-xs' : 'text-zinc-600 hover:text-zinc-950'"
+          >
+            Cuadrícula
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- View 1: Graphical SVG Map (Harmonized design) -->
-    <div v-show="activeView === 'mapa'" class="relative p-3 md:p-6 bg-gradient-to-br from-slate-50/50 via-sky-50/20 to-zinc-50/60 flex-1 flex flex-col justify-between">
+    <!-- View 1: Graphical SVG Map (DominicanGo Cartographic Design) -->
+    <div v-show="activeView === 'mapa'" class="relative p-3 md:p-6 bg-slate-50/40 flex-1 flex flex-col justify-between">
       <!-- Top Map Controls & Quick Filter Chips -->
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-2 z-10">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3 z-10">
         <!-- Interactive Alert Filter Chips -->
         <div class="flex items-center space-x-1 sm:space-x-1.5 overflow-x-auto py-0.5">
           <button
@@ -88,31 +113,51 @@
           </button>
         </div>
 
-        <div class="flex items-center space-x-2 text-[11px] text-zinc-500">
+        <div class="flex items-center space-x-2 text-[11px] text-zinc-500 font-medium">
           <AppIcon name="map-pin" class="w-3.5 h-3.5 text-zinc-700" />
           <span class="hidden sm:inline">Posa o haz clic en una provincia</span>
         </div>
       </div>
 
-      <!-- SVG Map Canvas Container -->
-      <div class="relative w-full aspect-[800/520] max-h-[520px] mx-auto select-none">
+      <!-- DominicanGo Style Oceanic SVG Map Container -->
+      <div
+        class="relative w-full aspect-[960/500] max-h-[560px] mx-auto select-none rounded-[28px] overflow-hidden border border-sky-200/60 shadow-sm"
+        style="background: linear-gradient(180deg, #e8f4f8 0%, #d4eef7 30%, #e2f0e8 60%, #eef6fa 100%);"
+      >
+        <!-- Airplane pulling banner across top (DominicanGo Signature Feature) -->
+        <div class="airplane-flyby pointer-events-none absolute top-[6%] left-0 w-full z-20 overflow-hidden">
+          <div class="airplane-slider">
+            <div class="airplane-banner-box font-mono text-[11px] sm:text-xs">
+              ¡Haz clic en una provincia y explora alertas y detalles!
+            </div>
+            <svg class="airplane-rope" width="46" height="18" viewBox="0 0 50 20">
+              <line x1="0" y1="14" x2="48" y2="10" stroke="#4A7088" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/>
+            </svg>
+            <svg class="airplane-plane" width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" fill="#2E5062"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- SVG Canvas (960 x 500) -->
         <svg
-          viewBox="0 0 800 550"
+          viewBox="0 0 960 500"
           class="w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="xMidYMid meet"
         >
           <defs>
             <!-- Elevation drop shadow for Dominican Republic island -->
-            <filter id="island-shadow" x="-8%" y="-8%" width="120%" height="120%">
-              <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.10" />
+            <filter id="island-shadow" x="-5%" y="-5%" width="115%" height="115%">
+              <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0e364a" flood-opacity="0.12" />
             </filter>
 
-            <!-- Subtle ocean graticule grid pattern -->
-            <pattern id="ocean-grid" width="45" height="45" patternUnits="userSpaceOnUse">
-              <path d="M 45 0 L 0 0 0 45" fill="none" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="2 5" opacity="0.6" />
+            <!-- Subtle ocean graticule pattern -->
+            <pattern id="ocean-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+              <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#b4d7e6" stroke-width="0.5" stroke-dasharray="2 6" opacity="0.45" />
             </pattern>
 
-            <!-- Cartographic gradients for rich, harmonious elevation -->
+            <!-- Cartographic gradients for COE alert levels -->
             <linearGradient id="grad-roja" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#FB7185" />
               <stop offset="50%" stop-color="#E11D48" />
@@ -132,41 +177,102 @@
             </linearGradient>
 
             <linearGradient id="grad-normal" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#F8FAFC" />
-              <stop offset="60%" stop-color="#E2E8F0" />
-              <stop offset="100%" stop-color="#CBD5E1" />
+              <stop offset="0%" stop-color="#CBD5E1" />
+              <stop offset="60%" stop-color="#94A3B8" />
+              <stop offset="100%" stop-color="#64748B" />
             </linearGradient>
           </defs>
 
           <!-- Ocean Graticule Background Grid -->
-          <rect width="800" height="550" fill="url(#ocean-grid)" opacity="0.45" />
+          <rect width="960" height="500" fill="url(#ocean-grid)" />
 
-          <!-- Maritime Coordinates Stamp -->
-          <text x="780" y="28" text-anchor="end" class="font-mono text-[9px] fill-zinc-400 select-none pointer-events-none">
-            18°44' N • 70°09' W | CARIBE
+          <!-- Ocean Water Typography (DominicanGo Aesthetic) -->
+          <text
+            x="640"
+            y="46"
+            class="text-[11px] italic pointer-events-none tracking-[0.35em] uppercase select-none font-medium"
+            fill="#8aaec0"
+            text-anchor="middle"
+          >
+            Océano Atlántico
           </text>
 
-          <!-- Province Polygons with Rich Gradients & Elevation -->
+          <text
+            x="390"
+            y="480"
+            class="text-[11px] italic pointer-events-none tracking-[0.35em] uppercase select-none font-medium"
+            fill="#8aaec0"
+            text-anchor="middle"
+          >
+            Mar Caribe
+          </text>
+
+          <!-- Geographic Water Features & Coastal Labels -->
+          <g class="pointer-events-none select-none">
+            <!-- Bahía de Samaná -->
+            <text x="614.1" y="179.2" text-anchor="middle" fill="#4a8a96" font-size="6.8" font-style="italic" font-weight="500" letter-spacing="0.5" opacity="0.85">
+              Bahía de Samaná
+            </text>
+            <!-- Lago Enriquillo -->
+            <text x="203" y="283.9" text-anchor="middle" fill="#1a6070" font-size="5.5" font-style="italic" font-weight="700" letter-spacing="0.4" opacity="0.95">
+              L. Enriquillo
+            </text>
+            <!-- Isla Saona -->
+            <text x="759.9" y="354.9" text-anchor="middle" fill="#4a8a96" font-size="6" font-style="italic" font-weight="500" letter-spacing="0.4" opacity="0.85">
+              Isla Saona
+            </text>
+            <!-- Isla Catalina -->
+            <text x="703.8" y="311.9" text-anchor="middle" fill="#4a8a96" font-size="5.5" font-style="italic" font-weight="500" letter-spacing="0.4" opacity="0.85">
+              Isla Catalina
+            </text>
+            <!-- Isla Beata -->
+            <text x="227.3" y="452" text-anchor="middle" fill="#4a8a96" font-size="6" font-style="italic" font-weight="500" letter-spacing="0.4" opacity="0.85">
+              Isla Beata
+            </text>
+          </g>
+
+          <!-- Nautical Compass Rose (DominicanGo Signature) -->
+          <g transform="translate(865, 415)" class="pointer-events-none select-none">
+            <g id="map-compass">
+              <circle cx="0" cy="0" r="18" fill="none" stroke="#a6c0cd" stroke-width="1.2" opacity="0.75" />
+              <circle cx="0" cy="0" r="2" fill="#a6c0cd" />
+              <line x1="0" y1="-14" x2="0" y2="-6" stroke="#a6c0cd" stroke-width="1.5" />
+              <line x1="0" y1="6" x2="0" y2="14" stroke="#a6c0cd" stroke-width="1.2" />
+              <line x1="-14" y1="0" x2="-6" y2="0" stroke="#a6c0cd" stroke-width="1.2" />
+              <line x1="6" y1="0" x2="14" y2="0" stroke="#a6c0cd" stroke-width="1.2" />
+              <polygon points="0,-14 -3,-8 3,-8" fill="#a6c0cd" />
+              <text x="0" y="-18" text-anchor="middle" font-size="8.5" font-weight="800" fill="#7a9bab" font-family="sans-serif">N</text>
+            </g>
+          </g>
+
+          <!-- Maritime Coordinates -->
+          <text x="940" y="24" text-anchor="end" class="font-mono text-[9px] fill-[#8aaec0] select-none pointer-events-none opacity-80">
+            18°44' N • 70°09' W | REPUBLICA DOMINICANA
+          </text>
+
+          <!-- 32 Province Polygons (Official dr-optimized GeoJSON with Islands & Coastline) -->
           <g class="provinces-group" filter="url(#island-shadow)">
             <path
               v-for="prov in provincesList"
               :key="prov.code"
               :id="'prov-path-' + prov.code"
               :d="prov.path"
-              :fill="'url(#grad-' + prov.alerta.toLowerCase() + ')'"
+              :fill="getProvinceFill(prov)"
               class="origin-center transition-all duration-200 cursor-pointer"
               :class="[
                 selectedProvince?.code === prov.code
-                  ? 'brightness-110 drop-shadow-lg stroke-zinc-950 [stroke-width:2.8px]'
+                  ? 'brightness-110 drop-shadow-xl stroke-slate-950 [stroke-width:2.4px]'
                   : isProvinceDimmed(prov.alerta)
-                    ? 'opacity-30 saturate-50 stroke-white [stroke-width:1.5px]'
-                    : 'opacity-100 stroke-white [stroke-width:1.8px] hover:brightness-105 hover:stroke-zinc-950 hover:[stroke-width:2.4px]'
+                    ? 'opacity-25 saturate-50 stroke-white/80 [stroke-width:1.2px]'
+                    : 'opacity-100 stroke-white [stroke-width:1.3px] hover:brightness-105 hover:stroke-slate-900/70 hover:[stroke-width:2px]'
               ]"
               stroke-linejoin="round"
               stroke-linecap="round"
+              tabindex="0"
               @mouseenter="onHover(prov, $event)"
               @mouseleave="onLeave"
               @click="selectProvince(prov, $event)"
+              @keydown.enter="selectProvince(prov, $event)"
             />
           </g>
 
@@ -175,27 +281,27 @@
             <template v-for="prov in provincesList" :key="`beacon-${prov.code}`">
               <g
                 v-if="prov.alerta === 'ROJA' && !isProvinceDimmed(prov.alerta)"
-                :transform="`translate(${getCentroid(prov)[0]}, ${getCentroid(prov)[1] - 11})`"
+                :transform="`translate(${prov.centroid[0]}, ${prov.centroid[1] - 9})`"
               >
-                <circle r="5" fill="#E11D48" opacity="0.75" class="animate-ping" />
-                <circle r="2.5" fill="#ffffff" stroke="#BE123C" stroke-width="1.2" />
+                <circle r="6" fill="#E11D48" opacity="0.8" class="animate-ping" />
+                <circle r="3" fill="#ffffff" stroke="#BE123C" stroke-width="1.3" />
               </g>
             </template>
           </g>
 
-          <!-- Province Names Labels on Map (All 32 Provincias COE) -->
+          <!-- Province Names Labels on Map (All 32 Official DominicanGo Labels) -->
           <g class="pointer-events-none labels-group select-none">
             <template v-for="prov in provincesList" :key="`lbl-${prov.code}`">
               <text
-                :x="getCentroid(prov)[0]"
-                :y="getCentroid(prov)[1]"
+                :x="prov.centroid[0]"
+                :y="prov.centroid[1]"
                 text-anchor="middle"
                 dominant-baseline="central"
                 class="font-sans select-none pointer-events-none transition-all duration-150"
-                :class="isProvinceDimmed(prov.alerta) ? 'opacity-30' : 'opacity-100'"
-                :style="getLabelStyle(prov.alerta, prov.code)"
+                :class="isProvinceDimmed(prov.alerta) ? 'opacity-25' : 'opacity-100'"
+                :style="getLabelStyle(prov)"
               >
-                {{ getShortLabel(prov.code, prov.name) }}
+                {{ prov.shortLabel }}
               </text>
             </template>
           </g>
@@ -207,7 +313,7 @@
           class="absolute pointer-events-none z-30 transition-all duration-75 transform -translate-x-1/2 -translate-y-full mb-3"
           :style="{ left: `${tooltipPos.x}px`, top: `${tooltipPos.y}px` }"
         >
-          <div class="bg-zinc-950/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-2xl border border-zinc-700/60 min-w-[180px] space-y-1">
+          <div class="bg-zinc-950/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-2xl border border-zinc-700/60 min-w-[190px] space-y-1">
             <div class="flex items-center justify-between space-x-2">
               <p class="font-extrabold text-xs text-white">{{ hoveredProvince.name }}</p>
               <span
@@ -220,11 +326,14 @@
             <p class="text-[11px] text-zinc-300 font-normal leading-tight">
               {{ getProvinceStatusDescription(hoveredProvince.alerta) }}
             </p>
+            <p class="text-[10px] text-sky-400 font-medium pt-0.5">
+              Haz clic para ver informe y detalles &rarr;
+            </p>
           </div>
         </div>
 
-        <!-- Official COE Bulletin Legend (Matches bottom right of the uploaded user image) -->
-        <div class="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 z-20 bg-white/95 backdrop-blur-md p-3 sm:p-4 rounded-2xl border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-2 text-[11px]">
+        <!-- Official COE Bulletin Legend (Bottom right overlay) -->
+        <div class="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 z-20 bg-white/95 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-1.5 text-[11px]">
           <div class="flex items-center space-x-2">
             <span class="w-3.5 h-3.5 rounded-md bg-[#E11D48] shadow-xs shrink-0"></span>
             <span class="font-bold text-zinc-800">7 provincias en alerta roja</span>
@@ -238,7 +347,7 @@
             <span class="font-bold text-zinc-800">7 provincias en alerta verde</span>
           </div>
           <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#E2E8F0] border border-zinc-300 shadow-xs shrink-0"></span>
+            <span class="w-3.5 h-3.5 rounded-md bg-[#94A3B8] shadow-xs shrink-0"></span>
             <span class="font-semibold text-zinc-500">10 provincias sin alerta</span>
           </div>
         </div>
@@ -279,7 +388,7 @@
           <NuxtLink to="/mapa">
             <moni-button variant="tonal" shape="round" size="small">
               <AppIcon slot="icon" name="map" class="w-3.5 h-3.5 mr-1.5" />
-              Mapa
+              Mapa WebGL
             </moni-button>
           </NuxtLink>
         </div>
@@ -439,9 +548,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
-import rawProvincesPaths from '~/assets/data/provincias-svg-paths.json'
+import rawProvincesPaths from '~/assets/data/provincias-dr-paths.json'
 
 const activeView = ref<'mapa' | 'tabla'>('mapa')
+const mapColorMode = ref<'alertas' | 'dominicango'>('alertas')
 const activeAlertFilter = ref<'ALL' | 'ROJA' | 'AMARILLA' | 'VERDE' | 'NORMAL'>('ALL')
 const hoveredProvince = ref<any>(null)
 const selectedProvince = ref<any>(null)
@@ -454,12 +564,13 @@ function isProvinceDimmed(alerta: string): boolean {
   return activeAlertFilter.value !== alerta
 }
 
-// Exact 32 Provinces COE Alert mapping from official bulletin (image 2)
+// Exact 32 Provinces COE Alert mapping from official bulletin
 const coeAlertasMap: Record<string, string> = {
   // 7 ALERTA ROJA
   'ELIAS PINA': 'ROJA',
   'SAN JUAN': 'ROJA',
   'AZUA': 'ROJA',
+  'BAHORUCO': 'ROJA',
   'BAORUCO': 'ROJA',
   'INDEPENDENCIA': 'ROJA',
   'BARAHONA': 'ROJA',
@@ -509,16 +620,19 @@ const provincesList = computed(() => {
   })
 })
 
-function getProvinceColor(alerta: string): string {
-  switch (alerta) {
+function getProvinceFill(prov: any): string {
+  if (mapColorMode.value === 'dominicango') {
+    return prov.color || '#80BABA'
+  }
+  switch (prov.alerta) {
     case 'ROJA':
-      return '#E11D48' // Refined Crimson Red (Rose-600)
+      return 'url(#grad-roja)'
     case 'AMARILLA':
-      return '#F59E0B' // Refined Warm Amber (Amber-500)
+      return 'url(#grad-amarilla)'
     case 'VERDE':
-      return '#10B981' // Refined Emerald Green (Emerald-500)
+      return 'url(#grad-verde)'
     default:
-      return '#E2E8F0' // Modern Clean Slate (Slate-200)
+      return 'url(#grad-normal)'
   }
 }
 
@@ -531,7 +645,7 @@ function getBadgeColorClass(alerta: string): string {
     case 'VERDE':
       return 'bg-[#10B981] text-white'
     default:
-      return 'bg-zinc-400 text-white'
+      return 'bg-zinc-500 text-white'
   }
 }
 
@@ -583,146 +697,67 @@ function getProvinceAdvice(alerta: string, name: string): string {
   }
 }
 
-// Clean, elegant Title Case labels matching the modern application typography
-const customLabels: Record<string, string> = {
-  '01': 'D.N.',
-  '02': 'Azua',
-  '03': 'Baoruco',
-  '04': 'Barahona',
-  '05': 'Dajabón',
-  '06': 'Duarte',
-  '07': 'Elías Piña',
-  '08': 'El Seibo',
-  '09': 'Espaillat',
-  '10': 'Indep.',
-  '11': 'Altagracia',
-  '12': 'La Romana',
-  '13': 'La Vega',
-  '14': 'M.T. Sánchez',
-  '15': 'Mte. Cristi',
-  '16': 'Pedernales',
-  '17': 'Peravia',
-  '18': 'Pto. Plata',
-  '19': 'H. Mirabal',
-  '20': 'Samaná',
-  '21': 'S. Cristóbal',
-  '22': 'San Juan',
-  '23': 'S.P.M.',
-  '24': 'S. Ramírez',
-  '25': 'Santiago',
-  '26': 'Stgo. Rguez.',
-  '27': 'Valverde',
-  '28': 'M. Nouel',
-  '29': 'Monte Plata',
-  '30': 'Hato Mayor',
-  '31': 'S.J. Ocoa',
-  '32': 'Sto. Dgo.',
-}
-
-const centroidOverrides: Record<string, [number, number]> = {
-  '32': [474, 298], // Santo Domingo: outer ring northeast of D.N.
-  '01': [442, 321], // Distrito Nacional
-  '09': [348, 92],  // Espaillat: northern coastline away from Hermanas Mirabal
-  '19': [360, 130], // Hermanas Mirabal (Salcedo)
-  '27': [216, 98],  // Valverde (Mao)
-  '25': [250, 142], // Santiago
-  '26': [167, 136], // Santiago Rodríguez
-  '05': [104, 127], // Dajabón
-  '07': [97, 206],  // Elías Piña
-  '22': [168, 239], // San Juan
-  '10': [99, 326],  // Independencia
-  '03': [175, 318], // Baoruco
-  '16': [118, 442], // Pedernales
-  '04': [188, 373], // Barahona
-  '02': [260, 304], // Azua
-  '31': [336, 296], // San José de Ocoa
-  '17': [360, 347], // Peravia
-  '21': [387, 313], // San Cristóbal
-  '28': [348, 230], // Monseñor Nouel
-  '13': [313, 196], // La Vega
-  '24': [403, 204], // Sánchez Ramírez
-  '06': [424, 166], // Duarte
-  '14': [438, 122], // María Trinidad Sánchez
-  '20': [538, 171], // Samaná
-  '29': [468, 249], // Monte Plata
-  '30': [553, 224], // Hato Mayor
-  '23': [568, 298], // San Pedro de Macorís
-  '08': [625, 250], // El Seibo
-  '12': [664, 340], // La Romana
-  '11': [696, 301], // La Altagracia
-  '18': [270, 58],  // Puerto Plata
-  '15': [118, 52],  // Monte Cristi
-}
-
-function getCentroid(prov: any): [number, number] {
-  if (centroidOverrides[prov.code]) {
-    return centroidOverrides[prov.code]
-  }
-  return prov.centroid
-}
-
-function getShortLabel(code: string, name: string): string {
-  if (customLabels[code]) return customLabels[code]
-  return name
-}
-
 function getLabelPixelSize(code: string): string {
-  // Ultra-compact labels for smaller geographic areas
+  // Compact sizes on 960x500 canvas
   if (['01', '19', '27', '31', '24', '10', '28'].includes(code)) {
-    return '8.5px'
+    return '6px'
   }
-  // Larger areas
   if (['22', '25', '13', '02', '11', '18', '29', '04', '15', '16'].includes(code)) {
-    return '10.5px'
+    return '7.5px'
   }
-  return '9.5px'
+  return '6.8px'
 }
 
-function getLabelStyle(alerta: string, code: string): Record<string, string> {
-  const fontSize = getLabelPixelSize(code)
+function getLabelStyle(prov: any): Record<string, string> {
+  const fontSize = getLabelPixelSize(prov.code)
+  const isDominicanGoMode = mapColorMode.value === 'dominicango'
+
   const baseStyle: Record<string, string> = {
     fontSize,
-    fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    fontFamily: "'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif",
+    fontWeight: '700',
+    letterSpacing: '0.04em',
     paintOrder: 'stroke fill',
     strokeLinejoin: 'round'
   }
 
-  switch (alerta) {
+  if (isDominicanGoMode) {
+    return {
+      ...baseStyle,
+      fill: '#1e293b',
+      stroke: 'rgba(255, 255, 255, 0.95)',
+      strokeWidth: '1.8px'
+    }
+  }
+
+  switch (prov.alerta) {
     case 'ROJA':
       return {
         ...baseStyle,
         fill: '#ffffff',
-        fontWeight: '700',
-        letterSpacing: '0.015em',
-        stroke: 'rgba(159, 18, 57, 0.9)', // deep crimson halo for clean contrast
+        stroke: 'rgba(159, 18, 57, 0.95)',
         strokeWidth: '1.6px'
       }
     case 'VERDE':
       return {
         ...baseStyle,
         fill: '#ffffff',
-        fontWeight: '700',
-        letterSpacing: '0.015em',
-        stroke: 'rgba(6, 78, 59, 0.9)', // deep emerald halo
+        stroke: 'rgba(6, 78, 59, 0.95)',
         strokeWidth: '1.6px'
       }
     case 'AMARILLA':
       return {
         ...baseStyle,
-        fill: '#18181b', // dark charcoal
-        fontWeight: '800',
-        letterSpacing: '0.01em',
-        stroke: '#ffffff', // clean white halo
-        strokeWidth: '2.2px'
+        fill: '#18181b',
+        stroke: '#ffffff',
+        strokeWidth: '2px'
       }
     default: // NORMAL
       return {
         ...baseStyle,
-        fill: '#3f3f46', // zinc-700
-        fontWeight: '700',
-        letterSpacing: '0.01em',
-        stroke: '#ffffff', // clean white halo
-        strokeWidth: '2px'
+        fill: '#ffffff',
+        stroke: 'rgba(51, 65, 85, 0.9)',
+        strokeWidth: '1.8px'
       }
   }
 }
@@ -810,26 +845,26 @@ function getShapeColorStyle(alerta: string): Record<string, string> {
   switch (alerta) {
     case 'ROJA':
       return {
-        '--_shape-bg': '#FFE4E6', // soft crimson background
-        '--_shape-fg': '#E11D48', // vibrant crimson icon
+        '--_shape-bg': '#FFE4E6',
+        '--_shape-fg': '#E11D48',
         '--_shape-size': '2rem'
       }
     case 'AMARILLA':
       return {
-        '--_shape-bg': '#FEF3C7', // warm amber background
-        '--_shape-fg': '#D97706', // warm amber icon
+        '--_shape-bg': '#FEF3C7',
+        '--_shape-fg': '#D97706',
         '--_shape-size': '2rem'
       }
     case 'VERDE':
       return {
-        '--_shape-bg': '#D1FAE5', // fresh emerald background
-        '--_shape-fg': '#059669', // fresh emerald icon
+        '--_shape-bg': '#D1FAE5',
+        '--_shape-fg': '#059669',
         '--_shape-size': '2rem'
       }
-    default: // NORMAL / SIN ALERTA
+    default:
       return {
-        '--_shape-bg': '#F1F5F9', // light slate background
-        '--_shape-fg': '#64748B', // subtle slate icon
+        '--_shape-bg': '#F1F5F9',
+        '--_shape-fg': '#64748B',
         '--_shape-size': '2rem'
       }
   }
@@ -862,3 +897,84 @@ function toSlug(name: string): string {
     .replace(/[^a-z0-9-]/g, '')
 }
 </script>
+
+<style scoped>
+/* DominicanGo Signature Airplane Banner Animation */
+.airplane-flyby {
+  position: absolute;
+  top: 5%;
+  left: 0;
+  width: 100%;
+  z-index: 20;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.airplane-slider {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: flyby-x 22s ease-in-out infinite, flyby-y 22s ease-in-out infinite;
+}
+
+.airplane-banner-box {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  color: #244153;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 5px 14px;
+  border-radius: 9999px;
+  border: 1px solid rgba(184, 204, 214, 0.6);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  animation: banner-counterflip 22s ease-in-out infinite;
+}
+
+.airplane-rope {
+  flex-shrink: 0;
+  margin: 0 -2px;
+  align-self: center;
+  animation: banner-counterflip 22s ease-in-out infinite;
+}
+
+.airplane-plane {
+  flex-shrink: 0;
+  transform: rotate(90deg);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.15));
+}
+
+@keyframes flyby-x {
+  0%    { left: 10px;  transform: scaleX(1); }
+  42%   { left: calc(100% - 460px); transform: scaleX(1); }
+  46%   { left: calc(100% - 450px); transform: scaleX(1); }
+  50%   { left: calc(100% - 460px); transform: scaleX(-1); }
+  92%   { left: 10px; transform: scaleX(-1); }
+  96%   { left: 0px; transform: scaleX(-1); }
+  100%  { left: 10px; transform: scaleX(1); }
+}
+
+@keyframes flyby-y {
+  0%    { top: 0; }
+  42%   { top: 0; }
+  44%   { top: -14px; }
+  46%   { top: -24px; }
+  48%   { top: -14px; }
+  50%   { top: 0; }
+  92%   { top: 0; }
+  94%   { top: -14px; }
+  96%   { top: -24px; }
+  98%   { top: -14px; }
+  100%  { top: 0; }
+}
+
+@keyframes banner-counterflip {
+  0%    { transform: scaleX(1); }
+  42%   { transform: scaleX(1); }
+  46%   { transform: scaleX(1); }
+  50%   { transform: scaleX(-1); }
+  92%   { transform: scaleX(-1); }
+  96%   { transform: scaleX(-1); }
+  100%  { transform: scaleX(1); }
+}
+</style>
