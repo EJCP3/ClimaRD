@@ -57,6 +57,30 @@ moni-nav[modal]:not([open]) {
   pointer-events: none !important;
 }
 
+/* Critical fix: Keep aside moni-nav inside layout below bulletin ticker */
+aside moni-nav,
+moni-nav.layout-nav {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+}
+
+aside moni-nav::part(nav),
+moni-nav.layout-nav::part(nav) {
+  position: static !important;
+  inset: auto !important;
+  block-size: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  min-inline-size: 100% !important;
+  inline-size: 100% !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  z-index: auto !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
 moni-shape {
   --_shape-bg: var(--_shape-bg, #EAEAEB);
   --_shape-fg: var(--_shape-fg, #18181B);

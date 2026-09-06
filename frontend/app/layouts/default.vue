@@ -8,10 +8,11 @@
       <!-- 1. Clásica: Drawer lateral estándar completo (M3 Navigation Drawer) -->
       <aside
       v-if="navStyle === 'clasica'"
-      class="hidden md:flex flex-col w-72 border-r border-zinc-200/80 bg-white p-5 space-y-6 shrink-0 transition-all app-sidebar-elem"
+      class="hidden md:flex flex-col w-72 border-r border-zinc-200/80 bg-white p-5 space-y-4 shrink-0 transition-all app-sidebar-elem sticky self-start z-20"
+      :class="tickerPosition === 'top' ? 'top-10 sm:top-11 h-[calc(100vh-2.5rem)] sm:h-[calc(100vh-2.75rem)]' : 'top-0 h-screen'"
     >
       <!-- App Brand -->
-      <div class="flex items-center space-x-3 px-2">
+      <div class="flex items-center space-x-3 px-2 shrink-0">
         <moni-shape name="flower" color="surface" size="small" class="shrink-0">
           <AppIcon name="cloud-rain" class="w-5 h-5 text-zinc-900" />
         </moni-shape>
@@ -22,7 +23,7 @@
       </div>
 
       <!-- Navigation Links with moni-nav variant="drawer" -->
-      <moni-nav variant="drawer" layout="horizontal" placement="left" class="w-full flex-1">
+      <moni-nav variant="drawer" layout="horizontal" class="w-full flex-1 layout-nav space-y-1">
         <moni-nav-item
           v-for="item in navItems"
           :key="item.path"
@@ -34,31 +35,31 @@
         >
           <AppIcon slot="icon" :name="item.icon" class="w-5 h-5" />
         </moni-nav-item>
+
+        <div class="w-full h-px bg-zinc-200/80 my-2"></div>
+
+        <moni-nav-item
+          href="/mapa"
+          label="Reportar Incidencia"
+          :active="$route.path === '/mapa'"
+          @click.prevent="navigateTo('/mapa')"
+          class="w-full"
+        >
+          <AppIcon slot="icon" name="alert-triangle" class="w-5 h-5" />
+        </moni-nav-item>
+
+        <moni-nav-item
+          id="appearance-sidebar-btn-clasica"
+          label="Apariencia y Titulares"
+          @click.prevent="openAppearanceModal($event)"
+          class="w-full"
+        >
+          <AppIcon slot="icon" name="palette" class="w-5 h-5" />
+        </moni-nav-item>
       </moni-nav>
 
-      <!-- Sidebar Actions: Reportar & Apariencia -->
-      <div class="space-y-2 pt-2 border-t border-zinc-100">
-        <NuxtLink to="/mapa" class="block w-full">
-          <moni-button variant="filled" shape="round" size="medium" class="w-full">
-            <AppIcon slot="icon" name="alert-triangle" class="w-4 h-4 mr-2" />
-            Reportar Incidencia
-          </moni-button>
-        </NuxtLink>
-
-        <button
-          id="appearance-sidebar-btn"
-          type="button"
-          @click.stop="openAppearanceModal($event)"
-          class="w-full flex items-center justify-center space-x-2 py-2.5 px-3 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold transition-all cursor-pointer"
-          title="Personalizar Apariencia y Color"
-        >
-          <AppIcon name="palette" class="w-4 h-4 text-zinc-800" />
-          <span>Apariencia y Titulares</span>
-        </button>
-      </div>
-
       <!-- Institutional Footer Badge -->
-      <div class="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200/60">
+      <div class="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200/60 shrink-0">
         <div class="flex items-center space-x-2 text-zinc-800">
           <AppIcon name="check" class="w-4 h-4 text-zinc-900" />
           <span class="text-xs font-bold">Fuente Oficial</span>
@@ -70,13 +71,16 @@
     <!-- 2. Guapa: Riel de navegación M3 compacto lateral (M3 Navigation Rail) -->
     <aside
       v-else-if="navStyle === 'guapa'"
-      class="hidden md:flex flex-col w-20 border-r border-zinc-200/80 bg-white py-5 items-center space-y-6 shrink-0 transition-all app-rail-elem"
+      class="hidden md:flex flex-col w-20 border-r border-zinc-200/80 bg-white py-4 items-center shrink-0 transition-all app-rail-elem sticky self-start z-20"
+      :class="tickerPosition === 'top' ? 'top-10 sm:top-11 h-[calc(100vh-2.5rem)] sm:h-[calc(100vh-2.75rem)]' : 'top-0 h-screen'"
     >
-      <moni-shape name="flower" color="surface" size="small" class="shrink-0">
-        <AppIcon name="cloud-rain" class="w-5 h-5 text-zinc-900" />
-      </moni-shape>
+      <div class="mb-3 shrink-0">
+        <moni-shape name="flower" color="surface" size="small">
+          <AppIcon name="cloud-rain" class="w-5 h-5 text-zinc-900" />
+        </moni-shape>
+      </div>
 
-      <moni-nav variant="rail" layout="vertical" placement="left" class="flex-1 flex flex-col items-center">
+      <moni-nav variant="rail" layout="vertical" class="flex-1 flex flex-col items-center layout-nav w-full space-y-1">
         <moni-nav-item
           v-for="item in navItems"
           :key="item.path"
@@ -87,30 +91,26 @@
         >
           <AppIcon slot="icon" :name="item.icon" class="w-5 h-5" />
         </moni-nav-item>
-      </moni-nav>
 
-      <div class="space-y-3 flex flex-col items-center pt-2">
-        <NuxtLink to="/mapa" title="Reportar Incidencia">
-          <button
-            type="button"
-            class="w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-sm"
-            :style="{ backgroundColor: 'var(--primary)', color: 'var(--on-primary)' }"
-            title="Reportar Incidencia"
-          >
-            <AppIcon name="alert-triangle" class="w-4 h-4" />
-          </button>
-        </NuxtLink>
+        <div class="w-8 h-px bg-zinc-200/80 my-2 self-center shrink-0"></div>
 
-        <button
-          id="appearance-sidebar-btn"
-          type="button"
-          @click.stop="openAppearanceModal($event)"
-          class="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 flex items-center justify-center transition-all cursor-pointer"
-          title="Apariencia"
+        <moni-nav-item
+          href="/mapa"
+          label="Reportar"
+          :active="$route.path === '/mapa'"
+          @click.prevent="navigateTo('/mapa')"
         >
-          <AppIcon name="palette" class="w-4 h-4" />
-        </button>
-      </div>
+          <AppIcon slot="icon" name="alert-triangle" class="w-5 h-5" />
+        </moni-nav-item>
+
+        <moni-nav-item
+          id="appearance-sidebar-btn"
+          label="Tema"
+          @click.prevent="openAppearanceModal($event)"
+        >
+          <AppIcon slot="icon" name="palette" class="w-5 h-5" />
+        </moni-nav-item>
+      </moni-nav>
     </aside>
 
     <!-- 3. Tasks: Cajón Modal M3 para tareas y alertas operativas -->
