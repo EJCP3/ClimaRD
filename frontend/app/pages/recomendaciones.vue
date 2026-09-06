@@ -2,10 +2,6 @@
   <div class="p-4 md:p-8 max-w-5xl mx-auto space-y-8">
     <!-- Header Section -->
     <div>
-      <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-zinc-100 text-zinc-700 text-xs font-semibold mb-2 border border-zinc-200/60">
-        <AppIcon name="shield" class="w-3.5 h-3.5 text-zinc-800" />
-        <span>Centro de Asistencia y Prevención</span>
-      </div>
       <h2 class="text-2xl sm:text-4xl font-black text-zinc-950 tracking-tight">Prevención y Asistencia Ciudadana</h2>
       <p class="text-xs sm:text-sm text-zinc-500 mt-1 max-w-2xl leading-relaxed">
         Líneas directas de respuesta a emergencias y protocolos de seguridad ante inundaciones y vaguadas en RD.

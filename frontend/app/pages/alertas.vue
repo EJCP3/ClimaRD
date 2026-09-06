@@ -2,10 +2,6 @@
   <div class="p-4 md:p-8 max-w-5xl mx-auto space-y-8">
     <!-- Header -->
     <div class="space-y-2">
-      <div class="inline-flex items-center space-x-2 bg-zinc-100 px-3.5 py-1.5 rounded-full border border-zinc-200/60 text-xs font-semibold text-zinc-800">
-        <AppIcon name="bell" class="w-3.5 h-3.5 text-zinc-800" />
-        <span>Centro de Operaciones de Emergencias (COE)</span>
-      </div>
       <h2 class="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">Alertas Provinciales Activas</h2>
       <p class="text-xs md:text-sm text-zinc-600 max-w-2xl leading-relaxed">
         Niveles oficiales de advertencia meteorológica emitidos en coordinación técnica con el Instituto Dominicano de Meteorología (INDOMET).

@@ -3,10 +3,6 @@
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-zinc-100 text-zinc-700 text-xs font-semibold mb-2 border border-zinc-200/60">
-          <AppIcon name="camera" class="w-3.5 h-3.5 text-zinc-800" />
-          <span>Reportes Ciudadanos Verificados</span>
-        </div>
         <h2 class="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight">Muro de Evidencias Urbanas</h2>
         <p class="text-xs sm:text-sm text-zinc-500 mt-1">
           Validación ciudadana en tiempo real ante eventos meteorológicos y calles anegadas.

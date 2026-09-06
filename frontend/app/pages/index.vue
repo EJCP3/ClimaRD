@@ -2,12 +2,6 @@
   <div class="p-4 md:p-8 max-w-5xl mx-auto space-y-8">
     <!-- Hero Card (Styled directly from Material 3 Expressive Mobile-First screenshots) -->
     <div class="bg-white rounded-[32px] p-6 md:p-10 border border-zinc-200/80 shadow-sm space-y-6">
-      <!-- Location Header Pill -->
-      <div class="inline-flex items-center space-x-2 text-zinc-700 bg-zinc-100 px-3.5 py-1.5 rounded-full border border-zinc-200/60">
-        <AppIcon name="map-pin" class="w-4 h-4 text-zinc-800" />
-        <span class="text-xs font-semibold">Monitoreo en tu ubicación: Gran Santo Domingo</span>
-      </div>
-
       <!-- Big Bold Headline -->
       <div class="space-y-3">
         <h2 class="text-3xl md:text-5xl font-black text-zinc-950 tracking-tight leading-[1.15]">
