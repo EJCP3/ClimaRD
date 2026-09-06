@@ -1,0 +1,133 @@
+@import "tailwindcss";
+@plugin "daisyui";
+@import "wisspop/styles.css";
+@import "super-beautiful-toast/style.css";
+
+@theme {
+  --color-surface-light: #F8FAFC;
+  --color-surface-dark: #0F172A;
+  --color-primary-blue: #0284C7;
+  --color-accent-cyan: #06B6D4;
+  --color-alert-green: #10B981;
+  --color-alert-yellow: #F59E0B;
+  --color-alert-red: #EF4444;
+  --color-incident-orange: #F97316;
+
+  --font-sans: "Plus Jakarta Sans", Inter, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --animate-marquee: marquee 60s linear infinite;
+  --animate-fadeIn: fadeIn 0.25s ease-out forwards;
+  --animate-fade-in: fadeIn 0.25s ease-out forwards;
+  --animate-scaleUp: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-scale-up: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-vt-fade-out: vtPageFadeOut 180ms cubic-bezier(0.4, 0, 1, 1) both;
+  --animate-vt-fade-in: vtPageFadeIn 260ms cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleUp {
+  0% { opacity: 0; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes vtPageFadeOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-8px) scale(0.995); }
+}
+
+@keyframes vtPageFadeIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.995); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* MapLibre Theme Integration */
+.maplibregl-ctrl-group {
+  border-radius: 9999px !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid #e4e4e7 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden !important;
+}
+.maplibregl-ctrl-group button {
+  width: 38px !important;
+  height: 38px !important;
+  border: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background-color 0.15s ease;
+}
+.maplibregl-ctrl-group button:hover {
+  background-color: #f4f4f5 !important;
+}
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid #e4e4e7 !important;
+}
+.maplibregl-popup {
+  z-index: 30 !important;
+  max-width: 380px !important;
+}
+.maplibregl-popup-content {
+  background-color: #ffffff !important;
+  backdrop-filter: blur(12px) !important;
+  border-radius: 28px !important;
+  border: 1px solid #e4e4e7 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  font-family: inherit;
+  max-width: 380px !important;
+}
+.maplibregl-popup-tip {
+  border-top-color: #ffffff !important;
+}
+.maplibregl-popup-close-button {
+  top: 12px !important;
+  right: 12px !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 9999px !important;
+  background-color: #f4f4f5 !important;
+  color: #71717a !important;
+  border: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  outline: none !important;
+}
+.maplibregl-popup-close-button:hover {
+  background-color: #e4e4e7 !important;
+  color: #09090b !important;
+}
+.maplibregl-ctrl-attrib {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(4px) !important;
+  border-radius: 9999px !important;
+  padding: 2px 10px !important;
+  font-size: 10px !important;
+  color: #a1a1aa !important;
+  border: 1px solid #e4e4e7 !important;
+  margin: 10px !important;
+}
+.maplibregl-ctrl-attrib a {
+  color: #71717a !important;
+  text-decoration: none !important;
+}
+.maplibregl-ctrl-attrib a:hover {
+  text-decoration: underline !important;
+}
