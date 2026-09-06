@@ -1,7 +1,12 @@
 <template>
-  <div class="min-h-screen flex flex-col md:flex-row bg-[#F6F6F8] text-zinc-900 font-sans antialiased selection:bg-zinc-200">
-    <!-- 1. Clásica: Drawer lateral estándar completo (M3 Navigation Drawer) -->
-    <aside
+  <div class="min-h-screen flex flex-col bg-[#F6F6F8] text-zinc-900 font-sans antialiased selection:bg-zinc-200">
+    <!-- Top Full-Width Bulletin Ticker (Spans 100% width of the screen, above navigation) -->
+    <BulletinTicker v-if="tickerPosition === 'top'" />
+
+    <!-- Application Body: Navigation + Content Area -->
+    <div class="flex-1 flex flex-col md:flex-row min-w-0 relative">
+      <!-- 1. Clásica: Drawer lateral estándar completo (M3 Navigation Drawer) -->
+      <aside
       v-if="navStyle === 'clasica'"
       class="hidden md:flex flex-col w-72 border-r border-zinc-200/80 bg-white p-5 space-y-6 shrink-0 transition-all"
     >
@@ -166,9 +171,6 @@
 
     <!-- Main Content Area (Header removed completely per user request) -->
     <div class="flex-1 flex flex-col min-w-0 relative">
-      <!-- Animated Bulletin Ticker (Top Position) -->
-      <BulletinTicker v-if="tickerPosition === 'top'" />
-
       <!-- Tasks Mode Brand & Actions Pill on Desktop -->
       <div
         v-if="navStyle === 'tasks'"
@@ -265,16 +267,17 @@
         class="flex-1 pb-24 md:pb-8 transition-all"
         :class="[
           (navStyle === 'bonita' || navStyle === 'tasks')
-            ? (tickerPosition === 'top' ? 'pt-20 md:pt-24' : 'pt-14 md:pt-16')
-            : (tickerPosition === 'top' ? 'pt-2 md:pt-4' : 'pt-4 md:pt-6')
+            ? 'pt-16 md:pt-20'
+            : 'pt-4 md:pt-6'
         ]"
       >
         <slot />
       </main>
-
-      <!-- Animated Bulletin Ticker (Bottom Position) -->
-      <BulletinTicker v-if="tickerPosition === 'bottom'" />
     </div>
+  </div>
+
+  <!-- Animated Bulletin Ticker (Bottom Position - Full 100% Width) -->
+  <BulletinTicker v-if="tickerPosition === 'bottom'" />
 
     <!-- Mobile Bottom Navigation Bar (Powered by moni-nav) -->
     <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-zinc-200/80">
