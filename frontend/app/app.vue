@@ -81,4 +81,20 @@ moni-chip {
   --on-secondary-container: var(--on-secondary-container, #18181b);
   --outline-variant: var(--outline, #e4e4e7);
 }
+
+/* Appearance Modal styling: clean light background, no blur */
+moni-morph-modal#appearance-morph-modal::part(panel),
+.appearance-morph-modal::part(panel) {
+  background-color: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid #e4e4e7 !important;
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.12), 0 10px 15px -3px rgba(0, 0, 0, 0.06) !important;
+}
+
+moni-morph-modal#appearance-morph-modal::part(backdrop),
+.appearance-morph-modal::part(backdrop) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
 </style>
