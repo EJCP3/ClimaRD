@@ -8,16 +8,9 @@
     ]"
   >
     <div class="h-full flex items-center justify-between px-3 sm:px-5 w-full relative">
-      <!-- Left Tag: Live Bulletin Indicator -->
-      <div class="flex items-center space-x-2 shrink-0 z-10 bg-[#111113] pr-2">
-        <span class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-black uppercase tracking-wider">
-          <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
-          <span>Boletín COE</span>
-        </span>
-      </div>
-
-      <!-- Left Gradient Fade Mask -->
-      <div class="hidden sm:block w-8 h-full bg-gradient-to-r from-[#111113] to-transparent pointer-events-none z-10 shrink-0"></div>
+      <!-- Edge Gradient Fade Masks -->
+      <div class="w-8 h-full bg-gradient-to-r from-[#111113] to-transparent pointer-events-none absolute left-0 top-0 z-10"></div>
+      <div class="w-8 h-full bg-gradient-to-l from-[#111113] to-transparent pointer-events-none absolute right-0 top-0 z-10"></div>
 
       <!-- Center Animation Modes -->
       <!-- 1. Mode: Continuous Marquee (Slow, Smooth, Calm) -->
@@ -132,32 +125,6 @@
           {{ tickerItems[activeFlipIndex].text }}
         </span>
       </div>
-
-      <!-- Right Gradient Fade Mask -->
-      <div class="hidden sm:block w-8 h-full bg-gradient-to-l from-[#111113] to-transparent pointer-events-none z-10 shrink-0"></div>
-
-      <!-- Right Controls: Appearance & Full Map Link -->
-      <div class="flex items-center space-x-1.5 shrink-0 z-10 bg-[#111113] pl-2">
-        <NuxtLink
-          to="/alertas"
-          class="hidden sm:inline-flex items-center space-x-1 text-[11px] font-bold text-zinc-400 hover:text-white px-2.5 py-1 rounded hover:bg-zinc-800 transition-colors"
-        >
-          <span>Ver Mapa</span>
-          <AppIcon name="arrow-right" class="w-3 h-3" />
-        </NuxtLink>
-
-        <!-- Appearance Modal Trigger -->
-        <button
-          id="appearance-ticker-btn"
-          type="button"
-          @click.stop="openAppearanceModal($event)"
-          class="w-7 h-7 rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-          title="Personalizar Apariencia, Titular y Velocidad"
-          aria-label="Personalizar apariencia"
-        >
-          <AppIcon name="palette" class="w-3.5 h-3.5" />
-        </button>
-      </div>
     </div>
   </div>
 </template>
@@ -167,7 +134,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
 import { useAppearance } from '~/composables/useAppearance'
 
-const { tickerPosition, tickerAnimation, tickerSpeed, isAppearanceModalOpen, openAppearanceModal } = useAppearance()
+const { tickerPosition, tickerAnimation, tickerSpeed } = useAppearance()
 
 // Comprehensive, Rich Official Bulletins Feed
 const tickerItems = [
