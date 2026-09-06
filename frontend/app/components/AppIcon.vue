@@ -241,6 +241,22 @@
       <path d="M2 12h20" />
     </template>
 
+    <!-- copy -->
+    <template v-else-if="name === 'copy'">
+      <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+    </template>
+
+    <!-- chevron-right -->
+    <template v-else-if="name === 'chevron-right'">
+      <path d="m9 18 6-6-6-6" />
+    </template>
+
+    <!-- maximize / focus -->
+    <template v-else-if="name === 'maximize' || name === 'focus'">
+      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+    </template>
+
     <!-- default/fallback -->
     <template v-else>
       <circle cx="12" cy="12" r="10" />
