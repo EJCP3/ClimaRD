@@ -1,14 +1,14 @@
 <template>
   <div class="min-h-screen flex flex-col bg-[#F6F6F8] text-zinc-900 font-sans antialiased selection:bg-zinc-200">
     <!-- Top Full-Width Bulletin Ticker (Spans 100% width of the screen, above navigation) -->
-    <BulletinTicker v-if="tickerPosition === 'top'" />
+    <BulletinTicker v-if="tickerPosition === 'top'" class="bulletin-ticker-elem" />
 
     <!-- Application Body: Navigation + Content Area -->
     <div class="flex-1 flex flex-col md:flex-row min-w-0 relative">
       <!-- 1. Clásica: Drawer lateral estándar completo (M3 Navigation Drawer) -->
       <aside
       v-if="navStyle === 'clasica'"
-      class="hidden md:flex flex-col w-72 border-r border-zinc-200/80 bg-white p-5 space-y-6 shrink-0 transition-all"
+      class="hidden md:flex flex-col w-72 border-r border-zinc-200/80 bg-white p-5 space-y-6 shrink-0 transition-all app-sidebar-elem"
     >
       <!-- App Brand -->
       <div class="flex items-center space-x-3 px-2">
@@ -70,7 +70,7 @@
     <!-- 2. Guapa: Riel de navegación M3 compacto lateral (M3 Navigation Rail) -->
     <aside
       v-else-if="navStyle === 'guapa'"
-      class="hidden md:flex flex-col w-20 border-r border-zinc-200/80 bg-white py-5 items-center space-y-6 shrink-0 transition-all"
+      class="hidden md:flex flex-col w-20 border-r border-zinc-200/80 bg-white py-5 items-center space-y-6 shrink-0 transition-all app-rail-elem"
     >
       <moni-shape name="flower" color="surface" size="small" class="shrink-0">
         <AppIcon name="cloud-rain" class="w-5 h-5 text-zinc-900" />
@@ -174,7 +174,7 @@
       <!-- Tasks Mode Brand & Actions Pill on Desktop -->
       <div
         v-if="navStyle === 'tasks'"
-        class="hidden md:flex fixed z-30 items-center space-x-2 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300"
+        class="hidden md:flex fixed z-30 items-center space-x-2 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300 app-floating-nav-elem"
         :class="tickerPosition === 'top' ? 'top-[52px] left-4' : 'top-3.5 left-4'"
       >
         <button
@@ -217,7 +217,7 @@
       <!-- Bonita Mode Floating Nav Island on Desktop -->
       <div
         v-if="navStyle === 'bonita'"
-        class="hidden md:flex fixed z-30 items-center space-x-1.5 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300"
+        class="hidden md:flex fixed z-30 items-center space-x-1.5 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300 app-floating-nav-elem"
         :class="tickerPosition === 'top' ? 'top-[52px] left-4' : 'top-3.5 left-4'"
       >
         <div class="flex items-center space-x-2 mr-2">
@@ -264,7 +264,7 @@
 
       <!-- Page View Content -->
       <main
-        class="flex-1 pb-24 md:pb-8 transition-all"
+        class="flex-1 pb-24 md:pb-8 transition-all app-page-content"
         :class="[
           (navStyle === 'bonita' || navStyle === 'tasks')
             ? 'pt-16 md:pt-20'
@@ -277,10 +277,10 @@
   </div>
 
   <!-- Animated Bulletin Ticker (Bottom Position - Full 100% Width) -->
-  <BulletinTicker v-if="tickerPosition === 'bottom'" />
+  <BulletinTicker v-if="tickerPosition === 'bottom'" class="bulletin-ticker-elem" />
 
     <!-- Mobile Bottom Navigation Bar (Powered by moni-nav) -->
-    <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-zinc-200/80">
+    <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-zinc-200/80 app-mobile-nav-elem">
       <moni-nav placement="bottom" class="w-full">
         <moni-nav-item
           v-for="item in navItems"

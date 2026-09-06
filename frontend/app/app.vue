@@ -97,4 +97,97 @@ moni-morph-modal#appearance-morph-modal::part(backdrop),
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
+
+/* ==========================================================================
+   View Transitions API (Native Browser Transitions)
+   ========================================================================== */
+::view-transition-old(root),
+::view-transition-old(app-page-content) {
+  animation: 180ms cubic-bezier(0.4, 0, 1, 1) both vt-page-fade-out;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root),
+::view-transition-new(app-page-content) {
+  animation: 260ms cubic-bezier(0, 0, 0.2, 1) both vt-page-fade-in;
+  mix-blend-mode: normal;
+}
+
+@keyframes vt-page-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.995);
+  }
+}
+
+@keyframes vt-page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Layout Persistent Elements across View Transitions */
+.bulletin-ticker-elem {
+  view-transition-name: bulletin-ticker;
+}
+
+.app-sidebar-elem {
+  view-transition-name: app-sidebar;
+}
+
+.app-rail-elem {
+  view-transition-name: app-rail;
+}
+
+.app-floating-nav-elem {
+  view-transition-name: app-floating-nav;
+}
+
+.app-mobile-nav-elem {
+  view-transition-name: app-mobile-nav;
+}
+
+.app-page-content {
+  view-transition-name: app-page-content;
+}
+
+/* ==========================================================================
+   Vue Fallback Page Transitions (for browsers without View Transitions API)
+   ========================================================================== */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  .page-enter-active,
+  .page-leave-active {
+    transition: none !important;
+  }
+}
 </style>

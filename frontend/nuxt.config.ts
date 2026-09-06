@@ -17,12 +17,16 @@ export default defineNuxtConfig({
       isCustomElement: (tag) => tag.startsWith('moni-')
     }
   },
+  experimental: {
+    viewTransition: true
+  },
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'
     }
   },
   app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       title: 'Clima RD | Monitoreo Climático y Alertas Ciudadanas',
       meta: [
