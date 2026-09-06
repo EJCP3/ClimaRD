@@ -1,48 +1,81 @@
 <template>
-  <div class="relative w-full h-full min-h-[calc(100vh-4rem)]">
-    <!-- Material 3 Pill Search Bar (From Screenshot 1) -->
-    <div class="absolute top-4 left-4 right-4 md:right-auto md:w-[420px] z-20 space-y-2">
-      <div class="bg-white/95 backdrop-blur-md shadow-lg rounded-full p-1.5 pl-4 border border-zinc-200/80 flex items-center space-x-3 transition-all">
+  <div class="relative w-full h-full min-h-[calc(100vh-4rem)] overflow-hidden font-sans">
+    <!-- Centered Material 3 Pill Search Bar -->
+    <div class="absolute top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-[480px] z-20 space-y-2">
+      <div
+        class="bg-white/95 backdrop-blur-xl shadow-xl rounded-full p-2 pl-4 border border-zinc-200/80 flex items-center space-x-3 transition-all focus-within:ring-2 focus-within:ring-zinc-900/10 focus-within:border-zinc-300"
+      >
         <AppIcon name="search" class="w-5 h-5 text-zinc-400 shrink-0" />
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Buscar sector o código postal (ej. Piantini, 10100)..."
-          class="w-full bg-transparent text-xs md:text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none font-medium"
+          class="w-full bg-transparent text-xs md:text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none font-semibold tracking-tight"
         />
         <button
           v-if="searchQuery"
           @click="searchQuery = ''"
-          class="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 flex items-center justify-center shrink-0 transition-colors"
+          class="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+          title="Limpiar búsqueda"
+          aria-label="Limpiar búsqueda"
         >
           <AppIcon name="close" class="w-3.5 h-3.5" />
         </button>
       </div>
 
-      <!-- Autocomplete Dropdown (MD3 Card Container) -->
+      <!-- Autocomplete Dropdown (M3 Card Container) -->
       <ul
         v-if="filteredPlaces.length > 0"
-        class="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-zinc-200/80 max-h-60 overflow-y-auto divide-y divide-zinc-100 text-xs p-1"
+        class="bg-white/95 backdrop-blur-xl rounded-[22px] shadow-2xl border border-zinc-200/80 max-h-64 overflow-y-auto divide-y divide-zinc-100 text-xs p-1.5 animate-fadeIn"
       >
         <li
           v-for="item in filteredPlaces"
           :key="`${item.zipcode}-${item.place}`"
           @click="goToLocation(item.lng, item.lat, item.place)"
-          class="p-3 hover:bg-zinc-100 rounded-xl cursor-pointer flex justify-between items-center transition-colors"
+          class="p-2.5 hover:bg-zinc-100 rounded-xl cursor-pointer flex justify-between items-center transition-colors group"
         >
-          <div class="flex items-center space-x-2">
-            <AppIcon name="map-pin" class="w-3.5 h-3.5 text-zinc-800 shrink-0" />
-            <span class="font-bold text-zinc-900">{{ item.place }}</span>
+          <div class="flex items-center space-x-2.5">
+            <div class="w-7 h-7 rounded-full bg-zinc-100 group-hover:bg-white flex items-center justify-center text-zinc-700 transition-colors shrink-0">
+              <AppIcon name="map-pin" class="w-3.5 h-3.5" />
+            </div>
+            <span class="font-bold text-zinc-900 group-hover:text-zinc-950">{{ item.place }}</span>
           </div>
-          <span class="text-zinc-600 font-mono text-[11px] bg-zinc-100 px-2 py-0.5 rounded-full font-bold">
+          <span class="text-zinc-600 font-mono text-[11px] bg-zinc-100 px-2 py-0.5 rounded-full font-bold border border-zinc-200/60">
             {{ item.zipcode }}
           </span>
         </li>
       </ul>
     </div>
 
+    <!-- Map Layers Selector Pill (Bottom-Left) -->
+    <div class="absolute bottom-6 left-6 z-20 hidden sm:flex items-center space-x-1 bg-white/95 backdrop-blur-xl p-1 rounded-full border border-zinc-200/80 shadow-lg">
+      <button
+        v-for="layer in layerOptions"
+        :key="layer.id"
+        type="button"
+        @click="switchLayer(layer.id)"
+        class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
+        :style="currentLayer === layer.id ? { backgroundColor: 'var(--primary, #18181b)', color: 'var(--on-primary, #ffffff)' } : {}"
+        :class="currentLayer === layer.id ? 'shadow-sm' : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'"
+      >
+        <AppIcon :name="layer.icon" class="w-3.5 h-3.5" />
+        <span>{{ layer.label }}</span>
+      </button>
+    </div>
+
+    <!-- Live Emergency Legend / Incidents Status Pill (Top-Right / Sub-header) -->
+    <div class="absolute top-4 right-4 z-20 hidden lg:flex items-center space-x-2 bg-white/95 backdrop-blur-xl px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md">
+      <span class="relative flex h-2.5 w-2.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+      </span>
+      <span class="text-xs font-extrabold text-zinc-900">4 Incidencias en Vivo</span>
+      <span class="w-px h-3 bg-zinc-200"></span>
+      <span class="text-[10px] font-mono text-zinc-500 font-bold uppercase">Gran Santo Domingo</span>
+    </div>
+
     <!-- Map Container -->
-    <div ref="mapContainer" class="w-full h-full min-h-[calc(100vh-4rem)]"></div>
+    <div ref="mapContainer" class="w-full h-full min-h-[calc(100vh-4rem)] bg-[#F4F4F6]"></div>
   </div>
 </template>
 
@@ -54,8 +87,91 @@ import postalCodes from '~/assets/data/codigos-postales-rd.json'
 
 const mapContainer = ref<HTMLElement | null>(null)
 let mapInstance: maplibregl.Map | null = null
+let activeMarkers: maplibregl.Marker[] = []
 
 const searchQuery = ref('')
+const currentLayer = ref<'light' | 'satellite' | 'dark'>('light')
+
+const layerOptions = [
+  { id: 'light' as const, label: 'Claro M3', icon: 'sun' },
+  { id: 'satellite' as const, label: 'Satélite', icon: 'globe' },
+  { id: 'dark' as const, label: 'Oscuro', icon: 'moon' }
+]
+
+const MAP_STYLES = {
+  light: {
+    version: 8,
+    sources: {
+      'carto-light': {
+        type: 'raster',
+        tiles: [
+          'https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}@2x.png',
+          'https://b.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}@2x.png',
+          'https://c.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}@2x.png',
+          'https://d.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}@2x.png'
+        ],
+        tileSize: 256,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+      }
+    },
+    layers: [
+      {
+        id: 'carto-light-layer',
+        type: 'raster',
+        source: 'carto-light',
+        minzoom: 0,
+        maxzoom: 20
+      }
+    ]
+  },
+  satellite: {
+    version: 8,
+    sources: {
+      'esri-imagery': {
+        type: 'raster',
+        tiles: [
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+        ],
+        tileSize: 256,
+        attribution: '&copy; <a href="https://www.esri.com/">Esri</a>, Earthstar Geographics'
+      }
+    },
+    layers: [
+      {
+        id: 'esri-imagery-layer',
+        type: 'raster',
+        source: 'esri-imagery',
+        minzoom: 0,
+        maxzoom: 19
+      }
+    ]
+  },
+  dark: {
+    version: 8,
+    sources: {
+      'carto-dark': {
+        type: 'raster',
+        tiles: [
+          'https://a.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png',
+          'https://b.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png',
+          'https://c.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png',
+          'https://d.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png'
+        ],
+        tileSize: 256,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+      }
+    },
+    layers: [
+      {
+        id: 'carto-dark-layer',
+        type: 'raster',
+        source: 'carto-dark',
+        minzoom: 0,
+        maxzoom: 20
+      }
+    ]
+  }
+}
 
 const filteredPlaces = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
@@ -69,78 +185,172 @@ function goToLocation(lng: number, lat: number, name: string) {
   if (!mapInstance) return
   mapInstance.flyTo({
     center: [lng, lat],
-    zoom: 14,
-    essential: true
+    zoom: 14.5,
+    essential: true,
+    speed: 1.2
   })
   searchQuery.value = name
+}
+
+function switchLayer(layerKey: 'light' | 'satellite' | 'dark') {
+  if (!mapInstance || currentLayer.value === layerKey) return
+  currentLayer.value = layerKey
+  mapInstance.setStyle(MAP_STYLES[layerKey] as any)
+}
+
+const mockIncidents = [
+  {
+    id: 'inc-1',
+    category: 'Inundación Callejera',
+    title: 'Acumulación de Agua Pluvial',
+    desc: 'Av. Luperón esq. Gustavo Mejía Ricart. Nivel del agua sube sobre la acera.',
+    lng: -69.965,
+    lat: 18.476,
+    severity: 'ALTO',
+    time: 'Hace 12 min',
+    svgIcon: '<path d="M2 12h20"/><path d="M20 12v8H4v-8"/><path d="M4 12c1-2 2-3 4-3s3 1 4 3c1-2 2-3 4-3s3 1 4 3"/>'
+  },
+  {
+    id: 'inc-2',
+    category: 'Vía Bloqueada',
+    title: 'Tránsito Paralizado',
+    desc: 'Av. 27 de Febrero esq. Winston Churchill. Congestionamiento crítico.',
+    lng: -69.940,
+    lat: 18.468,
+    severity: 'MEDIO',
+    time: 'Hace 28 min',
+    svgIcon: '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>'
+  },
+  {
+    id: 'inc-3',
+    category: 'Obstáculo en Vía',
+    title: 'Árbol y Tendido Eléctrico Caído',
+    desc: 'Calle Las Damas, Zona Colonial. Vía cerrada preventivamente.',
+    lng: -69.885,
+    lat: 18.471,
+    severity: 'ALTO',
+    time: 'Hace 45 min',
+    svgIcon: '<path d="M12 19v3"/><path d="M12 2a5 5 0 0 0-4.9 4.1 4.5 4.5 0 0 0-1.6 7.4 5 5 0 0 0 6.5 5.5 5 5 0 0 0 6.5-5.5 4.5 4.5 0 0 0-1.6-7.4A5 5 0 0 0 12 2z"/>'
+  },
+  {
+    id: 'inc-4',
+    category: 'Derrumbe / Grieta',
+    title: 'Monitoreo de Talud',
+    desc: 'Margen río Ozama, La Ciénaga. Deslizamiento menor de tierra.',
+    lng: -69.889,
+    lat: 18.489,
+    severity: 'EXTREMO',
+    time: 'Hace 1 hora',
+    svgIcon: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/>'
+  }
+]
+
+function renderMarkers(map: maplibregl.Map) {
+  // Clear any existing markers
+  activeMarkers.forEach(m => m.remove())
+  activeMarkers = []
+
+  mockIncidents.forEach(inc => {
+    const el = document.createElement('div')
+    el.className = 'marker-pin-wrapper relative group cursor-pointer select-none'
+    
+    // Expressive beacon ping + pin body using CSS variables var(--primary) & var(--on-primary)
+    el.innerHTML = `
+      <div class="relative flex flex-col items-center">
+        <!-- Pulse Glow -->
+        <span class="absolute -inset-1 rounded-full animate-ping opacity-60 pointer-events-none" style="background-color: var(--primary, #18181b);"></span>
+        
+        <!-- Pin Body -->
+        <div class="relative w-9 h-9 rounded-2xl flex items-center justify-center shadow-xl border-2 border-white transition-all duration-200 group-hover:scale-115 group-hover:shadow-2xl" style="background-color: var(--primary, #18181b); color: var(--on-primary, #ffffff);">
+          <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            ${inc.svgIcon}
+          </svg>
+        </div>
+        
+        <!-- Pin Bottom Arrow Indicator -->
+        <div class="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] -mt-0.5" style="border-t-color: var(--primary, #18181b);"></div>
+      </div>
+    `
+
+    const severityClass = inc.severity === 'EXTREMO'
+      ? 'bg-rose-100 text-rose-800'
+      : inc.severity === 'ALTO'
+        ? 'bg-amber-100 text-amber-800'
+        : 'bg-zinc-100 text-zinc-800'
+
+    const popupHTML = `
+      <div class="p-4 space-y-3 min-w-[260px] max-w-[300px]">
+        <div class="flex items-center justify-between gap-2 border-b border-zinc-100 pb-2.5">
+          <div class="flex items-center space-x-1.5">
+            <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: var(--primary, #18181b);"></span>
+            <span class="text-[10px] font-black uppercase tracking-wider text-zinc-500">${inc.category}</span>
+          </div>
+          <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${severityClass}">${inc.severity}</span>
+        </div>
+        <div>
+          <h4 class="font-extrabold text-sm text-zinc-950 tracking-tight leading-snug">${inc.title}</h4>
+          <p class="text-xs text-zinc-600 leading-relaxed mt-1 font-normal">${inc.desc}</p>
+        </div>
+        <div class="bg-zinc-50 rounded-xl p-2.5 space-y-1 text-[11px] border border-zinc-200/60 font-medium">
+          <div class="flex items-center justify-between text-zinc-500">
+            <span>Coordenadas GPS:</span>
+            <span class="font-mono font-bold text-zinc-900">${inc.lat.toFixed(4)}° N, ${Math.abs(inc.lng).toFixed(4)}° W</span>
+          </div>
+          <div class="flex items-center justify-between text-zinc-500">
+            <span>Actualizado:</span>
+            <span class="text-zinc-700 font-semibold">${inc.time}</span>
+          </div>
+        </div>
+      </div>
+    `
+
+    const popup = new maplibregl.Popup({ offset: 22, closeButton: true })
+      .setHTML(popupHTML)
+
+    const marker = new maplibregl.Marker({ element: el, anchor: 'bottom' })
+      .setLngLat([inc.lng, inc.lat])
+      .setPopup(popup)
+      .addTo(map)
+
+    activeMarkers.push(marker)
+  })
 }
 
 onMounted(() => {
   if (!mapContainer.value) return
 
-  // Free, open, unwatermarked OpenStreetMap Standard Tiles
+  // Initialize MapLibre with Carto Positron Retina Tiles (matching page theme)
   const map = new maplibregl.Map({
     container: mapContainer.value,
-    style: {
-      version: 8,
-      sources: {
-        'osm-tiles': {
-          type: 'raster',
-          tiles: [
-            'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-          ],
-          tileSize: 256,
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> colaboradores'
-        }
-      },
-      layers: [
-        {
-          id: 'osm-layer',
-          type: 'raster',
-          source: 'osm-tiles',
-          minzoom: 0,
-          maxzoom: 19
-        }
-      ]
-    },
-    center: [-69.942, 18.485], // Santo Domingo (Gran Santo Domingo)
-    zoom: 12
+    style: MAP_STYLES.light as any,
+    center: [-69.942, 18.485], // Santo Domingo
+    zoom: 12.5,
+    attributionControl: true
   })
 
-  // Add Navigation Controls
-  map.addControl(new maplibregl.NavigationControl(), 'top-right')
+  // Add Navigation Controls (Zoom, Compass, Geolocate)
+  map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right')
   map.addControl(new maplibregl.GeolocateControl({
     positionOptions: { enableHighAccuracy: true },
     trackUserLocation: true
   }), 'top-right')
 
-  // Clean SVG Incident Markers (NO EMOJIS)
-  const mockIncidents = [
-    { lng: -69.965, lat: 18.476, title: 'Inundación Vía', desc: 'Av. Luperón esq. Gustavo Mejía Ricart' },
-    { lng: -69.940, lat: 18.468, title: 'Tránsito Detenido', desc: 'Av. 27 de Febrero esq. Winston Churchill' },
-    { lng: -69.885, lat: 18.471, title: 'Árbol Caído', desc: 'Zona Colonial' }
-  ]
-
-  mockIncidents.forEach(inc => {
-    const el = document.createElement('div')
-    el.className = 'w-9 h-9 rounded-full bg-zinc-950 border-2 border-white shadow-xl flex items-center justify-center text-zinc-100 cursor-pointer hover:scale-110 transition-transform'
-    // SVG warning icon inside marker instead of emoji
-    el.innerHTML = `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`
-
-    const popup = new maplibregl.Popup({ offset: 25 })
-      .setHTML(`<div class="p-3 space-y-1"><h4 class="font-bold text-xs text-zinc-950">${inc.title}</h4><p class="text-[11px] text-zinc-600 leading-tight">${inc.desc}</p></div>`)
-
-    new maplibregl.Marker(el)
-      .setLngLat([inc.lng, inc.lat])
-      .setPopup(popup)
-      .addTo(map)
+  // Render Markers on Map
+  map.on('load', () => {
+    renderMarkers(map)
   })
 
-  // Wrap in markRaw to avoid Vue reactivity overhead on WebGL (RNF-02)
+  // When style changes, re-render markers to ensure persistence
+  map.on('style.load', () => {
+    renderMarkers(map)
+  })
+
   mapInstance = markRaw(map)
 })
 
 onUnmounted(() => {
+  activeMarkers.forEach(m => m.remove())
+  activeMarkers = []
   if (mapInstance) {
     mapInstance.remove()
     mapInstance = null
