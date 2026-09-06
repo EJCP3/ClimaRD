@@ -146,7 +146,7 @@
       >
         <!-- Header Slot -->
         <div slot="header" class="flex items-center space-x-2.5">
-          <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small">
+          <moni-shape name="flower" color="surface" size="small">
             <AppIcon name="camera" class="w-4 h-4 text-zinc-900" />
           </moni-shape>
           <div>

@@ -16,7 +16,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
       <!-- Roja -->
       <div class="p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-4 shadow-sm">
-        <moni-shape name="burst" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0">
+        <moni-shape name="burst" color="surface" size="medium" class="shrink-0">
           <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
         </moni-shape>
         <div>
@@ -30,7 +30,7 @@
 
       <!-- Amarilla -->
       <div class="p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-4 shadow-sm">
-        <moni-shape name="12-sided-cookie" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0">
+        <moni-shape name="12-sided-cookie" color="surface" size="medium" class="shrink-0">
           <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
         </moni-shape>
         <div>
@@ -44,7 +44,7 @@
 
       <!-- Verde -->
       <div class="p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-4 shadow-sm">
-        <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0">
+        <moni-shape name="flower" color="surface" size="medium" class="shrink-0">
           <AppIcon name="shield" class="w-6 h-6 text-zinc-900" />
         </moni-shape>
         <div>
@@ -66,7 +66,7 @@
     <div class="space-y-4 pt-2">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2.5">
-          <moni-shape name="12-sided-cookie" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small">
+          <moni-shape name="12-sided-cookie" color="surface" size="small">
             <AppIcon name="calendar" class="w-4 h-4 text-zinc-900" />
           </moni-shape>
           <div>
@@ -95,7 +95,10 @@
               <span class="text-[11px] font-mono font-bold px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200/60">
                 {{ boletin.fecha }}
               </span>
-              <span class="text-[10px] font-black text-white bg-zinc-950 px-2.5 py-0.5 rounded-full tracking-wider uppercase">
+              <span
+                class="text-[10px] font-black px-2.5 py-0.5 rounded-full tracking-wider uppercase transition-colors"
+                :style="{ backgroundColor: 'var(--primary)', color: 'var(--on-primary)' }"
+              >
                 {{ boletin.estado }}
               </span>
             </div>
@@ -135,7 +138,7 @@
       >
         <!-- Header Slot -->
         <div slot="header" class="flex items-center space-x-2.5">
-          <moni-shape name="12-sided-cookie" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small">
+          <moni-shape name="12-sided-cookie" color="surface" size="small">
             <AppIcon name="calendar" class="w-4 h-4 text-zinc-900" />
           </moni-shape>
           <div>

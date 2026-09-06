@@ -43,9 +43,23 @@ html, body {
   color: #18181B;
 }
 
+/* Critical fix: Never allow moni-nav modal drawer scrim to block page clicks when closed */
+moni-nav:not([open])::part(scrim),
+moni-nav[modal]:not([open]) .scrim,
+moni-nav:not([open]) .scrim {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+moni-nav[modal]:not([open]) {
+  display: none !important;
+  pointer-events: none !important;
+}
+
 moni-shape {
-  --_shape-bg: #EAEAEB;
-  --_shape-fg: #18181B;
+  --_shape-bg: var(--_shape-bg, #EAEAEB);
+  --_shape-fg: var(--_shape-fg, #18181B);
 }
 
 moni-button {
@@ -53,5 +67,18 @@ moni-button {
   --on-primary: var(--on-primary, #ffffff);
   --secondary-container: var(--secondary-container, #EAEAEB);
   --on-secondary-container: var(--on-secondary-container, #18181b);
+  --moni-color-primary: var(--primary, #18181b);
+  --moni-color-on-primary: var(--on-primary, #ffffff);
+}
+
+moni-nav-item {
+  --secondary-container: var(--secondary-container, #EAEAEB);
+  --on-secondary-container: var(--on-secondary-container, #18181b);
+}
+
+moni-chip {
+  --secondary-container: var(--secondary-container, #EAEAEB);
+  --on-secondary-container: var(--on-secondary-container, #18181b);
+  --outline-variant: var(--outline, #e4e4e7);
 }
 </style>

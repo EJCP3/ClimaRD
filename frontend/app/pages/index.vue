@@ -49,7 +49,8 @@
           />
           <button
             @click="$router.push('/mapa')"
-            class="absolute right-1.5 w-10 h-10 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white flex items-center justify-center shadow-md transition-transform active:scale-95"
+            class="absolute right-1.5 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-transform active:scale-95 hover:opacity-90"
+            :style="{ backgroundColor: 'var(--primary)', color: 'var(--on-primary)' }"
           >
             <AppIcon name="arrow-right" class="w-4 h-4" />
           </button>
@@ -76,7 +77,7 @@
         <div class="bg-white p-5 rounded-[24px] border border-zinc-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div class="flex items-center space-x-4">
             <!-- Moni UI Flower Shape Container -->
-            <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0">
+            <moni-shape name="flower" color="surface" size="medium" class="shrink-0">
               <AppIcon name="cloud-rain" class="w-6 h-6 text-zinc-900" />
             </moni-shape>
             <div>
@@ -97,7 +98,7 @@
         <div class="bg-white p-5 rounded-[24px] border border-zinc-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div class="flex items-center space-x-4">
             <!-- Moni UI 12-Sided-Cookie Shape Container -->
-            <moni-shape name="12-sided-cookie" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0">
+            <moni-shape name="12-sided-cookie" color="surface" size="medium" class="shrink-0">
               <AppIcon name="wind" class="w-6 h-6 text-zinc-900" />
             </moni-shape>
             <div>
@@ -118,7 +119,7 @@
         <div class="bg-white p-5 rounded-[24px] border border-zinc-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div class="flex items-center space-x-4">
             <!-- Moni UI Soft-Burst Shape Container -->
-            <moni-shape name="soft-burst" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0">
+            <moni-shape name="soft-burst" color="surface" size="medium" class="shrink-0">
               <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
             </moni-shape>
             <div>
@@ -152,7 +153,7 @@
             <p class="text-lg font-extrabold text-zinc-950 mt-0.5">27°C</p>
             <p class="text-xs text-zinc-500">Chubascos aislados</p>
           </div>
-          <moni-shape name="sunny" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small" class="shrink-0">
+          <moni-shape name="sunny" color="surface" size="small" class="shrink-0">
             <AppIcon name="sun" class="w-4 h-4 text-zinc-800" />
           </moni-shape>
         </div>
@@ -163,7 +164,7 @@
             <p class="text-lg font-extrabold text-zinc-950 mt-0.5">30°C</p>
             <p class="text-xs text-zinc-500">Aguaceros y tronadas</p>
           </div>
-          <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small" class="shrink-0">
+          <moni-shape name="flower" color="surface" size="small" class="shrink-0">
             <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-800" />
           </moni-shape>
         </div>
@@ -174,7 +175,7 @@
             <p class="text-lg font-extrabold text-zinc-950 mt-0.5">25°C</p>
             <p class="text-xs text-zinc-500">Lloviznas dispersas</p>
           </div>
-          <moni-shape name="puffy" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small" class="shrink-0">
+          <moni-shape name="puffy" color="surface" size="small" class="shrink-0">
             <AppIcon name="droplets" class="w-4 h-4 text-zinc-800" />
           </moni-shape>
         </div>

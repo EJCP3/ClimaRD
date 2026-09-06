@@ -62,7 +62,6 @@
               variant="filled"
               shape="round"
               size="large"
-              style="--primary: #18181b; --on-primary: #ffffff;"
               class="w-full sm:w-auto"
             >
               <AppIcon slot="icon" name="phone" class="w-4 h-4 mr-2" />
@@ -98,7 +97,6 @@
               href="tel:8094720909"
               variant="filled"
               shape="round"
-              style="--primary: #18181b; --on-primary: #ffffff;"
               class="w-full"
             >
               <AppIcon slot="icon" name="phone" class="w-3.5 h-3.5 mr-2" />
@@ -131,7 +129,6 @@
               href="tel:8094728614"
               variant="filled"
               shape="round"
-              style="--primary: #18181b; --on-primary: #ffffff;"
               class="w-full"
             >
               <AppIcon slot="icon" name="phone" class="w-3.5 h-3.5 mr-2" />
@@ -164,7 +161,6 @@
               href="tel:8096822000"
               variant="filled"
               shape="round"
-              style="--primary: #18181b; --on-primary: #ffffff;"
               class="w-full"
             >
               <AppIcon slot="icon" name="phone" class="w-3.5 h-3.5 mr-2" />
@@ -197,7 +193,6 @@
               href="tel:8095674920"
               variant="filled"
               shape="round"
-              style="--primary: #18181b; --on-primary: #ffffff;"
               class="w-full"
             >
               <AppIcon slot="icon" name="phone" class="w-3.5 h-3.5 mr-2" />

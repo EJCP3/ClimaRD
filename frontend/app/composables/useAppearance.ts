@@ -45,14 +45,44 @@ export function useAppearance() {
         localStorage.setItem('climard_primary_color', colorHex)
         const root = document.documentElement
         root.style.setProperty('--primary', colorHex)
+        root.style.setProperty('--moni-primary', colorHex)
         root.style.setProperty('--moni-color-primary', colorHex)
+        root.style.setProperty('--md-sys-color-primary', colorHex)
+        root.style.setProperty('--color-primary', colorHex)
+
         root.style.setProperty('--on-primary', onColor)
+        root.style.setProperty('--moni-on-primary', onColor)
         root.style.setProperty('--moni-color-on-primary', onColor)
+        root.style.setProperty('--md-sys-color-on-primary', onColor)
+        root.style.setProperty('--color-on-primary', onColor)
+
+        root.style.setProperty('--secondary', colorHex)
+        root.style.setProperty('--moni-secondary', colorHex)
+        root.style.setProperty('--color-secondary', colorHex)
+        root.style.setProperty('--on-secondary', onColor)
+        root.style.setProperty('--moni-on-secondary', onColor)
+        root.style.setProperty('--color-on-secondary', onColor)
+
         root.style.setProperty('--primary-container', container)
+        root.style.setProperty('--moni-primary-container', container)
         root.style.setProperty('--moni-color-primary-container', container)
+        root.style.setProperty('--md-sys-color-primary-container', container)
+        root.style.setProperty('--color-primary-container', container)
+
         root.style.setProperty('--secondary-container', container)
+        root.style.setProperty('--moni-secondary-container', container)
         root.style.setProperty('--moni-color-secondary-container', container)
+        root.style.setProperty('--md-sys-color-secondary-container', container)
+        root.style.setProperty('--color-secondary-container', container)
+
         root.style.setProperty('--on-secondary-container', onContainer)
+        root.style.setProperty('--moni-on-secondary-container', onContainer)
+        root.style.setProperty('--moni-color-on-secondary-container', onContainer)
+        root.style.setProperty('--md-sys-color-on-secondary-container', onContainer)
+        root.style.setProperty('--color-on-secondary-container', onContainer)
+
+        root.style.setProperty('--_shape-bg', container)
+        root.style.setProperty('--_shape-fg', onContainer)
       } catch (e) {
         console.warn('Could not persist theme color:', e)
       }

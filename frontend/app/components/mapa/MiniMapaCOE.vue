@@ -3,7 +3,7 @@
     <!-- Map Card Header -->
     <div class="p-5 md:p-6 pb-3 border-b border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-50/50">
       <div class="flex items-start space-x-3">
-        <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small" class="shrink-0 mt-0.5">
+        <moni-shape name="flower" color="surface" size="small" class="shrink-0 mt-0.5">
           <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
         </moni-shape>
         <div>
@@ -22,14 +22,16 @@
         <button
           @click="activeView = 'mapa'"
           class="px-3 py-1 rounded-full transition-all text-xs font-bold"
-          :class="activeView === 'mapa' ? 'bg-zinc-950 text-white shadow-sm' : 'text-zinc-600 hover:text-zinc-900'"
+          :class="activeView === 'mapa' ? 'shadow-sm' : 'text-zinc-600 hover:text-zinc-900'"
+          :style="activeView === 'mapa' ? { backgroundColor: 'var(--primary)', color: 'var(--on-primary)' } : {}"
         >
           Mapa Gráfico
         </button>
         <button
           @click="activeView = 'tabla'"
           class="px-3 py-1 rounded-full transition-all text-xs font-bold"
-          :class="activeView === 'tabla' ? 'bg-zinc-950 text-white shadow-sm' : 'text-zinc-600 hover:text-zinc-900'"
+          :class="activeView === 'tabla' ? 'shadow-sm' : 'text-zinc-600 hover:text-zinc-900'"
+          :style="activeView === 'tabla' ? { backgroundColor: 'var(--primary)', color: 'var(--on-primary)' } : {}"
         >
           Cuadrícula
         </button>

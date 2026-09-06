@@ -50,10 +50,11 @@
               :key="cat.id"
               @click="selectCategory(cat.id)"
               class="p-4 rounded-[24px] border-2 flex flex-col items-center text-center space-y-3 transition-all cursor-pointer group hover:scale-[1.02]"
-              :class="selectedCategory === cat.id ? 'border-zinc-950 bg-zinc-50 shadow-md' : 'border-zinc-200/80 hover:border-zinc-300 bg-white'"
+              :class="selectedCategory === cat.id ? 'shadow-md' : 'border-zinc-200/80 hover:border-zinc-300 bg-white'"
+              :style="selectedCategory === cat.id ? { borderColor: 'var(--primary)', backgroundColor: 'var(--primary-container)' } : {}"
             >
               <!-- Moni UI Shape Container for Icons -->
-              <moni-shape :name="cat.shape" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0">
+              <moni-shape :name="cat.shape" color="surface" size="medium" class="shrink-0">
                 <AppIcon :name="cat.icon" class="w-6 h-6 text-zinc-900" />
               </moni-shape>
               <div>

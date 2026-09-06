@@ -7,7 +7,7 @@
     >
       <!-- App Brand -->
       <div class="flex items-center space-x-3 px-2">
-        <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small" class="shrink-0">
+        <moni-shape name="flower" color="surface" size="small" class="shrink-0">
           <AppIcon name="cloud-rain" class="w-5 h-5 text-zinc-900" />
         </moni-shape>
         <div>
@@ -67,7 +67,7 @@
       v-else-if="navStyle === 'guapa'"
       class="hidden md:flex flex-col w-20 border-r border-zinc-200/80 bg-white py-5 items-center space-y-6 shrink-0 transition-all"
     >
-      <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small" class="shrink-0">
+      <moni-shape name="flower" color="surface" size="small" class="shrink-0">
         <AppIcon name="cloud-rain" class="w-5 h-5 text-zinc-900" />
       </moni-shape>
 
@@ -100,16 +100,16 @@
     <!-- 3. Tasks: Cajón Modal M3 para tareas y alertas operativas -->
     <ClientOnly>
       <moni-nav
-        v-if="navStyle === 'tasks'"
+        v-if="navStyle === 'tasks' && isTasksDrawerOpen"
         variant="drawer"
         modal
-        :open="isTasksDrawerOpen"
+        open
         placement="left"
         @keydown.esc="isTasksDrawerOpen = false"
       >
         <div slot="header" class="p-4 border-b border-zinc-200/80 flex items-center justify-between w-full">
           <div class="flex items-center space-x-2.5">
-            <moni-shape name="soft-burst" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small">
+            <moni-shape name="soft-burst" color="surface" size="small">
               <AppIcon name="siren" class="w-4 h-4 text-zinc-900" />
             </moni-shape>
             <div>
@@ -167,12 +167,14 @@
         <button
           v-if="navStyle === 'tasks'"
           type="button"
-          @click="isTasksDrawerOpen = !isTasksDrawerOpen"
-          class="w-9 h-9 rounded-full bg-white/95 backdrop-blur-md shadow-md hover:bg-white text-zinc-900 border border-zinc-200 flex items-center justify-center transition-all cursor-pointer"
-          title="Abrir Tareas M3"
+          @click.stop="isTasksDrawerOpen = !isTasksDrawerOpen"
+          class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold shadow-md transition-all cursor-pointer"
+          :style="{ backgroundColor: 'var(--primary)', color: 'var(--on-primary)' }"
+          title="Abrir Centro de Tareas M3"
           aria-label="Abrir tareas"
         >
           <AppIcon name="filter" class="w-4 h-4" />
+          <span>Tareas M3</span>
         </button>
 
         <!-- Quick Reportar Button -->
@@ -196,6 +198,22 @@
         </button>
       </div>
 
+      <!-- Tasks Mode Brand Pill on Desktop -->
+      <div
+        v-if="navStyle === 'tasks'"
+        class="hidden md:flex fixed z-30 items-center space-x-2 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md cursor-pointer hover:bg-zinc-50 transition-all duration-300"
+        :class="tickerPosition === 'top' ? 'top-[52px] left-4' : 'top-3.5 left-4'"
+        @click="isTasksDrawerOpen = true"
+      >
+        <moni-shape name="flower" color="surface" :style="{ '--_shape-bg': 'var(--primary-container, #EAEAEB)', '--_shape-fg': 'var(--on-primary-container, #18181B)' }" size="small">
+          <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
+        </moni-shape>
+        <span class="font-extrabold text-xs text-zinc-950">Clima RD</span>
+        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" :style="{ backgroundColor: 'var(--secondary-container, #EAEAEB)', color: 'var(--on-secondary-container, #18181B)' }">
+          Abrir Tareas
+        </span>
+      </div>
+
       <!-- Bonita Mode Floating Nav Island on Desktop -->
       <div
         v-if="navStyle === 'bonita'"
@@ -203,7 +221,7 @@
         :class="tickerPosition === 'top' ? 'top-[52px] left-4' : 'top-3.5 left-4'"
       >
         <div class="flex items-center space-x-2 mr-2">
-          <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small">
+          <moni-shape name="flower" color="surface" :style="{ '--_shape-bg': 'var(--primary-container, #EAEAEB)', '--_shape-fg': 'var(--on-primary-container, #18181B)' }" size="small">
             <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
           </moni-shape>
           <span class="font-extrabold text-xs text-zinc-950">Clima RD</span>
@@ -214,7 +232,8 @@
           :key="item.path"
           :to="item.path"
           class="px-3 py-1 rounded-full text-xs font-bold transition-all"
-          :class="$route.path === item.path ? 'bg-zinc-950 text-white shadow-sm' : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'"
+          :style="$route.path === item.path ? { backgroundColor: 'var(--primary)', color: 'var(--on-primary)' } : {}"
+          :class="$route.path === item.path ? 'shadow-sm' : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'"
         >
           {{ item.shortLabel }}
         </NuxtLink>
@@ -224,7 +243,7 @@
       <main
         class="flex-1 pb-24 md:pb-8 transition-all"
         :class="[
-          navStyle === 'bonita'
+          (navStyle === 'bonita' || navStyle === 'tasks')
             ? (tickerPosition === 'top' ? 'pt-20 md:pt-24' : 'pt-14 md:pt-16')
             : (tickerPosition === 'top' ? 'pt-2 md:pt-4' : 'pt-4 md:pt-6')
         ]"

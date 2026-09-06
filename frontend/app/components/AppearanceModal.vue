@@ -65,8 +65,9 @@
               type="button"
               @click="setNavStyle(mode.id)"
               class="py-2.5 px-3 rounded-full text-xs font-bold transition-all text-center cursor-pointer"
+              :style="navStyle === mode.id ? { backgroundColor: 'var(--primary)', color: 'var(--on-primary)' } : {}"
               :class="navStyle === mode.id
-                ? 'bg-[#EAEAEB] text-zinc-950 shadow-sm'
+                ? 'shadow-sm'
                 : 'bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300'"
             >
               {{ mode.label }}
@@ -86,8 +87,9 @@
               type="button"
               @click="setTickerPosition(pos.id)"
               class="py-2 px-2.5 rounded-full text-xs font-bold transition-all text-center cursor-pointer"
+              :style="tickerPosition === pos.id ? { backgroundColor: 'var(--primary)', color: 'var(--on-primary)' } : {}"
               :class="tickerPosition === pos.id
-                ? 'bg-[#EAEAEB] text-zinc-950 shadow-sm'
+                ? 'shadow-sm'
                 : 'bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300'"
             >
               {{ pos.label }}
@@ -107,8 +109,9 @@
               type="button"
               @click="setTickerAnimation(anim.id)"
               class="py-2 px-2.5 rounded-full text-[11px] font-bold transition-all text-center cursor-pointer"
+              :style="tickerAnimation === anim.id ? { backgroundColor: 'var(--primary)', color: 'var(--on-primary)' } : {}"
               :class="tickerAnimation === anim.id
-                ? 'bg-[#EAEAEB] text-zinc-950 shadow-sm'
+                ? 'shadow-sm'
                 : 'bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300'"
             >
               {{ anim.label }}
@@ -128,8 +131,9 @@
               type="button"
               @click="setTickerSpeed(spd.id)"
               class="py-2 px-2.5 rounded-full text-[11px] font-bold transition-all text-center cursor-pointer"
+              :style="tickerSpeed === spd.id ? { backgroundColor: 'var(--primary)', color: 'var(--on-primary)' } : {}"
               :class="tickerSpeed === spd.id
-                ? 'bg-[#EAEAEB] text-zinc-950 shadow-sm'
+                ? 'shadow-sm'
                 : 'bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300'"
             >
               {{ spd.label }}
