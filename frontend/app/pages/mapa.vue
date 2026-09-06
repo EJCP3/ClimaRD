@@ -96,35 +96,35 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Footer Slot (Official Moni UI Slot) -->
-        <div slot="footer" class="flex items-center justify-end space-x-3 w-full">
-          <moni-button
-            v-if="currentStep === 2"
-            variant="text"
-            shape="round"
-            @click="currentStep = 1"
-          >
-            Atrás
-          </moni-button>
-          <moni-button
-            v-if="currentStep === 1"
-            variant="text"
-            shape="round"
-            @click="closeModal"
-          >
-            Cancelar
-          </moni-button>
-          <moni-button
-            v-if="currentStep === 2"
-            variant="filled"
-            shape="round"
-            @click="submitReport"
-          >
-            <AppIcon slot="icon" name="check" class="w-4 h-4 mr-1.5" />
-            Publicar Reporte
-          </moni-button>
+          <!-- Action Buttons inside Main (Eliminating footer slot gap) -->
+          <div class="flex items-center justify-end space-x-3 pt-3 border-t border-zinc-100">
+            <moni-button
+              v-if="currentStep === 2"
+              variant="text"
+              shape="round"
+              @click="currentStep = 1"
+            >
+              Atrás
+            </moni-button>
+            <moni-button
+              v-if="currentStep === 1"
+              variant="text"
+              shape="round"
+              @click="closeModal"
+            >
+              Cancelar
+            </moni-button>
+            <moni-button
+              v-if="currentStep === 2"
+              variant="filled"
+              shape="round"
+              @click="submitReport"
+            >
+              <AppIcon slot="icon" name="check" class="w-4 h-4 mr-1.5" />
+              Publicar Reporte
+            </moni-button>
+          </div>
         </div>
       </moni-morph-modal>
     </ClientOnly>

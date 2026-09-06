@@ -202,17 +202,17 @@
             <AppIcon name="camera" class="w-4 h-4 text-zinc-500" />
             <span class="font-semibold text-zinc-600">Adjuntar foto o video capturado</span>
           </div>
-        </div>
 
-        <!-- Footer -->
-        <div slot="footer" class="flex items-center justify-end space-x-2.5 w-full">
-          <moni-button variant="text" shape="round" @click="closeUploadModal">
-            Cancelar
-          </moni-button>
-          <moni-button variant="filled" shape="round" @click="submitNewEvidence">
-            <AppIcon slot="icon" name="check" class="w-4 h-4 mr-1" />
-            Publicar en el Muro
-          </moni-button>
+          <!-- Action Buttons inside Main (Eliminating footer slot gap) -->
+          <div class="flex items-center justify-end space-x-2.5 pt-3 border-t border-zinc-100">
+            <moni-button variant="text" shape="round" @click="closeUploadModal">
+              Cancelar
+            </moni-button>
+            <moni-button variant="filled" shape="round" @click="submitNewEvidence">
+              <AppIcon slot="icon" name="check" class="w-4 h-4 mr-1" />
+              Publicar en el Muro
+            </moni-button>
+          </div>
         </div>
       </moni-morph-modal>
     </ClientOnly>

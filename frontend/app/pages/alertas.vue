@@ -166,14 +166,14 @@
               <li>Ponerse en contacto con los organismos de auxilio ante cualquier síntoma de anegamiento o deslizamiento de tierra.</li>
             </ul>
           </div>
-        </div>
 
-        <!-- Footer Slot -->
-        <div slot="footer" class="flex items-center justify-between w-full">
-          <span class="text-[11px] text-zinc-500 font-medium">Línea de emergencia: 9-1-1</span>
-          <moni-button variant="filled" shape="round" size="small" @click="closeBoletin">
-            Entendido
-          </moni-button>
+          <!-- Action & Emergency Bar inside Main (Eliminating footer slot gap) -->
+          <div class="flex items-center justify-between pt-3 border-t border-zinc-100">
+            <span class="text-[11px] text-zinc-500 font-medium">Línea de emergencia: 9-1-1</span>
+            <moni-button variant="filled" shape="round" size="small" @click="closeBoletin">
+              Entendido
+            </moni-button>
+          </div>
         </div>
       </moni-morph-modal>
     </ClientOnly>
