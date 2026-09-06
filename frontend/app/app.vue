@@ -2,15 +2,56 @@
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+  <ClientOnly>
+    <ToastHost
+      close-label="Cerrar"
+      :options="toastHostOptions"
+    />
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
-// Clima RD - Root Component
+import { ToastHost, toast } from 'super-beautiful-toast'
+
+// Physics & animation tuning for super-beautiful-toast
+const toastHostOptions = {
+  enterDistance: 80, // Trayectoria visible de entrada al no tener origen (en lugar de solo 12px)
+  enterDuration: 0.65,
+  enterBlur: 6,
+  relayoutDuration: 0.55,
+  expandDuration: 0.5,
+  morph: {
+    stiffness: 150,
+    damping: 12, // Menor damping para rebote elástico más perceptible
+    velocity: 3000, // Impulso inicial para que la curva en arco sea evidente
+    sizeDuration: 0.45,
+    radiusDuration: 0.6,
+    contentDuration: 0.35,
+    colorDuration: 0.45,
+    shadowDuration: 0.5
+  },
+  stack: {
+    peek: 20,
+    scaleStep: 0.06,
+    maxVisible: 4,
+    gap: 10
+  }
+}
+
+// Default configuration for super-beautiful-toast
+if (import.meta.client) {
+  (window as any).$toast = toast
+  toast.configure({
+    position: 'bottom-right',
+    duration: 4000,
+    max: 4
+  })
+}
 </script>
 
 <style>
 :root {
-  /* Direct M3 Tokens used by Moni UI */
+  /* Theme tokens */
   --primary: #18181b;
   --on-primary: #ffffff;
   --primary-container: #EAEAEB;
@@ -25,110 +66,78 @@
   --surface-container-high: #EAEAEB;
   --outline: #e4e4e7;
   --outline-variant: #e4e4e7;
-  --_shape-bg: #EAEAEB;
-  --_shape-fg: #18181B;
+  --shape-bg: #EAEAEB;
+  --shape-fg: #18181B;
 
-  /* Moni Namespaced Tokens */
-  --moni-color-primary: #18181b;
-  --moni-color-on-primary: #ffffff;
-  --moni-color-secondary-container: #EAEAEB;
-  --moni-color-on-secondary-container: #18181b;
+  /* super-beautiful-toast tokens */
+  --sbt-font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --sbt-radius: 20px;
+  --sbt-z-index: 9999;
+  --sbt-edge-offset: 20px;
 }
 
-/* Moni UI Web Component fixes */
-moni-nav:not([open])::part(scrim),
-moni-nav[modal]:not([open]) .scrim,
-moni-nav:not([open]) .scrim {
-  display: none !important;
-  pointer-events: none !important;
-  visibility: hidden !important;
-}
-
-moni-nav[modal]:not([open]) {
-  display: none !important;
-  pointer-events: none !important;
-}
-
-aside moni-nav,
-moni-nav.layout-nav {
-  display: flex !important;
-  flex-direction: column !important;
-  width: 100% !important;
-}
-
-aside moni-nav::part(nav),
-moni-nav.layout-nav::part(nav) {
-  position: static !important;
-  inset: auto !important;
-  height: auto !important;
-  min-height: 0 !important;
-  inline-size: 100% !important;
-  background-color: transparent !important;
-  padding: 0 !important;
-  flex-direction: column !important;
-}
-
-moni-shape {
-  --_shape-bg: var(--_shape-bg, #EAEAEB);
-  --_shape-fg: var(--_shape-fg, #18181B);
-}
-
-moni-button {
-  --primary: var(--primary, #18181b);
-  --on-primary: var(--on-primary, #ffffff);
-  --secondary-container: var(--secondary-container, #EAEAEB);
-  --on-secondary-container: var(--on-secondary-container, #18181b);
-}
-
-moni-nav-item,
-moni-chip {
-  --secondary-container: var(--secondary-container, #EAEAEB);
-  --on-secondary-container: var(--on-secondary-container, #18181b);
-  --outline-variant: var(--outline, #e4e4e7);
-}
-
-/* View Transitions API */
-::view-transition-old(root),
+/* View Transitions API (Native Browser Transitions) */
 ::view-transition-old(app-page-content) {
   animation: 180ms cubic-bezier(0.4, 0, 1, 1) both vtPageFadeOut;
-  mix-blend-mode: normal;
 }
 
-::view-transition-new(root),
 ::view-transition-new(app-page-content) {
-  animation: 260ms cubic-bezier(0, 0, 0.2, 1) both vtPageFadeIn;
-  mix-blend-mode: normal;
+  animation: 240ms cubic-bezier(0, 0, 0.2, 1) both vtPageFadeIn;
 }
 
-/* MapLibre M3 Theme Integration via Tailwind Utilities */
-.maplibregl-ctrl-group {
-  @apply !rounded-full !bg-white/95 !backdrop-blur-md !border !border-zinc-200 !shadow-lg !overflow-hidden;
+::view-transition-old(root) {
+  animation: 140ms ease both vtFadeOut;
 }
-.maplibregl-ctrl-group button {
-  @apply !w-[38px] !h-[38px] !border-0 hover:!bg-zinc-100 flex !items-center !justify-center transition-colors;
+
+::view-transition-new(root) {
+  animation: 180ms ease both vtFadeIn;
 }
-.maplibregl-ctrl-group button + button {
-  @apply !border-t !border-zinc-200;
+
+@keyframes vtPageFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
 }
-.maplibregl-popup {
-  @apply !z-30;
-  max-width: 380px !important;
+
+@keyframes vtPageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.maplibregl-popup-content {
-  @apply !bg-white !backdrop-blur-md !rounded-[28px] !border !border-zinc-200 !shadow-2xl !p-0 !overflow-hidden font-sans;
-  max-width: 380px !important;
+
+@keyframes vtFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
-.maplibregl-popup-tip {
-  @apply !border-t-white;
+
+@keyframes vtFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
-.maplibregl-popup-close-button {
-  @apply !top-3 !right-3 !w-7 !h-7 !rounded-full !bg-zinc-100 hover:!bg-zinc-200 !text-zinc-500 hover:!text-zinc-950 !border-0 !p-0 flex !items-center !justify-center !text-sm transition-colors cursor-pointer !outline-none focus:!outline-none focus:!ring-0;
-  line-height: 1 !important;
-}
-.maplibregl-ctrl-attrib {
-  @apply !bg-white/90 !backdrop-blur-sm !rounded-full !px-2.5 !py-0.5 !text-[10px] !text-zinc-400 !border !border-zinc-200 !m-2.5;
-}
-.maplibregl-ctrl-attrib a {
-  @apply !text-zinc-500 hover:!underline no-underline;
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
 </style>

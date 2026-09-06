@@ -5,10 +5,10 @@
       <span>Volver a Alertas</span>
     </NuxtLink>
     <div v-if="!province" class="bg-white rounded-[32px] p-10 border border-zinc-200/80 shadow-sm text-center space-y-4">
-      <moni-shape name="burst" color="surface" size="large" class="mx-auto"><AppIcon name="search" class="w-8 h-8 text-zinc-600" /></moni-shape>
+      <AppShape name="burst" color="surface" size="large" class="mx-auto"><AppIcon name="search" class="w-8 h-8 text-zinc-600" /></AppShape>
       <h2 class="text-xl font-black text-zinc-950 tracking-tight">Provincia no encontrada</h2>
       <p class="text-sm text-zinc-500">No se encontro informacion para esta provincia.</p>
-      <NuxtLink to="/alertas"><moni-button variant="filled" shape="round">Volver a Alertas</moni-button></NuxtLink>
+      <NuxtLink to="/alertas"><AppButton variant="filled" shape="round">Volver a Alertas</AppButton></NuxtLink>
     </div>
     <template v-if="province">
       <div class="bg-white rounded-[32px] p-6 md:p-8 border border-zinc-200/80 shadow-sm space-y-4">
@@ -21,25 +21,25 @@
             </div>
             <p class="text-sm text-zinc-600 max-w-lg leading-relaxed">{{ advisoryText }}</p>
           </div>
-          <div class="shrink-0"><moni-shape :name="alertShape" color="surface" size="large"><AppIcon :name="alertIcon" class="w-7 h-7 text-zinc-900" /></moni-shape></div>
+          <div class="shrink-0"><AppShape :name="alertShape" color="surface" size="large"><AppIcon :name="alertIcon" class="w-7 h-7 text-zinc-900" /></AppShape></div>
         </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-white rounded-[24px] border border-zinc-200/80 shadow-sm p-5 space-y-4">
-          <div class="flex items-center space-x-2"><moni-shape name="flower" color="surface" size="small"><AppIcon name="sun" class="w-4 h-4 text-zinc-900" /></moni-shape><h3 class="font-extrabold text-sm text-zinc-950 tracking-tight">Condiciones Actuales</h3></div>
+          <div class="flex items-center space-x-2"><AppShape name="flower" color="surface" size="small"><AppIcon name="sun" class="w-4 h-4 text-zinc-900" /></AppShape><h3 class="font-extrabold text-sm text-zinc-950 tracking-tight">Condiciones Actuales</h3></div>
           <div class="grid grid-cols-2 gap-3"><div v-for="cond in currentConditions" :key="cond.label" class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1"><div class="flex items-center space-x-1.5 text-zinc-500"><AppIcon :name="cond.icon" class="w-3.5 h-3.5" /><span class="text-[11px] font-bold">{{ cond.label }}</span></div><p class="text-lg font-black text-zinc-950 tracking-tight">{{ cond.value }}</p></div></div>
         </div>
         <div class="bg-white rounded-[24px] border border-zinc-200/80 shadow-sm p-5 space-y-4">
-          <div class="flex items-center space-x-2"><moni-shape name="12-sided-cookie" color="surface" size="small"><AppIcon name="calendar" class="w-4 h-4 text-zinc-900" /></moni-shape><h3 class="font-extrabold text-sm text-zinc-950 tracking-tight">Pronostico 5 Dias</h3></div>
+          <div class="flex items-center space-x-2"><AppShape name="12-sided-cookie" color="surface" size="small"><AppIcon name="calendar" class="w-4 h-4 text-zinc-900" /></AppShape><h3 class="font-extrabold text-sm text-zinc-950 tracking-tight">Pronostico 5 Dias</h3></div>
           <div class="flex overflow-x-auto space-x-2 pb-1 -mx-1 px-1"><div v-for="day in forecast" :key="day.name" class="flex-shrink-0 w-[80px] p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 text-center space-y-1.5"><span class="text-[11px] font-extrabold text-zinc-500 uppercase">{{ day.name }}</span><div class="flex justify-center"><AppIcon :name="day.icon" class="w-5 h-5 text-zinc-700" /></div><div><span class="text-xs font-black text-zinc-950">{{ day.high }}</span><span class="text-[10px] text-zinc-400 font-bold"> / {{ day.low }}</span></div></div></div>
         </div>
         <div class="bg-white rounded-[24px] border border-zinc-200/80 shadow-sm p-5 space-y-4">
-          <div class="flex items-center space-x-2"><moni-shape name="soft-burst" color="surface" size="small"><AppIcon name="bell" class="w-4 h-4 text-zinc-900" /></moni-shape><h3 class="font-extrabold text-sm text-zinc-950 tracking-tight">Boletines y Avisos</h3></div>
+          <div class="flex items-center space-x-2"><AppShape name="soft-burst" color="surface" size="small"><AppIcon name="bell" class="w-4 h-4 text-zinc-900" /></AppShape><h3 class="font-extrabold text-sm text-zinc-950 tracking-tight">Boletines y Avisos</h3></div>
           <div class="space-y-3"><div v-for="boletin in bulletins" :key="boletin.id" class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1.5"><div class="flex items-center justify-between"><span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase" :class="boletin.severityClass">{{ boletin.severity }}</span><div class="flex items-center space-x-1 text-zinc-400"><AppIcon name="clock" class="w-3 h-3" /><span class="text-[10px] font-bold">{{ boletin.time }}</span></div></div><h4 class="text-xs font-extrabold text-zinc-950 leading-snug">{{ boletin.title }}</h4><p class="text-[11px] text-zinc-600 leading-relaxed">{{ boletin.desc }}</p></div></div>
         </div>
         <div class="bg-white rounded-[24px] border border-zinc-200/80 shadow-sm p-5 space-y-4">
           <div class="flex items-center space-x-2">
-            <moni-shape name="arch" color="surface" size="small"><AppIcon name="alert-triangle" class="w-4 h-4 text-zinc-900" /></moni-shape>
+            <AppShape name="arch" color="surface" size="small"><AppIcon name="alert-triangle" class="w-4 h-4 text-zinc-900" /></AppShape>
             <h3 class="font-extrabold text-sm text-zinc-950 tracking-tight">Incidencias Reportadas</h3>
           </div>
           <div class="space-y-3">
@@ -82,8 +82,18 @@
         <ul class="space-y-1.5 text-xs leading-relaxed"><li v-for="(rec, i) in recommendations" :key="i" class="flex items-start space-x-2"><AppIcon name="check" class="w-3.5 h-3.5 mt-0.5 shrink-0" /><span>{{ rec }}</span></li></ul>
       </div>
       <div class="flex flex-col sm:flex-row gap-3">
-        <NuxtLink to="/alertas" class="w-full sm:w-auto"><moni-button variant="tonal" shape="round" size="large" class="w-full sm:w-auto"><AppIcon slot="icon" name="map" class="w-4 h-4 mr-2" />Volver al Mapa COE</moni-button></NuxtLink>
-        <NuxtLink to="/mapa" class="w-full sm:w-auto"><moni-button variant="filled" shape="round" size="large" class="w-full sm:w-auto"><AppIcon slot="icon" name="map-pin" class="w-4 h-4 mr-2" />Ver Mapa Operativo</moni-button></NuxtLink>
+        <NuxtLink to="/alertas" class="w-full sm:w-auto">
+          <AppButton variant="tonal" shape="round" size="large" class="w-full sm:w-auto">
+            <template #icon><AppIcon name="map" class="w-4 h-4 mr-2" /></template>
+            Volver al Mapa COE
+          </AppButton>
+        </NuxtLink>
+        <NuxtLink to="/mapa" class="w-full sm:w-auto">
+          <AppButton variant="filled" shape="round" size="large" class="w-full sm:w-auto">
+            <template #icon><AppIcon name="map-pin" class="w-4 h-4 mr-2" /></template>
+            Ver Mapa Operativo
+          </AppButton>
+        </NuxtLink>
       </div>
     </template>
   </div>
@@ -91,6 +101,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
+import AppButton from '~/components/AppButton.vue'
+import AppShape from '~/components/AppShape.vue'
 definePageMeta({ layout: 'default' })
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)

@@ -10,15 +10,9 @@
 
     <!-- Direct Emergency Calling Bento Grid -->
     <div class="space-y-4">
-      <div class="flex items-center justify-between">
-        <div>
-          <span class="text-[11px] font-extrabold uppercase tracking-widest text-zinc-400">CONTACTO INMEDIATO</span>
-          <h3 class="text-xl font-bold text-zinc-950 tracking-tight">Directorio Nacional de Emergencias</h3>
-        </div>
-        <span class="text-xs font-bold text-zinc-600 hidden sm:inline-flex items-center space-x-1.5 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200/60">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Líneas activas 24/7 sin costo</span>
-        </span>
+      <div>
+        <span class="text-[11px] font-extrabold uppercase tracking-widest text-zinc-400">CONTACTO INMEDIATO</span>
+        <h3 class="text-xl font-bold text-zinc-950 tracking-tight">Directorio Nacional de Emergencias</h3>
       </div>
 
       <!-- Bento Grid (Asymmetric, dynamic and modern) -->
@@ -27,9 +21,9 @@
         <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-[32px] border border-zinc-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-all group relative overflow-hidden">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <moni-shape name="burst" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="large" class="shrink-0 group-hover:scale-105 transition-transform">
+              <AppShape name="burst" size="large" class="shrink-0 group-hover:scale-105 transition-transform">
                 <AppIcon name="siren" class="w-7 h-7 text-zinc-900" />
-              </moni-shape>
+              </AppShape>
               <div class="flex items-center space-x-2">
                 <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-[10px] font-black uppercase tracking-wider">
                   Prioridad Nacional
@@ -53,16 +47,18 @@
           </div>
 
           <div class="pt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <moni-button
+            <AppButton
               href="tel:911"
               variant="filled"
               shape="round"
               size="large"
               class="w-full sm:w-auto"
             >
-              <AppIcon slot="icon" name="phone" class="w-4 h-4 mr-2" />
+              <template #icon>
+                <AppIcon name="phone" class="w-4 h-4 mr-2" />
+              </template>
               Llamar al 911 (Línea Rápida)
-            </moni-button>
+            </AppButton>
             <span class="text-[11px] text-zinc-400 font-medium">Llamada prioritaria sin saldo</span>
           </div>
         </div>
@@ -71,9 +67,9 @@
         <div class="lg:col-span-5 bg-white p-6 sm:p-7 rounded-[32px] border border-zinc-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-all group">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <moni-shape name="12-sided-cookie" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0 group-hover:scale-105 transition-transform">
+              <AppShape name="12-sided-cookie" size="medium" class="shrink-0 group-hover:scale-105 transition-transform">
                 <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
-              </moni-shape>
+              </AppShape>
               <span class="px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase border border-zinc-200/60">
                 Mando Operativo
               </span>
@@ -89,15 +85,17 @@
           </div>
 
           <div class="pt-5">
-            <moni-button
+            <AppButton
               href="tel:8094720909"
               variant="filled"
               shape="round"
               class="w-full"
             >
-              <AppIcon slot="icon" name="phone" class="w-3.5 h-3.5 mr-2" />
+              <template #icon>
+                <AppIcon name="phone" class="w-3.5 h-3.5 mr-2" />
+              </template>
               (809) 472-0909
-            </moni-button>
+            </AppButton>
           </div>
         </div>
 
@@ -105,9 +103,9 @@
         <div class="lg:col-span-4 bg-white p-5 sm:p-6 rounded-[28px] border border-zinc-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-all group">
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0 group-hover:scale-105 transition-transform">
+              <AppShape name="flower" size="medium" class="shrink-0 group-hover:scale-105 transition-transform">
                 <AppIcon name="life-buoy" class="w-6 h-6 text-zinc-900" />
-              </moni-shape>
+              </AppShape>
               <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-bold uppercase border border-zinc-200/60">
                 Albergues
               </span>
@@ -121,15 +119,17 @@
             </div>
           </div>
           <div class="pt-4">
-            <moni-button
+            <AppButton
               href="tel:8094728614"
               variant="filled"
               shape="round"
               class="w-full"
             >
-              <AppIcon slot="icon" name="phone" class="w-3.5 h-3.5 mr-2" />
+              <template #icon>
+                <AppIcon name="phone" class="w-3.5 h-3.5 mr-2" />
+              </template>
               (809) 472-8614
-            </moni-button>
+            </AppButton>
           </div>
         </div>
 
@@ -137,9 +137,9 @@
         <div class="lg:col-span-4 bg-white p-5 sm:p-6 rounded-[28px] border border-zinc-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-all group">
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <moni-shape name="sunny" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0 group-hover:scale-105 transition-transform">
+              <AppShape name="sunny" size="medium" class="shrink-0 group-hover:scale-105 transition-transform">
                 <AppIcon name="flame" class="w-6 h-6 text-zinc-900" />
-              </moni-shape>
+              </AppShape>
               <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-bold uppercase border border-zinc-200/60">
                 Urbano
               </span>
@@ -153,15 +153,17 @@
             </div>
           </div>
           <div class="pt-4">
-            <moni-button
+            <AppButton
               href="tel:8096822000"
               variant="filled"
               shape="round"
               class="w-full"
             >
-              <AppIcon slot="icon" name="phone" class="w-3.5 h-3.5 mr-2" />
+              <template #icon>
+                <AppIcon name="phone" class="w-3.5 h-3.5 mr-2" />
+              </template>
               (809) 682-2000
-            </moni-button>
+            </AppButton>
           </div>
         </div>
 
@@ -169,9 +171,9 @@
         <div class="lg:col-span-4 bg-white p-5 sm:p-6 rounded-[28px] border border-zinc-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-all group">
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <moni-shape name="arch" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="medium" class="shrink-0 group-hover:scale-105 transition-transform">
+              <AppShape name="arch" size="medium" class="shrink-0 group-hover:scale-105 transition-transform">
                 <AppIcon name="car" class="w-6 h-6 text-zinc-900" />
-              </moni-shape>
+              </AppShape>
               <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-bold uppercase border border-zinc-200/60">
                 Autopistas
               </span>
@@ -185,15 +187,17 @@
             </div>
           </div>
           <div class="pt-4">
-            <moni-button
+            <AppButton
               href="tel:8095674920"
               variant="filled"
               shape="round"
               class="w-full"
             >
-              <AppIcon slot="icon" name="phone" class="w-3.5 h-3.5 mr-2" />
+              <template #icon>
+                <AppIcon name="phone" class="w-3.5 h-3.5 mr-2" />
+              </template>
               (809) 567-4920
-            </moni-button>
+            </AppButton>
           </div>
         </div>
 
@@ -214,7 +218,7 @@
       </div>
     </div>
 
-    <moni-divider inset="none" class="opacity-40"></moni-divider>
+    <div class="divider opacity-40 my-2"></div>
 
     <!-- Protocols Bento Grid -->
     <div class="space-y-4">
@@ -228,9 +232,9 @@
         <div class="p-6 md:p-7 rounded-[32px] bg-white border border-zinc-200/80 shadow-sm space-y-3 hover:shadow-md transition-shadow">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <moni-shape name="arch" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small" class="shrink-0">
+              <AppShape name="arch" size="small" class="shrink-0">
                 <AppIcon name="car" class="w-4 h-4 text-zinc-900" />
-              </moni-shape>
+              </AppShape>
               <h4 class="text-sm font-bold text-zinc-950 leading-snug">
                 Si te encuentras conduciendo durante aguaceros
               </h4>
@@ -250,9 +254,9 @@
         <div class="p-6 md:p-7 rounded-[32px] bg-white border border-zinc-200/80 shadow-sm space-y-3 hover:shadow-md transition-shadow">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <moni-shape name="puffy" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small" class="shrink-0">
+              <AppShape name="puffy" size="small" class="shrink-0">
                 <AppIcon name="home" class="w-4 h-4 text-zinc-900" />
-              </moni-shape>
+              </AppShape>
               <h4 class="text-sm font-bold text-zinc-950 leading-snug">
                 Si habitas cerca de cañadas, ríos o zonas de ladera
               </h4>
@@ -272,9 +276,9 @@
         <div class="p-6 md:p-7 rounded-[32px] bg-white border border-zinc-200/80 shadow-sm space-y-3 hover:shadow-md transition-shadow">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <moni-shape name="12-sided-cookie" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small" class="shrink-0">
+              <AppShape name="12-sided-cookie" size="small" class="shrink-0">
                 <AppIcon name="tree" class="w-4 h-4 text-zinc-900" />
-              </moni-shape>
+              </AppShape>
               <h4 class="text-sm font-bold text-zinc-950 leading-snug">
                 Cables del tendido eléctrico y árboles caídos
               </h4>
@@ -294,9 +298,9 @@
         <div class="p-6 md:p-7 rounded-[32px] bg-white border border-zinc-200/80 shadow-sm space-y-3 hover:shadow-md transition-shadow">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <moni-shape name="flower" color="surface" style="--_shape-bg: #EAEAEB; --_shape-fg: #111111;" size="small" class="shrink-0">
+              <AppShape name="flower" size="small" class="shrink-0">
                 <AppIcon name="water" class="w-4 h-4 text-zinc-900" />
-              </moni-shape>
+              </AppShape>
               <h4 class="text-sm font-bold text-zinc-950 leading-snug">
                 Colaboración comunitaria con imbornales y desechos
               </h4>

@@ -29,6 +29,7 @@ export function useAppearance() {
   const primaryColor = useState<string>('appearance_primary_color', () => '#18181B')
   const navStyle = useState<NavStyle>('appearance_nav_style', () => 'bonita')
   const isAppearanceModalOpen = useState<boolean>('appearance_modal_open', () => false)
+  const appearanceTrigger = useState<any>('appearance_trigger_ref', () => null)
   const tickerPosition = useState<TickerPosition>('appearance_ticker_position', () => 'top')
   const tickerAnimation = useState<TickerAnimation>('appearance_ticker_animation', () => 'marquee')
   const tickerSpeed = useState<TickerSpeed>('appearance_ticker_speed', () => 'slow')
@@ -45,44 +46,13 @@ export function useAppearance() {
         localStorage.setItem('climard_primary_color', colorHex)
         const root = document.documentElement
         root.style.setProperty('--primary', colorHex)
-        root.style.setProperty('--moni-primary', colorHex)
-        root.style.setProperty('--moni-color-primary', colorHex)
-        root.style.setProperty('--md-sys-color-primary', colorHex)
-        root.style.setProperty('--color-primary', colorHex)
-
         root.style.setProperty('--on-primary', onColor)
-        root.style.setProperty('--moni-on-primary', onColor)
-        root.style.setProperty('--moni-color-on-primary', onColor)
-        root.style.setProperty('--md-sys-color-on-primary', onColor)
-        root.style.setProperty('--color-on-primary', onColor)
-
         root.style.setProperty('--secondary', colorHex)
-        root.style.setProperty('--moni-secondary', colorHex)
-        root.style.setProperty('--color-secondary', colorHex)
         root.style.setProperty('--on-secondary', onColor)
-        root.style.setProperty('--moni-on-secondary', onColor)
-        root.style.setProperty('--color-on-secondary', onColor)
-
         root.style.setProperty('--primary-container', container)
-        root.style.setProperty('--moni-primary-container', container)
-        root.style.setProperty('--moni-color-primary-container', container)
-        root.style.setProperty('--md-sys-color-primary-container', container)
-        root.style.setProperty('--color-primary-container', container)
-
-        root.style.setProperty('--secondary-container', container)
-        root.style.setProperty('--moni-secondary-container', container)
-        root.style.setProperty('--moni-color-secondary-container', container)
-        root.style.setProperty('--md-sys-color-secondary-container', container)
-        root.style.setProperty('--color-secondary-container', container)
-
-        root.style.setProperty('--on-secondary-container', onContainer)
-        root.style.setProperty('--moni-on-secondary-container', onContainer)
-        root.style.setProperty('--moni-color-on-secondary-container', onContainer)
-        root.style.setProperty('--md-sys-color-on-secondary-container', onContainer)
-        root.style.setProperty('--color-on-secondary-container', onContainer)
-
-        root.style.setProperty('--_shape-bg', container)
-        root.style.setProperty('--_shape-fg', onContainer)
+        root.style.setProperty('--on-primary-container', onContainer)
+        root.style.setProperty('--shape-bg', container)
+        root.style.setProperty('--shape-fg', onContainer)
       } catch (e) {
         console.warn('Could not persist theme color:', e)
       }
@@ -164,51 +134,22 @@ export function useAppearance() {
     }
   }
 
-  const openAppearanceModal = (triggerEventOrEl?: Event | HTMLElement) => {
-    let el: HTMLElement | null = null
-    if (triggerEventOrEl instanceof Event) {
-      triggerEventOrEl.stopPropagation()
-      el = (triggerEventOrEl.currentTarget || triggerEventOrEl.target) as HTMLElement
-    } else if (triggerEventOrEl instanceof HTMLElement) {
-      el = triggerEventOrEl
+  const openAppearanceModal = (trigger?: any) => {
+    if (trigger) {
+      appearanceTrigger.value = trigger
     }
-
     isAppearanceModalOpen.value = true
-
-    if (import.meta.client) {
-      nextTick(() => {
-        const modal = document.getElementById('appearance-morph-modal') as any
-        const target = el
-          || document.getElementById('appearance-trigger-btn')
-          || document.getElementById('appearance-tasks-trigger-btn')
-          || document.getElementById('appearance-mobile-trigger-btn')
-          || document.getElementById('appearance-sidebar-btn')
-          || document.body
-        if (modal) {
-          if (target && typeof modal.showFrom === 'function') {
-            modal.showFrom(target)
-          } else if (typeof modal.show === 'function') {
-            modal.show()
-          }
-        }
-      })
-    }
   }
 
   const closeAppearanceModal = () => {
     isAppearanceModalOpen.value = false
-    if (import.meta.client) {
-      const modal = document.getElementById('appearance-morph-modal') as any
-      if (modal && typeof modal.hide === 'function') {
-        modal.hide()
-      }
-    }
   }
 
   return {
     primaryColor,
     navStyle,
     isAppearanceModalOpen,
+    appearanceTrigger,
     tickerPosition,
     tickerAnimation,
     tickerSpeed,

@@ -1,12 +1,21 @@
 <template>
-  <div
-    v-if="tickerPosition !== 'hidden'"
-    class="w-full bg-[#111113] text-white border-b border-zinc-800/80 select-none overflow-hidden transition-all duration-300"
-    :class="[
-      tickerPosition === 'top' ? 'sticky top-0 z-[1050]' : 'fixed bottom-0 md:bottom-0 left-0 right-0 z-[1050] mb-16 md:mb-0 border-t border-b-0 shadow-2xl',
-      tickerAnimation === 'compact' ? 'h-9' : 'h-10 sm:h-11'
-    ]"
-  >
+  <div v-if="tickerPosition !== 'hidden'" class="w-full">
+    <!-- Spacer reserving height in document flow when ticker is fixed at top -->
+    <div
+      v-if="tickerPosition === 'top'"
+      aria-hidden="true"
+      class="w-full pointer-events-none"
+      :class="tickerAnimation === 'compact' ? 'h-9' : 'h-10 sm:h-11'"
+    ></div>
+
+    <!-- Bulletin Ticker Bar: Fixed at top or bottom, elevated above backdrops (z-[1050]) -->
+    <div
+      class="w-full bg-[#111113] text-white border-b border-zinc-800/80 select-none overflow-hidden transition-all duration-300"
+      :class="[
+        tickerPosition === 'top' ? 'fixed top-0 left-0 right-0 z-[1050]' : 'fixed bottom-0 md:bottom-0 left-0 right-0 z-[1050] mb-16 md:mb-0 border-t border-b-0 shadow-2xl',
+        tickerAnimation === 'compact' ? 'h-9' : 'h-10 sm:h-11'
+      ]"
+    >
     <div class="h-full flex items-center justify-between px-3 sm:px-5 w-full relative">
       <!-- Edge Gradient Fade Masks -->
       <div class="w-8 h-full bg-gradient-to-r from-[#111113] to-transparent pointer-events-none absolute left-0 top-0 z-10"></div>
@@ -126,6 +135,7 @@
         </span>
       </div>
     </div>
+  </div>
   </div>
 </template>
 

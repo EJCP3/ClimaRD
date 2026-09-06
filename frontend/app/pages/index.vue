@@ -12,24 +12,28 @@
         </p>
       </div>
 
-      <!-- Moni UI M3 Buttons (From Screenshot 1: Black Pill & Tonal Pill) -->
+      <!-- Expressive M3 Buttons (Black Pill & Tonal Pill) -->
       <div class="flex flex-col sm:flex-row gap-3 pt-2">
         <NuxtLink to="/mapa" class="w-full sm:w-auto">
-          <moni-button variant="filled" shape="round" size="large" class="w-full sm:w-auto">
-            <AppIcon slot="icon" name="map" class="w-4 h-4 mr-2" />
+          <AppButton variant="filled" shape="round" size="large" class="w-full sm:w-auto">
+            <template #icon>
+              <AppIcon name="map" class="w-4 h-4 mr-2" />
+            </template>
             Ver mapa interactivo
-          </moni-button>
+          </AppButton>
         </NuxtLink>
 
         <NuxtLink to="/alertas" class="w-full sm:w-auto">
-          <moni-button variant="tonal" shape="round" size="large" class="w-full sm:w-auto">
-            <AppIcon slot="icon" name="bell" class="w-4 h-4 mr-2" />
+          <AppButton variant="tonal" shape="round" size="large" class="w-full sm:w-auto">
+            <template #icon>
+              <AppIcon name="bell" class="w-4 h-4 mr-2" />
+            </template>
             Alertas COE / INDOMET
-          </moni-button>
+          </AppButton>
         </NuxtLink>
       </div>
 
-      <!-- Pill Search Bar with Circular Action Button (From Screenshot 1) -->
+      <!-- Pill Search Bar with Circular Action Button -->
       <div class="pt-2">
         <div class="relative flex items-center">
           <div class="absolute left-4 text-zinc-400">
@@ -52,7 +56,7 @@
       </div>
     </div>
 
-    <!-- Section 2: Explore Conditions (M3 Expressive Shapes from Screenshot 1 & 2) -->
+    <!-- Section 2: Explore Conditions (M3 Expressive Shapes) -->
     <div class="space-y-4">
       <div class="flex items-center justify-between px-1">
         <div>
@@ -65,15 +69,14 @@
         </NuxtLink>
       </div>
 
-      <!-- Cards with Moni UI Expressive Shapes & Pill Action (Matching Moni UI moni-shape) -->
+      <!-- Cards with Expressive Shapes & Pill Action -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <!-- Metric Card 1: Temperatura & Clima -->
         <div class="bg-white p-5 rounded-[24px] border border-zinc-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div class="flex items-center space-x-4">
-            <!-- Moni UI Flower Shape Container -->
-            <moni-shape name="flower" color="surface" size="medium" class="shrink-0">
+            <AppShape name="flower" color="surface" size="medium" class="shrink-0">
               <AppIcon name="cloud-rain" class="w-6 h-6 text-zinc-900" />
-            </moni-shape>
+            </AppShape>
             <div>
               <h4 class="font-bold text-sm text-zinc-950">Aguaceros Moderados</h4>
               <p class="text-xs text-zinc-500">Sensación 33°C / Humedad 84%</p>
@@ -81,20 +84,21 @@
             </div>
           </div>
           <NuxtLink to="/mapa">
-            <moni-button variant="tonal" shape="round" size="small">
-              <AppIcon slot="icon" name="plus" class="w-3 h-3 mr-1" />
+            <AppButton variant="tonal" shape="round" size="small">
+              <template #icon>
+                <AppIcon name="plus" class="w-3 h-3 mr-1" />
+              </template>
               Mapa
-            </moni-button>
+            </AppButton>
           </NuxtLink>
         </div>
 
         <!-- Metric Card 2: Viento & Presión -->
         <div class="bg-white p-5 rounded-[24px] border border-zinc-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div class="flex items-center space-x-4">
-            <!-- Moni UI 12-Sided-Cookie Shape Container -->
-            <moni-shape name="12-sided-cookie" color="surface" size="medium" class="shrink-0">
+            <AppShape name="12-sided-cookie" color="surface" size="medium" class="shrink-0">
               <AppIcon name="wind" class="w-6 h-6 text-zinc-900" />
-            </moni-shape>
+            </AppShape>
             <div>
               <h4 class="font-bold text-sm text-zinc-950">Viento del Este</h4>
               <p class="text-xs text-zinc-500">Ráfagas ocasionales</p>
@@ -102,20 +106,21 @@
             </div>
           </div>
           <NuxtLink to="/alertas">
-            <moni-button variant="tonal" shape="round" size="small">
-              <AppIcon slot="icon" name="plus" class="w-3 h-3 mr-1" />
+            <AppButton variant="tonal" shape="round" size="small">
+              <template #icon>
+                <AppIcon name="plus" class="w-3 h-3 mr-1" />
+              </template>
               Detalle
-            </moni-button>
+            </AppButton>
           </NuxtLink>
         </div>
 
         <!-- Metric Card 3: Nivel de Alerta -->
         <div class="bg-white p-5 rounded-[24px] border border-zinc-200/80 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div class="flex items-center space-x-4">
-            <!-- Moni UI Soft-Burst Shape Container -->
-            <moni-shape name="soft-burst" color="surface" size="medium" class="shrink-0">
+            <AppShape name="soft-burst" color="surface" size="medium" class="shrink-0">
               <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
-            </moni-shape>
+            </AppShape>
             <div>
               <h4 class="font-bold text-sm text-zinc-950">Alerta Amarilla</h4>
               <p class="text-xs text-zinc-500">Vaguada activa en D.N.</p>
@@ -123,15 +128,16 @@
             </div>
           </div>
           <NuxtLink to="/alertas">
-            <moni-button variant="tonal" shape="round" size="small">
+            <AppButton variant="tonal" shape="round" size="small">
               COE
-            </moni-button>
+            </AppButton>
           </NuxtLink>
         </div>
       </div>
     </div>
 
-    <moni-divider inset="none" class="opacity-40"></moni-divider>
+    <!-- daisyUI Divider -->
+    <div class="divider opacity-40 my-2"></div>
 
     <!-- Section 3: Official Shifts / Turnos Horarios -->
     <div class="bg-white p-6 md:p-8 rounded-[32px] border border-zinc-200/80 shadow-sm space-y-4">
@@ -147,9 +153,9 @@
             <p class="text-lg font-extrabold text-zinc-950 mt-0.5">27°C</p>
             <p class="text-xs text-zinc-500">Chubascos aislados</p>
           </div>
-          <moni-shape name="sunny" color="surface" size="small" class="shrink-0">
+          <AppShape name="sunny" color="surface" size="small" class="shrink-0">
             <AppIcon name="sun" class="w-4 h-4 text-zinc-800" />
-          </moni-shape>
+          </AppShape>
         </div>
 
         <div class="p-4 rounded-[20px] bg-zinc-50 border border-zinc-200/60 flex items-center justify-between">
@@ -158,9 +164,9 @@
             <p class="text-lg font-extrabold text-zinc-950 mt-0.5">30°C</p>
             <p class="text-xs text-zinc-500">Aguaceros y tronadas</p>
           </div>
-          <moni-shape name="flower" color="surface" size="small" class="shrink-0">
+          <AppShape name="flower" color="surface" size="small" class="shrink-0">
             <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-800" />
-          </moni-shape>
+          </AppShape>
         </div>
 
         <div class="p-4 rounded-[20px] bg-zinc-50 border border-zinc-200/60 flex items-center justify-between">
@@ -169,9 +175,9 @@
             <p class="text-lg font-extrabold text-zinc-950 mt-0.5">25°C</p>
             <p class="text-xs text-zinc-500">Lloviznas dispersas</p>
           </div>
-          <moni-shape name="puffy" color="surface" size="small" class="shrink-0">
+          <AppShape name="puffy" color="surface" size="small" class="shrink-0">
             <AppIcon name="droplets" class="w-4 h-4 text-zinc-800" />
-          </moni-shape>
+          </AppShape>
         </div>
       </div>
     </div>
@@ -180,4 +186,6 @@
 
 <script setup lang="ts">
 import AppIcon from '~/components/AppIcon.vue'
+import AppButton from '~/components/AppButton.vue'
+import AppShape from '~/components/AppShape.vue'
 </script>

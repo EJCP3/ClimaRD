@@ -8,13 +8,13 @@
       </p>
     </div>
 
-    <!-- Alert Level Legend (Material 3 Cards with Moni UI moni-shape) -->
+    <!-- Alert Level Legend (Cards with AppShape) -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
       <!-- Roja -->
       <div class="p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-4 shadow-sm">
-        <moni-shape name="burst" color="surface" size="medium" class="shrink-0">
+        <AppShape name="burst" size="medium" class="shrink-0">
           <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
-        </moni-shape>
+        </AppShape>
         <div>
           <div class="flex items-center space-x-2">
             <h4 class="text-sm font-extrabold text-zinc-950">Alerta Roja</h4>
@@ -26,9 +26,9 @@
 
       <!-- Amarilla -->
       <div class="p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-4 shadow-sm">
-        <moni-shape name="12-sided-cookie" color="surface" size="medium" class="shrink-0">
+        <AppShape name="12-sided-cookie" size="medium" class="shrink-0">
           <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
-        </moni-shape>
+        </AppShape>
         <div>
           <div class="flex items-center space-x-2">
             <h4 class="text-sm font-extrabold text-zinc-950">Alerta Amarilla</h4>
@@ -40,9 +40,9 @@
 
       <!-- Verde -->
       <div class="p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-4 shadow-sm">
-        <moni-shape name="flower" color="surface" size="medium" class="shrink-0">
+        <AppShape name="flower" size="medium" class="shrink-0">
           <AppIcon name="shield" class="w-6 h-6 text-zinc-900" />
-        </moni-shape>
+        </AppShape>
         <div>
           <div class="flex items-center space-x-2">
             <h4 class="text-sm font-extrabold text-zinc-950">Alerta Verde</h4>
@@ -62,9 +62,9 @@
     <div class="space-y-4 pt-2">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2.5">
-          <moni-shape name="12-sided-cookie" color="surface" size="small">
+          <AppShape name="12-sided-cookie" size="small">
             <AppIcon name="calendar" class="w-4 h-4 text-zinc-900" />
-          </moni-shape>
+          </AppShape>
           <div>
             <h3 class="font-black text-xl text-zinc-950 tracking-tight">Últimos Boletines Oficiales</h3>
             <p class="text-xs text-zinc-500">Actualizaciones técnicas y avisos especiales vigentes emitidos por el COE e INDOMET</p>
@@ -78,13 +78,13 @@
 
       <!-- Bulletins Feed in Responsive Multi-Column Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <moni-card
+        <AppCard
           v-for="boletin in boletines"
           :key="boletin.id"
           :id="`boletin-btn-${boletin.id}`"
           variant="outlined"
           class="p-6 rounded-[28px] bg-white border border-zinc-200/80 shadow-sm space-y-3 flex flex-col justify-between hover:shadow-md transition-all group cursor-pointer"
-          @click.stop="openBoletin(boletin, $event)"
+          @click="openBoletin(boletin, $event)"
         >
           <div class="space-y-2.5">
             <div class="flex items-center justify-between">
@@ -112,31 +112,23 @@
               <AppIcon name="arrow-right" class="w-3 h-3" />
             </span>
           </div>
-        </moni-card>
+        </AppCard>
       </div>
     </div>
 
-    <!-- Bulletin Detail Morph Modal -->
-    <ClientOnly>
-      <moni-morph-modal
-        id="boletin-morph-modal"
-        target="#boletin-btn-1, #boletin-btn-2, #boletin-btn-3"
-        :open="isBoletinModalOpen"
-        expanded-width="32rem"
-        expanded-height="auto"
-        auto-height
-        has-backdrop
-        close-on-click-outside
-        close-on-esc
-        show-close-button
-        placement="center"
-        style="--surface-container-high: #ffffff; --on-surface: #18181b; --moni-morph-panel-radius: 1.75rem;"
-      >
-        <!-- Header Slot -->
-        <div slot="header" class="flex items-center space-x-2.5">
-          <moni-shape name="12-sided-cookie" color="surface" size="small">
+    <!-- Bulletin Detail Modal (wisspop morph) -->
+    <AppModal
+      v-model="isBoletinModalOpen"
+      :origin-ref="activeBoletinTrigger"
+      max-width="max-w-lg"
+      @close="closeBoletin"
+    >
+      <!-- Header Slot -->
+      <template #header>
+        <div class="flex items-center space-x-2.5">
+          <AppShape name="12-sided-cookie" size="small">
             <AppIcon name="calendar" class="w-4 h-4 text-zinc-900" />
-          </moni-shape>
+          </AppShape>
           <div>
             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
               {{ activeBoletin?.fecha }}
@@ -146,42 +138,42 @@
             </h3>
           </div>
         </div>
+      </template>
 
-        <!-- Body Content -->
-        <div v-if="activeBoletin" class="space-y-4 py-2 text-xs">
-          <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 space-y-2">
-            <span class="text-[10px] font-black uppercase text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full">
-              {{ activeBoletin.estado }}
-            </span>
-            <h4 class="text-sm font-bold text-zinc-950">{{ activeBoletin.titulo }}</h4>
-            <p class="text-zinc-600 leading-relaxed font-normal">{{ activeBoletin.resumen }}</p>
-          </div>
-
-          <div class="space-y-2">
-            <h5 class="font-bold text-zinc-950 text-xs">Recomendaciones Oficiales de Protección Civil:</h5>
-            <ul class="space-y-2 text-zinc-600 list-disc list-inside leading-relaxed">
-              <li>Seguir estrictamente las orientaciones de los organismos de protección civil (COE, Defensa Civil, Bomberos).</li>
-              <li>Abstenerse de cruzar ríos, arroyos y cañadas con niveles de agua elevados.</li>
-              <li>A los operadores de frágiles embarcaciones en la costa Atlántica, navegar con precaución cerca del perímetro costero.</li>
-              <li>Ponerse en contacto con los organismos de auxilio ante cualquier síntoma de anegamiento o deslizamiento de tierra.</li>
-            </ul>
-          </div>
-
-          <!-- Action & Emergency Bar inside Main (Eliminating footer slot gap) -->
-          <div class="flex items-center justify-between pt-3 border-t border-zinc-100">
-            <span class="text-[11px] text-zinc-500 font-medium">Línea de emergencia: 9-1-1</span>
-            <moni-button variant="filled" shape="round" size="small" @click="closeBoletin">
-              Entendido
-            </moni-button>
-          </div>
+      <!-- Body Content -->
+      <div v-if="activeBoletin" class="space-y-4 py-2 text-xs">
+        <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 space-y-2">
+          <span class="text-[10px] font-black uppercase text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full">
+            {{ activeBoletin.estado }}
+          </span>
+          <h4 class="text-sm font-bold text-zinc-950">{{ activeBoletin.titulo }}</h4>
+          <p class="text-zinc-600 leading-relaxed font-normal">{{ activeBoletin.resumen }}</p>
         </div>
-      </moni-morph-modal>
-    </ClientOnly>
+
+        <div class="space-y-2">
+          <h5 class="font-bold text-zinc-950 text-xs">Recomendaciones Oficiales de Protección Civil:</h5>
+          <ul class="space-y-2 text-zinc-600 list-disc list-inside leading-relaxed">
+            <li>Seguir estrictamente las orientaciones de los organismos de protección civil (COE, Defensa Civil, Bomberos).</li>
+            <li>Abstenerse de cruzar ríos, arroyos y cañadas con niveles de agua elevados.</li>
+            <li>A los operadores de frágiles embarcaciones en la costa Atlántica, navegar con precaución cerca del perímetro costero.</li>
+            <li>Ponerse en contacto con los organismos de auxilio ante cualquier síntoma de anegamiento o deslizamiento de tierra.</li>
+          </ul>
+        </div>
+
+        <!-- Action & Emergency Bar inside Main -->
+        <div class="flex items-center justify-between pt-3 border-t border-zinc-100">
+          <span class="text-[11px] text-zinc-500 font-medium">Línea de emergencia: 9-1-1</span>
+          <AppButton variant="filled" shape="round" size="small" @click="closeBoletin">
+            Entendido
+          </AppButton>
+        </div>
+      </div>
+    </AppModal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
 import MiniMapaCOE from '~/components/mapa/MiniMapaCOE.vue'
 
@@ -218,55 +210,20 @@ const boletines: Boletin[] = [
 ]
 
 const isBoletinModalOpen = ref(false)
+const activeBoletinTrigger = ref<any>(null)
 const activeBoletin = ref<Boletin | null>(null)
 
-const openBoletin = (b: Boletin, event?: Event) => {
-  if (event) event.stopPropagation()
+const openBoletin = (b: Boletin, event?: MouseEvent) => {
   activeBoletin.value = b
-  isBoletinModalOpen.value = true
-
-  if (import.meta.client) {
-    nextTick(() => {
-      const modal = document.getElementById('boletin-morph-modal') as any
-      const trigger = (event?.currentTarget as HTMLElement)
-        || document.getElementById(`boletin-btn-${b.id}`)
-        || document.body
-      if (modal) {
-        if (trigger && typeof modal.showFrom === 'function') {
-          modal.showFrom(trigger)
-        } else if (typeof modal.show === 'function') {
-          modal.show()
-        }
-      }
-    })
+  if (event) {
+    activeBoletinTrigger.value = event.currentTarget || event.target || `#boletin-btn-${b.id}`
+  } else {
+    activeBoletinTrigger.value = `#boletin-btn-${b.id}`
   }
+  isBoletinModalOpen.value = true
 }
 
 const closeBoletin = () => {
   isBoletinModalOpen.value = false
-  if (import.meta.client) {
-    const el = document.getElementById('boletin-morph-modal') as any
-    if (el && typeof el.hide === 'function') {
-      el.hide()
-    }
-  }
 }
-
-let boletinObserver: MutationObserver | null = null
-
-onMounted(() => {
-  const modal = document.getElementById('boletin-morph-modal')
-  if (modal) {
-    boletinObserver = new MutationObserver(() => {
-      if (!modal.hasAttribute('open') && isBoletinModalOpen.value) {
-        isBoletinModalOpen.value = false
-      }
-    })
-    boletinObserver.observe(modal, { attributes: true, attributeFilter: ['open'] })
-  }
-})
-
-onUnmounted(() => {
-  if (boletinObserver) boletinObserver.disconnect()
-})
 </script>

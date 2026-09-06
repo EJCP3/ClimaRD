@@ -1,10 +1,16 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-[#F6F6F8] text-zinc-900 font-sans antialiased selection:bg-zinc-200">
+  <div
+    class="flex flex-col bg-[#F6F6F8] text-zinc-900 font-sans antialiased selection:bg-zinc-200"
+    :class="isMapPage ? 'h-screen overflow-hidden' : 'min-h-screen'"
+  >
     <!-- Top Full-Width Bulletin Ticker (Spans 100% width of the screen, above navigation) -->
     <BulletinTicker v-if="tickerPosition === 'top'" class="[view-transition-name:bulletin-ticker] !z-[1050]" />
 
     <!-- Application Body: Navigation + Content Area -->
-    <div class="flex-1 flex flex-col md:flex-row min-w-0 relative">
+    <div
+      class="flex-1 flex flex-col md:flex-row min-w-0 relative"
+      :class="isMapPage ? 'h-full overflow-hidden' : ''"
+    >
       <!-- 1. Clásica: Drawer lateral estándar completo (M3 Navigation Drawer) -->
       <aside
       v-if="navStyle === 'clasica'"
@@ -13,51 +19,61 @@
     >
       <!-- App Brand -->
       <div class="flex items-center space-x-3 px-2 shrink-0">
-        <moni-shape name="flower" color="surface" size="small" class="shrink-0">
+        <AppShape name="flower" color="surface" size="small" class="shrink-0">
           <AppIcon name="cloud-rain" class="w-5 h-5 text-zinc-900" />
-        </moni-shape>
+        </AppShape>
         <div>
           <h1 class="font-extrabold text-lg text-zinc-950 tracking-tight leading-tight">Clima RD</h1>
           <p class="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">Cajón Clásico M3</p>
         </div>
       </div>
 
-      <!-- Navigation Links with moni-nav variant="drawer" -->
-      <moni-nav variant="drawer" layout="horizontal" class="w-full flex-1 layout-nav space-y-1">
-        <moni-nav-item
+      <!-- Navigation Links -->
+      <nav class="w-full flex-1 space-y-1 select-none" aria-label="Navegación clásica">
+        <button
           v-for="item in navItems"
           :key="item.path"
-          :href="item.path"
-          :label="item.label"
-          :active="$route.path === item.path"
-          @click.prevent="navigateTo(item.path)"
-          class="w-full"
+          type="button"
+          @click="navigateTo(item.path)"
+          class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-full text-sm font-semibold transition-all cursor-pointer text-left"
+          :class="[
+            $route.path === item.path
+              ? 'bg-zinc-100 text-zinc-950 font-black shadow-xs'
+              : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-50'
+          ]"
         >
-          <AppIcon slot="icon" :name="item.icon" class="w-5 h-5" />
-        </moni-nav-item>
+          <AppIcon :name="item.icon" class="w-5 h-5 shrink-0" :class="$route.path === item.path ? 'text-zinc-950' : 'text-zinc-500'" />
+          <span class="flex-1">{{ item.label }}</span>
+          <span v-if="item.badge" class="badge badge-sm badge-neutral font-bold">{{ item.badge }}</span>
+        </button>
 
         <div class="w-full h-px bg-zinc-200/80 my-2"></div>
 
-        <moni-nav-item
+        <button
           id="nav-report-btn-clasica"
-          class="w-full nav-report-btn"
-          href="/mapa"
-          label="Reportar Incidencia"
-          :active="$route.path === '/mapa' && isReportModalOpen"
+          type="button"
+          class="nav-report-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-full text-sm font-bold transition-all cursor-pointer text-left"
+          :class="[
+            isReportModalOpen
+              ? 'bg-zinc-950 text-white'
+              : 'text-zinc-800 hover:bg-zinc-100'
+          ]"
           @click.prevent="handleReportNav('#nav-report-btn-clasica')"
         >
-          <AppIcon slot="icon" name="alert-triangle" class="w-5 h-5" />
-        </moni-nav-item>
+          <AppIcon name="alert-triangle" class="w-5 h-5 shrink-0" />
+          <span class="flex-1">Reportar Incidencia</span>
+        </button>
 
-        <moni-nav-item
+        <button
           id="appearance-sidebar-btn-clasica"
-          label="Apariencia y Titulares"
+          type="button"
           @click.prevent="openAppearanceModal($event)"
-          class="w-full"
+          class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-full text-sm font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-50 transition-all cursor-pointer text-left"
         >
-          <AppIcon slot="icon" name="palette" class="w-5 h-5" />
-        </moni-nav-item>
-      </moni-nav>
+          <AppIcon name="palette" class="w-5 h-5 shrink-0 text-zinc-500" />
+          <span class="flex-1">Apariencia y Titulares</span>
+        </button>
+      </nav>
 
       <!-- Institutional Footer Badge -->
       <div class="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200/60 shrink-0">
@@ -76,115 +92,138 @@
       :class="tickerPosition === 'top' ? 'top-10 sm:top-11 h-[calc(100vh-2.5rem)] sm:h-[calc(100vh-2.75rem)]' : 'top-0 h-screen'"
     >
       <div class="mb-3 shrink-0">
-        <moni-shape name="flower" color="surface" size="small">
+        <AppShape name="flower" color="surface" size="small">
           <AppIcon name="cloud-rain" class="w-5 h-5 text-zinc-900" />
-        </moni-shape>
+        </AppShape>
       </div>
 
-      <moni-nav variant="rail" layout="vertical" class="flex-1 flex flex-col items-center layout-nav w-full space-y-1">
-        <moni-nav-item
+      <nav class="flex-1 flex flex-col items-center w-full space-y-1.5 select-none" aria-label="Riel de navegación">
+        <button
           v-for="item in navItems"
           :key="item.path"
-          :href="item.path"
-          :label="item.shortLabel"
-          :active="$route.path === item.path"
-          @click.prevent="navigateTo(item.path)"
+          type="button"
+          @click="navigateTo(item.path)"
+          class="flex flex-col items-center justify-center w-14 py-2 rounded-2xl transition-all cursor-pointer group select-none"
+          :class="[
+            $route.path === item.path
+              ? 'bg-zinc-100 text-zinc-950 font-black'
+              : 'text-zinc-500 hover:text-zinc-950 hover:bg-zinc-50 font-semibold'
+          ]"
         >
-          <AppIcon slot="icon" :name="item.icon" class="w-5 h-5" />
-        </moni-nav-item>
+          <AppIcon :name="item.icon" class="w-5 h-5 shrink-0" :class="$route.path === item.path ? 'text-zinc-950' : 'text-zinc-500'" />
+          <span class="text-[10px] mt-1 leading-tight tracking-tight">{{ item.shortLabel }}</span>
+        </button>
 
         <div class="w-8 h-px bg-zinc-200/80 my-2 self-center shrink-0"></div>
 
-        <moni-nav-item
+        <button
           id="nav-report-btn-guapa"
-          class="nav-report-btn"
-          href="/mapa"
-          label="Reportar"
-          :active="$route.path === '/mapa' && isReportModalOpen"
+          type="button"
           @click.prevent="handleReportNav('#nav-report-btn-guapa')"
+          class="nav-report-btn flex flex-col items-center justify-center w-14 py-2 rounded-2xl transition-all cursor-pointer group select-none text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100"
+          :class="[
+            isReportModalOpen ? 'bg-zinc-950 text-white hover:bg-zinc-900' : ''
+          ]"
         >
-          <AppIcon slot="icon" name="alert-triangle" class="w-5 h-5" />
-        </moni-nav-item>
+          <AppIcon name="alert-triangle" class="w-5 h-5 shrink-0" />
+          <span class="text-[10px] mt-1 leading-tight tracking-tight">Reportar</span>
+        </button>
 
-        <moni-nav-item
+        <button
           id="appearance-sidebar-btn"
-          label="Tema"
+          type="button"
           @click.prevent="openAppearanceModal($event)"
+          class="flex flex-col items-center justify-center w-14 py-2 rounded-2xl transition-all cursor-pointer group select-none text-zinc-500 hover:text-zinc-950 hover:bg-zinc-50"
         >
-          <AppIcon slot="icon" name="palette" class="w-5 h-5" />
-        </moni-nav-item>
-      </moni-nav>
+          <AppIcon name="palette" class="w-5 h-5 shrink-0" />
+          <span class="text-[10px] mt-1 leading-tight tracking-tight">Tema</span>
+        </button>
+      </nav>
     </aside>
 
     <!-- 3. Tasks: Cajón Modal M3 para tareas y alertas operativas -->
     <ClientOnly>
-      <moni-nav
+      <div
         v-if="navStyle === 'tasks' && isTasksDrawerOpen"
-        variant="drawer"
-        modal
-        open
-        placement="left"
-        @keydown.esc="isTasksDrawerOpen = false"
+        class="fixed inset-0 z-50 flex"
       >
-        <div slot="header" class="p-4 border-b border-zinc-200/80 flex items-center justify-between w-full">
-          <div class="flex items-center space-x-2.5">
-            <moni-shape name="soft-burst" color="surface" size="small">
-              <AppIcon name="siren" class="w-4 h-4 text-zinc-900" />
-            </moni-shape>
-            <div>
-              <h3 class="font-black text-sm text-zinc-950">Centro de Tareas</h3>
-              <p class="text-[10px] text-zinc-500 font-semibold">Operaciones Clima RD</p>
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity" @click="isTasksDrawerOpen = false"></div>
+
+        <!-- Drawer Content -->
+        <div class="relative w-72 max-w-[80vw] bg-white h-full shadow-2xl flex flex-col z-10 transition-transform duration-300">
+          <div class="p-4 border-b border-zinc-200/80 flex items-center justify-between w-full">
+            <div class="flex items-center space-x-2.5">
+              <AppShape name="soft-burst" color="surface" size="small">
+                <AppIcon name="siren" class="w-4 h-4 text-zinc-900" />
+              </AppShape>
+              <div>
+                <h3 class="font-black text-sm text-zinc-950">Centro de Tareas</h3>
+                <p class="text-[10px] text-zinc-500 font-semibold">Operaciones Clima RD</p>
+              </div>
             </div>
+            <button
+              type="button"
+              @click="isTasksDrawerOpen = false"
+              class="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer"
+              aria-label="Cerrar cajón de tareas"
+            >
+              <AppIcon name="close" class="w-3.5 h-3.5" />
+            </button>
           </div>
-          <button
-            type="button"
-            @click="isTasksDrawerOpen = false"
-            class="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer"
-            aria-label="Cerrar cajón de tareas"
-          >
-            <AppIcon name="close" class="w-3.5 h-3.5" />
-          </button>
+
+          <div class="flex-1 p-3 space-y-1 overflow-y-auto">
+            <button
+              v-for="item in navItems"
+              :key="item.path"
+              type="button"
+              @click="handleTaskNav(item.path)"
+              class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-full text-sm font-semibold transition-all cursor-pointer select-none text-left"
+              :class="[
+                $route.path === item.path
+                  ? 'bg-zinc-100 text-zinc-950 font-black'
+                  : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-50'
+              ]"
+            >
+              <AppIcon :name="item.icon" class="w-5 h-5 shrink-0" />
+              <span class="flex-1">{{ item.label }}</span>
+              <span v-if="item.badge" class="badge badge-sm badge-neutral font-bold">{{ item.badge }}</span>
+            </button>
+
+            <button
+              id="nav-report-btn-tasks-drawer"
+              type="button"
+              class="nav-report-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-full text-sm font-bold text-zinc-800 hover:bg-zinc-100 transition-all cursor-pointer text-left"
+              :class="[
+                isReportModalOpen ? 'bg-zinc-950 text-white' : ''
+              ]"
+              @click="isTasksDrawerOpen = false; handleReportNav('#nav-report-btn-tasks-drawer')"
+            >
+              <AppIcon name="alert-triangle" class="w-5 h-5 shrink-0" />
+              <span>Reportar Incidencia</span>
+            </button>
+          </div>
+
+          <div class="p-4 border-t border-zinc-100 w-full space-y-3">
+            <button
+              id="appearance-sidebar-btn"
+              type="button"
+              @click.stop="openAppearanceModal($event); isTasksDrawerOpen = false"
+              class="w-full flex items-center justify-center space-x-2 py-2 px-3 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold transition-all cursor-pointer"
+            >
+              <AppIcon name="palette" class="w-4 h-4" />
+              <span>Apariencia</span>
+            </button>
+          </div>
         </div>
-
-        <moni-nav-item
-          v-for="item in navItems"
-          :key="item.path"
-          :href="item.path"
-          :label="item.label"
-          :active="$route.path === item.path"
-          @click.prevent="handleTaskNav(item.path)"
-        >
-          <AppIcon slot="icon" :name="item.icon" class="w-5 h-5" />
-          <moni-badge v-if="item.badge" :value="item.badge"></moni-badge>
-        </moni-nav-item>
-
-        <moni-nav-item
-          id="nav-report-btn-tasks-drawer"
-          class="nav-report-btn"
-          href="/mapa"
-          label="Reportar Incidencia"
-          :active="$route.path === '/mapa' && isReportModalOpen"
-          @click.prevent="isTasksDrawerOpen = false; handleReportNav('#nav-report-btn-tasks-drawer')"
-        >
-          <AppIcon slot="icon" name="alert-triangle" class="w-5 h-5" />
-        </moni-nav-item>
-
-        <div slot="footer" class="p-4 border-t border-zinc-100 w-full space-y-3">
-          <button
-            id="appearance-sidebar-btn"
-            type="button"
-            @click.stop="openAppearanceModal($event); isTasksDrawerOpen = false"
-            class="w-full flex items-center justify-center space-x-2 py-2 px-3 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold transition-all cursor-pointer"
-          >
-            <AppIcon name="palette" class="w-4 h-4" />
-            <span>Apariencia</span>
-          </button>
-        </div>
-      </moni-nav>
+      </div>
     </ClientOnly>
 
-    <!-- Main Content Area (Header removed completely per user request) -->
-    <div class="flex-1 flex flex-col min-w-0 relative">
+    <!-- Main Content Area -->
+    <div
+      class="flex-1 flex flex-col min-w-0 relative"
+      :class="isMapPage ? 'h-full overflow-hidden' : ''"
+    >
       <!-- Tasks Mode Brand & Actions Pill on Desktop -->
       <div
         v-if="navStyle === 'tasks'"
@@ -196,9 +235,9 @@
           @click="isTasksDrawerOpen = true"
           class="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
         >
-          <moni-shape name="flower" color="surface" :style="{ '--_shape-bg': 'var(--primary-container, #EAEAEB)', '--_shape-fg': 'var(--on-primary-container, #18181B)' }" size="small">
+          <AppShape name="flower" color="surface" :style="{ '--_shape-bg': 'var(--primary-container, #EAEAEB)', '--_shape-fg': 'var(--on-primary-container, #18181B)' }" size="small">
             <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
-          </moni-shape>
+          </AppShape>
           <span class="font-extrabold text-xs text-zinc-950">Clima RD</span>
           <span class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" :style="{ backgroundColor: 'var(--primary)', color: 'var(--on-primary)' }">
             Tareas M3
@@ -208,7 +247,7 @@
         <span class="w-px h-4 bg-zinc-200/80 mx-1"></span>
 
         <!-- Quick Reportar Button inside Nav -->
-        <moni-button
+        <AppButton
           id="nav-report-btn-tasks"
           class="nav-report-btn"
           variant="filled"
@@ -216,9 +255,11 @@
           size="small"
           @click="handleReportNav('#nav-report-btn-tasks')"
         >
-          <AppIcon slot="icon" name="alert-triangle" class="w-3.5 h-3.5 mr-1" />
+          <template #icon>
+            <AppIcon name="alert-triangle" class="w-3.5 h-3.5 mr-1" />
+          </template>
           Reportar
-        </moni-button>
+        </AppButton>
 
         <!-- Quick Appearance Button inside Nav -->
         <button
@@ -297,7 +338,7 @@
           @click.stop="openAppearanceModal($event)"
           class="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950 border border-zinc-200/80 flex items-center justify-center transition-all cursor-pointer group"
           title="Personalizar Apariencia y Titular"
-          aria-label="Personalizar apariencia"
+          aria-label="Personalizar外观"
         >
           <AppIcon name="palette" class="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-950 group-hover:rotate-12 transition-transform" />
         </button>
@@ -305,11 +346,15 @@
 
       <!-- Page View Content -->
       <main
-        class="flex-1 transition-all [view-transition-name:app-page-content]"
+        class="flex-1 [view-transition-name:app-page-content]"
         :class="[
-          navStyle === 'tasks' ? 'pt-16 md:pt-20 pb-24 md:pb-8' : '',
-          navStyle === 'bonita' ? 'pt-4 md:pt-6 pb-28 md:pb-24' : '',
-          (navStyle !== 'tasks' && navStyle !== 'bonita') ? 'pt-4 md:pt-6 pb-24 md:pb-8' : ''
+          isMapPage
+            ? 'h-full w-full p-0 overflow-hidden relative'
+            : [
+                navStyle === 'tasks' ? 'pt-16 md:pt-20 pb-24 md:pb-8' : '',
+                navStyle === 'bonita' ? 'pt-4 md:pt-6 pb-28 md:pb-24' : '',
+                (navStyle !== 'tasks' && navStyle !== 'bonita') ? 'pt-4 md:pt-6 pb-24 md:pb-8' : ''
+              ]
         ]"
       >
         <slot />
@@ -366,50 +411,67 @@
       v-else
       class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-zinc-200/80 [view-transition-name:app-mobile-nav]"
     >
-      <moni-nav placement="bottom" class="w-full">
-        <moni-nav-item
+      <div class="flex items-center justify-around py-1.5 px-2">
+        <button
           v-for="item in navItems"
           :key="item.path"
-          :href="item.path"
-          :label="item.shortLabel"
-          :active="$route.path === item.path"
-          @click.prevent="navigateTo(item.path)"
+          type="button"
+          @click="navigateTo(item.path)"
+          class="flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all cursor-pointer select-none"
+          :class="[
+            $route.path === item.path
+              ? 'text-zinc-950 font-black'
+              : 'text-zinc-400 hover:text-zinc-700'
+          ]"
         >
-          <AppIcon slot="icon" :name="item.icon" class="w-5 h-5" />
-        </moni-nav-item>
-        <moni-nav-item
+          <AppIcon :name="item.icon" class="w-5 h-5 shrink-0" />
+          <span class="text-[10px] mt-0.5 font-bold tracking-tight">{{ item.shortLabel }}</span>
+        </button>
+        <button
           id="nav-report-btn-mobile"
-          class="nav-report-btn"
-          label="Reportar"
-          :active="$route.path === '/mapa' && isReportModalOpen"
-          @click.prevent="handleReportNav('#nav-report-btn-mobile')"
+          type="button"
+          class="nav-report-btn flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all cursor-pointer select-none text-zinc-600 hover:text-zinc-950"
+          :class="[
+            isReportModalOpen ? 'text-zinc-950 font-black' : ''
+          ]"
+          @click="handleReportNav('#nav-report-btn-mobile')"
         >
-          <AppIcon slot="icon" name="alert-triangle" class="w-5 h-5" />
-        </moni-nav-item>
-        <moni-nav-item
+          <AppIcon name="alert-triangle" class="w-5 h-5 shrink-0" />
+          <span class="text-[10px] mt-0.5 font-bold tracking-tight">Reportar</span>
+        </button>
+        <button
           id="appearance-mobile-trigger-btn"
-          label="Tema"
+          type="button"
+          class="flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all cursor-pointer select-none text-zinc-400 hover:text-zinc-700"
           @click.prevent="openAppearanceModal($event)"
         >
-          <AppIcon slot="icon" name="palette" class="w-5 h-5" />
-        </moni-nav-item>
-      </moni-nav>
+          <AppIcon name="palette" class="w-5 h-5 shrink-0" />
+          <span class="text-[10px] mt-0.5 font-bold tracking-tight">Tema</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Appearance Modal using moni-morph-modal -->
+    <!-- Appearance Modal using AppModal -->
     <AppearanceModal />
+
+    <!-- Incident Report Modal using AppModal (Global, in-place, without navigating to /mapa) -->
+    <IncidentReportModal />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
+import AppShape from '~/components/AppShape.vue'
+import AppButton from '~/components/AppButton.vue'
 import AppearanceModal from '~/components/AppearanceModal.vue'
+import IncidentReportModal from '~/components/IncidentReportModal.vue'
 import BulletinTicker from '~/components/BulletinTicker.vue'
 import { useAppearance } from '~/composables/useAppearance'
 import { useIncidentReport } from '~/composables/useIncidentReport'
 
 const route = useRoute()
+const isMapPage = computed(() => route.path === '/mapa')
 const { isReportModalOpen, openReportModal } = useIncidentReport()
 
 const {
@@ -435,11 +497,7 @@ const handleTaskNav = (path: string) => {
 }
 
 const handleReportNav = (selector?: string) => {
-  if (route.path === '/mapa') {
-    openReportModal(selector)
-  } else {
-    navigateTo({ path: '/mapa', query: { report: '1' } })
-  }
+  openReportModal(selector)
 }
 
 onMounted(() => {

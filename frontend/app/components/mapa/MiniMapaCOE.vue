@@ -3,9 +3,9 @@
     <!-- Map Card Header -->
     <div class="p-5 md:p-6 pb-3 border-b border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-50/50">
       <div class="flex items-start space-x-3">
-        <moni-shape name="flower" color="surface" size="small" class="shrink-0 mt-0.5">
+        <AppShape name="flower" color="surface" size="small" class="shrink-0 mt-0.5">
           <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
-        </moni-shape>
+        </AppShape>
         <div>
           <div class="flex items-center space-x-2">
             <h3 class="font-extrabold text-base text-zinc-950 tracking-tight">Mapa de Alerta por Ciclón / Vaguada</h3>
@@ -271,7 +271,7 @@
               tabindex="0"
               @mouseenter="onHover(prov, $event)"
               @mouseleave="onLeave"
-              @click="selectProvince(prov, $event)"
+              @click.stop="selectProvince(prov, $event)"
               @keydown.enter="selectProvince(prov, $event)"
             />
           </g>
@@ -357,14 +357,14 @@
       <div v-if="selectedProvince" class="mt-4 p-4 rounded-2xl bg-white border border-zinc-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
         <div class="space-y-1">
           <div class="flex items-center space-x-2.5">
-            <moni-shape
+            <AppShape
               :name="getProvinceShape(selectedProvince.alerta)"
               size="small"
               class="shrink-0"
               :style="getShapeColorStyle(selectedProvince.alerta)"
             >
               <AppIcon :name="getProvinceIcon(selectedProvince.alerta)" class="w-3.5 h-3.5" />
-            </moni-shape>
+            </AppShape>
             <h4 class="font-black text-sm text-zinc-950">{{ selectedProvince.name }}</h4>
             <span
               class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase text-white tracking-wider"
@@ -380,16 +380,20 @@
 
         <div class="flex items-center space-x-2 shrink-0">
           <NuxtLink :to="`/provincia/${toSlug(selectedProvince.name)}`">
-            <moni-button variant="filled" shape="round" size="small">
-              <AppIcon slot="icon" name="arrow-right" class="w-3.5 h-3.5 mr-1.5" />
+            <AppButton variant="filled" shape="round" size="small">
+              <template #icon>
+                <AppIcon name="arrow-right" class="w-3.5 h-3.5 mr-1.5" />
+              </template>
               Ver Detalles
-            </moni-button>
+            </AppButton>
           </NuxtLink>
           <NuxtLink to="/mapa">
-            <moni-button variant="tonal" shape="round" size="small">
-              <AppIcon slot="icon" name="map" class="w-3.5 h-3.5 mr-1.5" />
+            <AppButton variant="tonal" shape="round" size="small">
+              <template #icon>
+                <AppIcon name="map" class="w-3.5 h-3.5 mr-1.5" />
+              </template>
               Mapa WebGL
-            </moni-button>
+            </AppButton>
           </NuxtLink>
         </div>
       </div>
@@ -401,14 +405,14 @@
       </div>
     </div>
 
-    <!-- View 2: Grid Table Matrix (32 provinces with organic moni-shape indicators) -->
+    <!-- View 2: Grid Table Matrix (32 provinces with organic shape indicators) -->
     <div v-show="activeView === 'tabla'" class="p-5 md:p-6 space-y-4">
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 max-h-[460px] overflow-y-auto pr-1">
         <div
           v-for="prov in provincesList"
           :key="`grid-${prov.code}`"
           :id="`grid-${prov.code}`"
-          @click="selectProvince(prov, $event)"
+          @click.stop="selectProvince(prov, $event)"
           class="py-2.5 px-3.5 rounded-2xl border transition-all cursor-pointer hover:shadow-md flex items-center justify-between gap-2.5 group select-none"
           :class="[
             getGridCardClass(prov.alerta),
@@ -421,47 +425,35 @@
             </p>
           </div>
 
-          <!-- Organic Moni-Shape replacing circular dot -->
-          <moni-shape
+          <!-- Organic Shape replacing circular dot -->
+          <AppShape
             :name="getProvinceShape(prov.alerta)"
             size="small"
             class="shrink-0 transition-transform duration-300 group-hover:scale-110"
             :style="getShapeColorStyle(prov.alerta)"
           >
             <AppIcon :name="getProvinceIcon(prov.alerta)" class="w-3.5 h-3.5" />
-          </moni-shape>
+          </AppShape>
         </div>
       </div>
     </div>
 
-    <!-- Province Interactive Moni Morph Modal (With Morph Animation) -->
-    <ClientOnly>
-      <moni-morph-modal
-        id="province-morph-modal"
-        :target="currentModalTriggerSelector"
-        :open="isProvinceModalOpen"
-        expanded-width="32rem"
-        expanded-height="auto"
-        auto-height
-        has-backdrop
-        close-on-click-outside
-        close-on-esc
-        show-close-button
-        placement="center"
-        style="--surface-container-high: #ffffff; --on-surface: #18181b; --moni-morph-panel-radius: 1.75rem;"
-        class="[&::part(panel)]:!bg-white [&::part(panel)]:!border [&::part(panel)]:!border-zinc-200/90 [&::part(panel)]:!shadow-2xl"
-        @modal-close="closeProvinceModal"
-      >
-        <!-- Header Slot -->
-        <div slot="header" class="flex items-center space-x-3" v-if="selectedProvince">
-          <moni-shape
+    <!-- Province Interactive Modal (daisyUI AppModal with wisspop morph) -->
+    <AppModal
+      v-model="isProvinceModalOpen"
+      :origin-ref="selectedProvinceTrigger"
+      maxWidth="max-w-lg"
+    >
+      <template #header>
+        <div class="flex items-center space-x-3" v-if="selectedProvince">
+          <AppShape
             :name="getProvinceShape(selectedProvince.alerta)"
             size="small"
             class="shrink-0"
             :style="getShapeColorStyle(selectedProvince.alerta)"
           >
-            <AppIcon :name="getProvinceIcon(selectedProvince.alerta)" class="w-4 h-4" />
-          </moni-shape>
+            <AppIcon :name="getProvinceIcon(selectedProvince.alerta)" class="w-3.5 h-3.5" />
+          </AppShape>
           <div>
             <div class="flex items-center space-x-2">
               <h3 class="font-black text-lg text-zinc-950 tracking-tight leading-none">
@@ -477,74 +469,79 @@
             <p class="text-xs text-zinc-500 mt-1">Centro de Operaciones de Emergencias (COE) • Boletín Oficial</p>
           </div>
         </div>
+      </template>
 
-        <!-- Body Content (Default Slot - NO slot=footer) -->
-        <div v-if="selectedProvince" class="space-y-4 py-2 text-xs select-none">
-          <!-- Official Advisory Box -->
-          <div class="p-4 rounded-2xl border space-y-1.5" :class="getGridCardClass(selectedProvince.alerta)">
-            <div class="flex items-center space-x-1.5">
-              <AppIcon name="shield" class="w-4 h-4 shrink-0 text-zinc-900" />
-              <span class="text-xs font-black uppercase tracking-wider">Aviso y Recomendación Oficial</span>
-            </div>
-            <p class="text-xs text-zinc-700 leading-relaxed font-normal">
-              {{ getProvinceAdvice(selectedProvince.alerta, selectedProvince.name) }}
-            </p>
+      <!-- Body Content -->
+      <div v-if="selectedProvince" class="space-y-4 py-2 text-xs select-none">
+        <!-- Official Advisory Box -->
+        <div class="p-4 rounded-2xl border space-y-1.5" :class="getGridCardClass(selectedProvince.alerta)">
+          <div class="flex items-center space-x-1.5">
+            <AppIcon name="shield" class="w-4 h-4 shrink-0 text-zinc-900" />
+            <span class="text-xs font-black uppercase tracking-wider">Aviso y Recomendación Oficial</span>
           </div>
+          <p class="text-xs text-zinc-700 leading-relaxed font-normal">
+            {{ getProvinceAdvice(selectedProvince.alerta, selectedProvince.name) }}
+          </p>
+        </div>
 
-          <!-- Quick Metrics Grid -->
-          <div class="grid grid-cols-3 gap-2.5 text-center">
-            <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1">
-              <span class="text-[10px] font-bold text-zinc-500 block uppercase">Nivel Riesgo</span>
-              <span class="text-xs font-black" :class="getRiskTextColor(selectedProvince.alerta)">
-                {{ selectedProvince.alerta === 'ROJA' ? 'Máximo' : selectedProvince.alerta === 'AMARILLA' ? 'Elevado' : selectedProvince.alerta === 'VERDE' ? 'Moderado' : 'Bajo' }}
-              </span>
-            </div>
-            <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1">
-              <span class="text-[10px] font-bold text-zinc-500 block uppercase">Precipitación</span>
-              <span class="text-xs font-black text-zinc-900">
-                {{ selectedProvince.alerta === 'ROJA' ? '> 120 mm' : selectedProvince.alerta === 'AMARILLA' ? '60-100 mm' : selectedProvince.alerta === 'VERDE' ? '20-50 mm' : '< 10 mm' }}
-              </span>
-            </div>
-            <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1">
-              <span class="text-[10px] font-bold text-zinc-500 block uppercase">Monitoreo</span>
-              <span class="text-xs font-black text-emerald-600">
-                Activo
-              </span>
-            </div>
+        <!-- Quick Metrics Grid -->
+        <div class="grid grid-cols-3 gap-2.5 text-center">
+          <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1">
+            <span class="text-[10px] font-bold text-zinc-500 block uppercase">Nivel Riesgo</span>
+            <span class="text-xs font-black" :class="getRiskTextColor(selectedProvince.alerta)">
+              {{ selectedProvince.alerta === 'ROJA' ? 'Máximo' : selectedProvince.alerta === 'AMARILLA' ? 'Elevado' : selectedProvince.alerta === 'VERDE' ? 'Moderado' : 'Bajo' }}
+            </span>
           </div>
-
-          <!-- Action Buttons inside Main (NO slot="footer" to eliminate empty gap) -->
-          <div class="pt-3 border-t border-zinc-100 flex items-center justify-between">
-            <button
-              type="button"
-              @click="closeProvinceModal"
-              class="px-4 py-2 text-xs font-bold text-zinc-600 hover:text-zinc-900 rounded-full hover:bg-zinc-100 transition-colors cursor-pointer"
-            >
-              Cerrar
-            </button>
-
-            <NuxtLink :to="`/provincia/${toSlug(selectedProvince.name)}`">
-              <moni-button
-                variant="filled"
-                shape="round"
-                size="small"
-                class="cursor-pointer"
-                @click="closeProvinceModal"
-              >
-                <AppIcon slot="icon" name="arrow-right" class="w-3.5 h-3.5 mr-1.5" />
-                Ver Pronóstico y Reportes
-              </moni-button>
-            </NuxtLink>
+          <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1">
+            <span class="text-[10px] font-bold text-zinc-500 block uppercase">Precipitación</span>
+            <span class="text-xs font-black text-zinc-900">
+              {{ selectedProvince.alerta === 'ROJA' ? '> 120 mm' : selectedProvince.alerta === 'AMARILLA' ? '60-100 mm' : selectedProvince.alerta === 'VERDE' ? '20-50 mm' : '< 10 mm' }}
+            </span>
+          </div>
+          <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1">
+            <span class="text-[10px] font-bold text-zinc-500 block uppercase">Monitoreo</span>
+            <span class="text-xs font-black text-emerald-600">
+              Activo
+            </span>
           </div>
         </div>
-      </moni-morph-modal>
-    </ClientOnly>
+
+        <!-- Action Buttons -->
+        <div class="pt-3 border-t border-zinc-100 flex items-center justify-between">
+          <button
+            type="button"
+            @click="closeProvinceModal"
+            class="px-4 py-2 text-xs font-bold text-zinc-600 hover:text-zinc-900 rounded-full hover:bg-zinc-100 transition-colors cursor-pointer"
+          >
+            Cerrar
+          </button>
+
+          <NuxtLink :to="`/provincia/${toSlug(selectedProvince.name)}`">
+            <AppButton
+              variant="filled"
+              shape="round"
+              size="small"
+              class="cursor-pointer"
+              @click="closeProvinceModal"
+            >
+              <template #icon>
+                <AppIcon name="arrow-right" class="w-3.5 h-3.5 mr-1.5" />
+              </template>
+              Ver Pronóstico y Reportes
+            </AppButton>
+          </NuxtLink>
+        </div>
+      </div>
+    </AppModal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
+import AppButton from '~/components/AppButton.vue'
+import AppShape from '~/components/AppShape.vue'
+import AppModal from '~/components/AppModal.vue'
 import rawProvincesPaths from '~/assets/data/provincias-dr-paths.json'
 
 const activeView = ref<'mapa' | 'tabla'>('mapa')
@@ -554,7 +551,7 @@ const hoveredProvince = ref<any>(null)
 const selectedProvince = ref<any>(null)
 const tooltipPos = ref({ x: 0, y: 0 })
 const isProvinceModalOpen = ref(false)
-const currentModalTriggerSelector = ref<string>('#province-morph-modal')
+const selectedProvinceTrigger = ref<any>(null)
 
 function isProvinceDimmed(alerta: string): boolean {
   if (activeAlertFilter.value === 'ALL') return false
@@ -767,58 +764,19 @@ function onLeave() {
 }
 
 function selectProvince(prov: any, event?: MouseEvent) {
-  selectedProvince.value = prov
-  currentModalTriggerSelector.value = `#prov-path-${prov.code}, #grid-${prov.code}`
-  isProvinceModalOpen.value = true
-
-  if (import.meta.client) {
-    nextTick(() => {
-      const modal = document.getElementById('province-morph-modal') as any
-      const trigger = (event?.currentTarget as HTMLElement)
-        || document.getElementById(`prov-path-${prov.code}`)
-        || document.getElementById(`grid-${prov.code}`)
-      if (modal) {
-        if (trigger && typeof modal.showFrom === 'function') {
-          modal.showFrom(trigger)
-        } else if (typeof modal.show === 'function') {
-          modal.show()
-        }
-      }
-    })
+  if (event) {
+    event.stopPropagation()
+    selectedProvinceTrigger.value = event.currentTarget || event.target || `#prov-path-${prov.code}`
+  } else {
+    selectedProvinceTrigger.value = `#prov-path-${prov.code}`
   }
+  selectedProvince.value = prov
+  isProvinceModalOpen.value = true
 }
 
 function closeProvinceModal() {
   isProvinceModalOpen.value = false
-  if (import.meta.client) {
-    const modal = document.getElementById('province-morph-modal') as any
-    if (modal && typeof modal.hide === 'function') {
-      modal.hide()
-    }
-  }
 }
-
-onMounted(() => {
-  if (import.meta.client) {
-    nextTick(() => {
-      const modal = document.getElementById('province-morph-modal')
-      if (modal) {
-        modal.addEventListener('modal-close', closeProvinceModal)
-        modal.addEventListener('close', closeProvinceModal)
-      }
-    })
-  }
-})
-
-onUnmounted(() => {
-  if (import.meta.client) {
-    const modal = document.getElementById('province-morph-modal')
-    if (modal) {
-      modal.removeEventListener('modal-close', closeProvinceModal)
-      modal.removeEventListener('close', closeProvinceModal)
-    }
-  }
-})
 
 function getProvinceShape(alerta: string): string {
   switch (alerta) {

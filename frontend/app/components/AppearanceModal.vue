@@ -1,22 +1,13 @@
 <template>
-  <ClientOnly>
-    <moni-morph-modal
-      id="appearance-morph-modal"
-      target="#appearance-trigger-btn, #appearance-tasks-trigger-btn, #appearance-sidebar-btn, #appearance-sidebar-btn-clasica, #appearance-mobile-trigger-btn, #appearance-mobile-trigger-btn-bonita"
-      :open="isAppearanceModalOpen"
-      expanded-width="24rem"
-      expanded-height="auto"
-      auto-height
-      has-backdrop
-      close-on-click-outside
-      close-on-esc
-      show-close-button
-      placement="center"
-      style="--surface-container-high: #ffffff; --on-surface: #18181b; --on-surface-variant: #71717a; --scrim: rgba(0, 0, 0, 0.3); --outline-variant: #e4e4e7; --active: #f4f4f5; --moni-morph-panel-radius: 1.75rem;"
-      class="appearance-morph-modal [&::part(panel)]:!bg-white [&::part(panel)]:![backdrop-filter:none] [&::part(panel)]:!border [&::part(panel)]:!border-zinc-200 [&::part(panel)]:!shadow-2xl [&::part(backdrop)]:![backdrop-filter:none]"
-    >
-      <!-- Header Slot -->
-      <div slot="header" class="flex items-center space-x-2.5">
+  <AppModal
+    v-model="isAppearanceModalOpen"
+    :origin-ref="appearanceTrigger"
+    placement="origin"
+    max-width="max-w-sm"
+  >
+    <!-- Header Slot -->
+    <template #header>
+      <div class="flex items-center space-x-2.5">
         <div class="w-8 h-8 rounded-full bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-900 shrink-0">
           <AppIcon name="palette" class="w-4 h-4 text-zinc-900" />
         </div>
@@ -25,6 +16,7 @@
           <p class="text-[10px] text-zinc-500 mt-0.5">Colores, navegación y titulares</p>
         </div>
       </div>
+    </template>
 
       <!-- Body Content (Default Slot) -->
       <div class="space-y-4 py-2 text-zinc-900 select-none">
@@ -143,13 +135,12 @@
           </div>
         </div>
       </div>
-    </moni-morph-modal>
-  </ClientOnly>
+  </AppModal>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, nextTick, watch } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
+import AppModal from '~/components/AppModal.vue'
 import {
   useAppearance,
   type NavStyle,
@@ -165,6 +156,7 @@ const {
   tickerAnimation,
   tickerSpeed,
   isAppearanceModalOpen,
+  appearanceTrigger,
   COLOR_PALETTE,
   applyColor,
   setNavStyle,
@@ -197,22 +189,4 @@ const tickerSpeeds: { id: TickerSpeed; label: string }[] = [
   { id: 'normal', label: 'Normal' },
   { id: 'fast', label: 'Rápida' },
 ]
-
-let modalObserver: MutationObserver | null = null
-
-onMounted(() => {
-  const modal = document.getElementById('appearance-morph-modal')
-  if (modal) {
-    modalObserver = new MutationObserver(() => {
-      if (!modal.hasAttribute('open') && isAppearanceModalOpen.value) {
-        isAppearanceModalOpen.value = false
-      }
-    })
-    modalObserver.observe(modal, { attributes: true, attributeFilter: ['open'] })
-  }
-})
-
-onUnmounted(() => {
-  if (modalObserver) modalObserver.disconnect()
-})
 </script>

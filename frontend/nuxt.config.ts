@@ -1,3 +1,5 @@
+import tailwindcss from '@tailwindcss/vite'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
@@ -5,18 +7,17 @@ export default defineNuxtConfig({
     compatibilityVersion: 4
   },
   modules: [
-    '@nuxtjs/tailwindcss',
     '@pinia/nuxt'
   ],
-  css: [
-    'maplibre-gl/dist/maplibre-gl.css',
-    '@moni-labs/moni-ui/styles'
-  ],
-  vue: {
-    compilerOptions: {
-      isCustomElement: (tag) => tag.startsWith('moni-')
-    }
+  vite: {
+    plugins: [
+      tailwindcss()
+    ]
   },
+  css: [
+    '~/assets/css/main.css',
+    'maplibre-gl/dist/maplibre-gl.css'
+  ],
   experimental: {
     viewTransition: true
   },
@@ -26,7 +27,8 @@ export default defineNuxtConfig({
     }
   },
   app: {
-    pageTransition: { name: 'page', mode: 'out-in' },
+    pageTransition: false,
+    layoutTransition: false,
     head: {
       title: 'Clima RD | Monitoreo Climático y Alertas Ciudadanas',
       meta: [

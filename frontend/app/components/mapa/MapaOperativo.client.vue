@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full h-full min-h-[calc(100vh-4rem)] overflow-hidden font-sans">
+  <div class="relative w-full h-full overflow-hidden font-sans">
     <!-- Centered Material 3 Pill Search Bar -->
     <div class="absolute top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-[480px] z-20 space-y-2">
       <div
@@ -48,7 +48,10 @@
     </div>
 
     <!-- Map Layers Selector Pill (Bottom-Left) -->
-    <div class="absolute bottom-6 left-6 z-20 hidden sm:flex items-center space-x-1 bg-white/95 backdrop-blur-xl p-1 rounded-full border border-zinc-200/80 shadow-lg">
+    <div
+      class="absolute z-20 hidden sm:flex items-center space-x-1 bg-white/95 backdrop-blur-xl p-1 rounded-full border border-zinc-200/80 shadow-lg transition-all duration-300"
+      :class="tickerPosition === 'bottom' ? 'bottom-16 left-4 sm:left-6' : 'bottom-6 sm:bottom-7 left-4 sm:left-6'"
+    >
       <button
         v-for="layer in layerOptions"
         :key="layer.id"
@@ -63,8 +66,11 @@
       </button>
     </div>
 
-    <!-- Live Emergency Legend / Incidents Status Pill (Top-Right / Sub-header) -->
-    <div class="absolute top-4 right-4 z-20 hidden lg:flex items-center space-x-2 bg-white/95 backdrop-blur-xl px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md">
+    <!-- Live Emergency Legend / Incidents Status Pill (Bottom-Right) -->
+    <div
+      class="absolute z-20 hidden sm:flex items-center space-x-2 bg-white/95 backdrop-blur-xl px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300"
+      :class="tickerPosition === 'bottom' ? 'bottom-16 right-4 sm:right-6' : 'bottom-7 sm:bottom-8 right-4 sm:right-6'"
+    >
       <span class="relative flex h-2.5 w-2.5">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
@@ -75,7 +81,7 @@
     </div>
 
     <!-- Map Container -->
-    <div ref="mapContainer" class="w-full h-full min-h-[calc(100vh-4rem)] bg-[#F4F4F6]"></div>
+    <div ref="mapContainer" class="w-full h-full bg-[#F4F4F6]"></div>
   </div>
 </template>
 
@@ -84,9 +90,13 @@ import { ref, computed, onMounted, onUnmounted, markRaw } from 'vue'
 import maplibregl from 'maplibre-gl'
 import AppIcon from '~/components/AppIcon.vue'
 import postalCodes from '~/assets/data/codigos-postales-rd.json'
+import { useAppearance } from '~/composables/useAppearance'
+
+const { tickerPosition } = useAppearance()
 
 const mapContainer = ref<HTMLElement | null>(null)
 let mapInstance: maplibregl.Map | null = null
+let resizeObserver: ResizeObserver | null = null
 let activeMarkers: maplibregl.Marker[] = []
 
 const searchQuery = ref('')
@@ -427,9 +437,20 @@ onMounted(() => {
   })
 
   mapInstance = markRaw(map)
+
+  if (typeof ResizeObserver !== 'undefined' && mapContainer.value) {
+    resizeObserver = new ResizeObserver(() => {
+      map.resize()
+    })
+    resizeObserver.observe(mapContainer.value)
+  }
 })
 
 onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
   activeMarkers.forEach(m => m.remove())
   activeMarkers = []
   if (mapInstance) {

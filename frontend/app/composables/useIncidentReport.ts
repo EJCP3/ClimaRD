@@ -1,10 +1,10 @@
-﻿export function useIncidentReport() {
+export function useIncidentReport() {
   const isReportModalOpen = useState<boolean>('report_incident_modal_open', () => false)
-  const reportTriggerSelector = useState<string | null>('report_incident_trigger_selector', () => null)
+  const reportTriggerSelector = useState<any>('report_incident_trigger_selector', () => null)
 
-  const openReportModal = (triggerSelector?: string) => {
-    if (triggerSelector) {
-      reportTriggerSelector.value = triggerSelector
+  const openReportModal = (trigger?: any) => {
+    if (trigger) {
+      reportTriggerSelector.value = trigger
     }
     isReportModalOpen.value = true
   }
