@@ -297,7 +297,7 @@
                 :y="prov.centroid[1]"
                 text-anchor="middle"
                 dominant-baseline="central"
-                class="font-sans select-none pointer-events-none transition-all duration-150"
+                class="select-none pointer-events-none transition-all duration-150"
                 :class="isProvinceDimmed(prov.alerta) ? 'opacity-25' : 'opacity-100'"
                 :style="getLabelStyle(prov)"
               >
@@ -548,7 +548,7 @@ import AppIcon from '~/components/AppIcon.vue'
 import rawProvincesPaths from '~/assets/data/provincias-dr-paths.json'
 
 const activeView = ref<'mapa' | 'tabla'>('mapa')
-const mapColorMode = ref<'alertas' | 'dominicango'>('alertas')
+const mapColorMode = ref<'dominicango' | 'alertas'>('dominicango')
 const activeAlertFilter = ref<'ALL' | 'ROJA' | 'AMARILLA' | 'VERDE' | 'NORMAL'>('ALL')
 const hoveredProvince = ref<any>(null)
 const selectedProvince = ref<any>(null)
@@ -695,14 +695,14 @@ function getProvinceAdvice(alerta: string, name: string): string {
 }
 
 function getLabelPixelSize(code: string): string {
-  // Compact sizes on 960x500 canvas
+  // Balanced, subtle sizes matching DominicanGo (media_1788667346781)
   if (['01', '19', '27', '31', '24', '10', '28'].includes(code)) {
-    return '6px'
+    return '5.5px'
   }
   if (['22', '25', '13', '02', '11', '18', '29', '04', '15', '16'].includes(code)) {
-    return '7.5px'
+    return '6.5px'
   }
-  return '6.8px'
+  return '6px'
 }
 
 function getLabelStyle(prov: any): Record<string, string> {
@@ -712,18 +712,15 @@ function getLabelStyle(prov: any): Record<string, string> {
   const baseStyle: Record<string, string> = {
     fontSize,
     fontFamily: "'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif",
-    fontWeight: '700',
-    letterSpacing: '0.04em',
-    paintOrder: 'stroke fill',
-    strokeLinejoin: 'round'
+    fontWeight: '600',
+    letterSpacing: '0.5px'
   }
 
+  // Exact DominicanGo typography from reference image (#2A3D4A, no outline, soft and elegant)
   if (isDominicanGoMode) {
     return {
       ...baseStyle,
-      fill: '#1e293b',
-      stroke: 'rgba(255, 255, 255, 0.95)',
-      strokeWidth: '1.8px'
+      fill: '#2A3D4A'
     }
   }
 
@@ -732,29 +729,23 @@ function getLabelStyle(prov: any): Record<string, string> {
       return {
         ...baseStyle,
         fill: '#ffffff',
-        stroke: 'rgba(159, 18, 57, 0.95)',
-        strokeWidth: '1.6px'
+        opacity: '0.95'
       }
     case 'VERDE':
       return {
         ...baseStyle,
         fill: '#ffffff',
-        stroke: 'rgba(6, 78, 59, 0.95)',
-        strokeWidth: '1.6px'
+        opacity: '0.95'
       }
     case 'AMARILLA':
       return {
         ...baseStyle,
-        fill: '#18181b',
-        stroke: '#ffffff',
-        strokeWidth: '2px'
+        fill: '#2A3D4A'
       }
     default: // NORMAL
       return {
         ...baseStyle,
-        fill: '#ffffff',
-        stroke: 'rgba(51, 65, 85, 0.9)',
-        strokeWidth: '1.8px'
+        fill: '#2A3D4A'
       }
   }
 }
