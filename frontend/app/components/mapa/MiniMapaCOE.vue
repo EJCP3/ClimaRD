@@ -38,20 +38,59 @@
 
     <!-- View 1: Graphical SVG Map (Harmonized design) -->
     <div v-show="activeView === 'mapa'" class="relative p-3 md:p-6 bg-gradient-to-br from-slate-50/50 via-sky-50/20 to-zinc-50/60 flex-1 flex flex-col justify-between">
-      <!-- Top Map Controls & Quick Filter -->
+      <!-- Top Map Controls & Quick Filter Chips -->
       <div class="flex flex-wrap items-center justify-between gap-2 mb-2 z-10">
-        <div class="flex items-center space-x-2 text-[11px] text-zinc-500">
-          <AppIcon name="map-pin" class="w-3.5 h-3.5 text-zinc-700" />
-          <span>Haz clic o posa el cursor sobre una provincia para ver su reporte</span>
+        <!-- Interactive Alert Filter Chips -->
+        <div class="flex items-center space-x-1 sm:space-x-1.5 overflow-x-auto py-0.5">
+          <button
+            @click="activeAlertFilter = 'ALL'"
+            type="button"
+            class="px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer select-none"
+            :class="activeAlertFilter === 'ALL' ? 'bg-zinc-950 text-white shadow-xs' : 'bg-white/90 text-zinc-600 hover:bg-zinc-100 border border-zinc-200/80'"
+          >
+            Todas (32)
+          </button>
+          <button
+            @click="activeAlertFilter = 'ROJA'"
+            type="button"
+            class="px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer select-none flex items-center space-x-1.5"
+            :class="activeAlertFilter === 'ROJA' ? 'bg-[#E11D48] text-white shadow-xs' : 'bg-white/90 text-zinc-700 hover:bg-rose-50 border border-zinc-200/80'"
+          >
+            <span class="w-2 h-2 rounded-full bg-[#E11D48]" :class="activeAlertFilter === 'ROJA' ? 'bg-white' : ''"></span>
+            <span>Roja (7)</span>
+          </button>
+          <button
+            @click="activeAlertFilter = 'AMARILLA'"
+            type="button"
+            class="px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer select-none flex items-center space-x-1.5"
+            :class="activeAlertFilter === 'AMARILLA' ? 'bg-[#F59E0B] text-zinc-950 shadow-xs' : 'bg-white/90 text-zinc-700 hover:bg-amber-50 border border-zinc-200/80'"
+          >
+            <span class="w-2 h-2 rounded-full bg-[#F59E0B]" :class="activeAlertFilter === 'AMARILLA' ? 'bg-zinc-950' : ''"></span>
+            <span>Amarilla (8)</span>
+          </button>
+          <button
+            @click="activeAlertFilter = 'VERDE'"
+            type="button"
+            class="px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer select-none flex items-center space-x-1.5"
+            :class="activeAlertFilter === 'VERDE' ? 'bg-[#10B981] text-white shadow-xs' : 'bg-white/90 text-zinc-700 hover:bg-emerald-50 border border-zinc-200/80'"
+          >
+            <span class="w-2 h-2 rounded-full bg-[#10B981]" :class="activeAlertFilter === 'VERDE' ? 'bg-white' : ''"></span>
+            <span>Verde (7)</span>
+          </button>
+          <button
+            @click="activeAlertFilter = 'NORMAL'"
+            type="button"
+            class="px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer select-none flex items-center space-x-1.5"
+            :class="activeAlertFilter === 'NORMAL' ? 'bg-zinc-700 text-white shadow-xs' : 'bg-white/90 text-zinc-600 hover:bg-zinc-100 border border-zinc-200/80'"
+          >
+            <span class="w-2 h-2 rounded-full bg-zinc-400" :class="activeAlertFilter === 'NORMAL' ? 'bg-white' : ''"></span>
+            <span>Sin Alerta (10)</span>
+          </button>
         </div>
 
-        <div v-if="selectedProvince" class="flex items-center space-x-2">
-          <button
-            @click="selectedProvince = null"
-            class="text-[11px] font-bold text-zinc-600 hover:text-zinc-950 underline cursor-pointer"
-          >
-            Limpiar selección
-          </button>
+        <div class="flex items-center space-x-2 text-[11px] text-zinc-500">
+          <AppIcon name="map-pin" class="w-3.5 h-3.5 text-zinc-700" />
+          <span class="hidden sm:inline">Posa o haz clic en una provincia</span>
         </div>
       </div>
 
@@ -64,32 +103,84 @@
         >
           <defs>
             <!-- Elevation drop shadow for Dominican Republic island -->
-            <filter id="island-shadow" x="-5%" y="-5%" width="115%" height="115%">
-              <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#09090b" flood-opacity="0.08" />
+            <filter id="island-shadow" x="-8%" y="-8%" width="120%" height="120%">
+              <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.10" />
             </filter>
+
+            <!-- Subtle ocean graticule grid pattern -->
+            <pattern id="ocean-grid" width="45" height="45" patternUnits="userSpaceOnUse">
+              <path d="M 45 0 L 0 0 0 45" fill="none" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="2 5" opacity="0.6" />
+            </pattern>
+
+            <!-- Cartographic gradients for rich, harmonious elevation -->
+            <linearGradient id="grad-roja" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FB7185" />
+              <stop offset="50%" stop-color="#E11D48" />
+              <stop offset="100%" stop-color="#BE123C" />
+            </linearGradient>
+
+            <linearGradient id="grad-amarilla" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FDE047" />
+              <stop offset="50%" stop-color="#F59E0B" />
+              <stop offset="100%" stop-color="#D97706" />
+            </linearGradient>
+
+            <linearGradient id="grad-verde" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6EE7B7" />
+              <stop offset="50%" stop-color="#10B981" />
+              <stop offset="100%" stop-color="#059669" />
+            </linearGradient>
+
+            <linearGradient id="grad-normal" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#F8FAFC" />
+              <stop offset="60%" stop-color="#E2E8F0" />
+              <stop offset="100%" stop-color="#CBD5E1" />
+            </linearGradient>
           </defs>
 
-          <!-- Province Polygons -->
+          <!-- Ocean Graticule Background Grid -->
+          <rect width="800" height="550" fill="url(#ocean-grid)" opacity="0.45" />
+
+          <!-- Maritime Coordinates Stamp -->
+          <text x="780" y="28" text-anchor="end" class="font-mono text-[9px] fill-zinc-400 select-none pointer-events-none">
+            18°44' N • 70°09' W | CARIBE
+          </text>
+
+          <!-- Province Polygons with Rich Gradients & Elevation -->
           <g class="provinces-group" filter="url(#island-shadow)">
             <path
               v-for="prov in provincesList"
               :key="prov.code"
+              :id="'prov-path-' + prov.code"
               :d="prov.path"
-              :fill="getProvinceColor(prov.alerta)"
+              :fill="'url(#grad-' + prov.alerta.toLowerCase() + ')'"
               class="origin-center transition-all duration-200 cursor-pointer"
               :class="[
                 selectedProvince?.code === prov.code
-                  ? 'brightness-110 drop-shadow-md stroke-zinc-950 [stroke-width:2.8px]'
-                  : selectedProvince
-                    ? 'opacity-70 stroke-white [stroke-width:1.8px] hover:opacity-100 hover:brightness-105 hover:stroke-zinc-900 hover:[stroke-width:2.4px]'
-                    : 'stroke-white [stroke-width:1.8px] hover:brightness-105 hover:stroke-zinc-900 hover:[stroke-width:2.4px]'
+                  ? 'brightness-110 drop-shadow-lg stroke-zinc-950 [stroke-width:2.8px]'
+                  : isProvinceDimmed(prov.alerta)
+                    ? 'opacity-30 saturate-50 stroke-white [stroke-width:1.5px]'
+                    : 'opacity-100 stroke-white [stroke-width:1.8px] hover:brightness-105 hover:stroke-zinc-950 hover:[stroke-width:2.4px]'
               ]"
               stroke-linejoin="round"
               stroke-linecap="round"
               @mouseenter="onHover(prov, $event)"
               @mouseleave="onLeave"
-              @click="selectProvince(prov)"
+              @click="selectProvince(prov, $event)"
             />
+          </g>
+
+          <!-- Live Alert Radar Pulses on Critical Alerta Roja Hotspots -->
+          <g class="pointer-events-none select-none">
+            <template v-for="prov in provincesList" :key="`beacon-${prov.code}`">
+              <g
+                v-if="prov.alerta === 'ROJA' && !isProvinceDimmed(prov.alerta)"
+                :transform="`translate(${getCentroid(prov)[0]}, ${getCentroid(prov)[1] - 11})`"
+              >
+                <circle r="5" fill="#E11D48" opacity="0.75" class="animate-ping" />
+                <circle r="2.5" fill="#ffffff" stroke="#BE123C" stroke-width="1.2" />
+              </g>
+            </template>
           </g>
 
           <!-- Province Names Labels on Map (All 32 Provincias COE) -->
@@ -101,6 +192,7 @@
                 text-anchor="middle"
                 dominant-baseline="central"
                 class="font-sans select-none pointer-events-none transition-all duration-150"
+                :class="isProvinceDimmed(prov.alerta) ? 'opacity-30' : 'opacity-100'"
                 :style="getLabelStyle(prov.alerta, prov.code)"
               >
                 {{ getShortLabel(prov.code, prov.name) }}
@@ -202,9 +294,13 @@
         <div
           v-for="prov in provincesList"
           :key="`grid-${prov.code}`"
-          @click="selectProvince(prov)"
+          :id="`grid-${prov.code}`"
+          @click="selectProvince(prov, $event)"
           class="p-3 rounded-2xl border transition-all cursor-pointer hover:shadow-md block no-underline"
-          :class="getGridCardClass(prov.alerta)"
+          :class="[
+            getGridCardClass(prov.alerta),
+            isProvinceDimmed(prov.alerta) ? 'opacity-30' : 'opacity-100'
+          ]"
         >
           <div class="flex items-center justify-between">
             <p class="font-bold text-xs truncate">{{ prov.name }}</p>
@@ -220,132 +316,126 @@
       </div>
     </div>
 
-    <!-- Province Interactive Modal Dialog (Requested by User) -->
-    <Teleport to="body">
-      <Transition
-        enter-active-class="transition duration-200 ease-out"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition duration-150 ease-in"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
+    <!-- Province Interactive Moni Morph Modal (With Morph Animation) -->
+    <ClientOnly>
+      <moni-morph-modal
+        id="province-morph-modal"
+        :target="currentModalTriggerSelector"
+        :open="isProvinceModalOpen"
+        expanded-width="32rem"
+        expanded-height="auto"
+        auto-height
+        has-backdrop
+        close-on-click-outside
+        close-on-esc
+        show-close-button
+        placement="center"
+        style="--surface-container-high: #ffffff; --on-surface: #18181b; --moni-morph-panel-radius: 1.75rem;"
+        class="[&::part(panel)]:!bg-white [&::part(panel)]:!border [&::part(panel)]:!border-zinc-200/90 [&::part(panel)]:!shadow-2xl"
+        @modal-close="closeProvinceModal"
       >
-        <div
-          v-if="isProvinceModalOpen && selectedProvince"
-          class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-zinc-950/50 backdrop-blur-sm"
-          @click.self="closeProvinceModal"
-        >
-          <div
-            class="relative w-full max-w-lg bg-white rounded-[32px] p-6 sm:p-8 border border-zinc-200/90 shadow-2xl space-y-6 transform transition-all animate-scaleUp overflow-hidden"
-          >
-            <!-- Close Button -->
-            <button
-              @click="closeProvinceModal"
-              class="absolute top-5 right-5 w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950 flex items-center justify-center transition-colors cursor-pointer"
-              aria-label="Cerrar modal"
-            >
-              <AppIcon name="close" class="w-4 h-4" />
-            </button>
-
-            <!-- Modal Header -->
-            <div class="flex items-start space-x-3.5 pr-8">
-              <moni-shape :name="getProvinceShape(selectedProvince.alerta)" color="surface" size="medium" class="shrink-0 mt-0.5">
-                <AppIcon :name="getProvinceIcon(selectedProvince.alerta)" class="w-5 h-5 text-zinc-900" />
-              </moni-shape>
-              <div class="space-y-1">
-                <div class="flex items-center space-x-2 flex-wrap gap-y-1">
-                  <h3 class="font-black text-xl sm:text-2xl text-zinc-950 tracking-tight">
-                    {{ selectedProvince.name }}
-                  </h3>
-                  <span
-                    class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase text-white tracking-wider"
-                    :class="getBadgeColorClass(selectedProvince.alerta)"
-                  >
-                    ALERTA {{ selectedProvince.alerta === 'NORMAL' ? 'DESCONTINUADA' : selectedProvince.alerta }}
-                  </span>
-                </div>
-                <p class="text-xs text-zinc-500 font-medium">
-                  Centro de Operaciones de Emergencias (COE) • Boletín Oficial
-                </p>
-              </div>
-            </div>
-
-            <!-- Modal Body Content -->
-            <div class="space-y-4">
-              <!-- Official Advisory Box -->
-              <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 space-y-2">
-                <div class="flex items-center space-x-2 text-zinc-700">
-                  <AppIcon name="shield" class="w-4 h-4 text-zinc-900" />
-                  <span class="text-xs font-black uppercase tracking-wider">Aviso y Recomendación Oficial</span>
-                </div>
-                <p class="text-xs text-zinc-700 leading-relaxed font-normal">
-                  {{ getProvinceAdvice(selectedProvince.alerta, selectedProvince.name) }}
-                </p>
-              </div>
-
-              <!-- Quick Metrics Grid -->
-              <div class="grid grid-cols-3 gap-2.5 text-center">
-                <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1">
-                  <span class="text-[10px] font-bold text-zinc-500 block uppercase">Nivel Riesgo</span>
-                  <span class="text-xs font-black" :class="getRiskTextColor(selectedProvince.alerta)">
-                    {{ selectedProvince.alerta === 'ROJA' ? 'Máximo' : selectedProvince.alerta === 'AMARILLA' ? 'Elevado' : selectedProvince.alerta === 'VERDE' ? 'Moderado' : 'Bajo' }}
-                  </span>
-                </div>
-                <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1">
-                  <span class="text-[10px] font-bold text-zinc-500 block uppercase">Precipitación</span>
-                  <span class="text-xs font-black text-zinc-900">
-                    {{ selectedProvince.alerta === 'ROJA' ? '> 120 mm' : selectedProvince.alerta === 'AMARILLA' ? '60-100 mm' : selectedProvince.alerta === 'VERDE' ? '20-50 mm' : '< 10 mm' }}
-                  </span>
-                </div>
-                <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1">
-                  <span class="text-[10px] font-bold text-zinc-500 block uppercase">Monitoreo</span>
-                  <span class="text-xs font-black text-emerald-600">
-                    Activo
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Modal Actions -->
-            <div class="pt-2 border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <button
-                @click="closeProvinceModal"
-                class="w-full sm:w-auto px-4 py-2.5 text-xs font-bold text-zinc-600 hover:text-zinc-900 rounded-full hover:bg-zinc-100 transition-colors"
+        <!-- Header Slot -->
+        <div slot="header" class="flex items-center space-x-3" v-if="selectedProvince">
+          <moni-shape :name="getProvinceShape(selectedProvince.alerta)" color="surface" size="small">
+            <AppIcon :name="getProvinceIcon(selectedProvince.alerta)" class="w-4 h-4 text-zinc-900" />
+          </moni-shape>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h3 class="font-black text-lg text-zinc-950 tracking-tight leading-none">
+                {{ selectedProvince.name }}
+              </h3>
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase text-white tracking-wider"
+                :class="getBadgeColorClass(selectedProvince.alerta)"
               >
-                Cerrar
-              </button>
-
-              <div class="flex items-center space-x-2 w-full sm:w-auto">
-                <NuxtLink :to="`/provincia/${toSlug(selectedProvince.name)}`" class="w-full sm:w-auto">
-                  <moni-button
-                    variant="filled"
-                    shape="round"
-                    size="medium"
-                    class="w-full sm:w-auto cursor-pointer"
-                    @click="closeProvinceModal"
-                  >
-                    <AppIcon slot="icon" name="arrow-right" class="w-4 h-4 mr-1.5" />
-                    Ver Pronóstico y Reportes
-                  </moni-button>
-                </NuxtLink>
-              </div>
+                ALERTA {{ selectedProvince.alerta === 'NORMAL' ? 'DESCONTINUADA' : selectedProvince.alerta }}
+              </span>
             </div>
+            <p class="text-xs text-zinc-500 mt-1">Centro de Operaciones de Emergencias (COE) • Boletín Oficial</p>
           </div>
         </div>
-      </Transition>
-    </Teleport>
+
+        <!-- Body Content (Default Slot - NO slot=footer) -->
+        <div v-if="selectedProvince" class="space-y-4 py-2 text-xs select-none">
+          <!-- Official Advisory Box -->
+          <div class="p-4 rounded-2xl border space-y-1.5" :class="getGridCardClass(selectedProvince.alerta)">
+            <div class="flex items-center space-x-1.5">
+              <AppIcon name="shield" class="w-4 h-4 shrink-0 text-zinc-900" />
+              <span class="text-xs font-black uppercase tracking-wider">Aviso y Recomendación Oficial</span>
+            </div>
+            <p class="text-xs text-zinc-700 leading-relaxed font-normal">
+              {{ getProvinceAdvice(selectedProvince.alerta, selectedProvince.name) }}
+            </p>
+          </div>
+
+          <!-- Quick Metrics Grid -->
+          <div class="grid grid-cols-3 gap-2.5 text-center">
+            <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1">
+              <span class="text-[10px] font-bold text-zinc-500 block uppercase">Nivel Riesgo</span>
+              <span class="text-xs font-black" :class="getRiskTextColor(selectedProvince.alerta)">
+                {{ selectedProvince.alerta === 'ROJA' ? 'Máximo' : selectedProvince.alerta === 'AMARILLA' ? 'Elevado' : selectedProvince.alerta === 'VERDE' ? 'Moderado' : 'Bajo' }}
+              </span>
+            </div>
+            <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1">
+              <span class="text-[10px] font-bold text-zinc-500 block uppercase">Precipitación</span>
+              <span class="text-xs font-black text-zinc-900">
+                {{ selectedProvince.alerta === 'ROJA' ? '> 120 mm' : selectedProvince.alerta === 'AMARILLA' ? '60-100 mm' : selectedProvince.alerta === 'VERDE' ? '20-50 mm' : '< 10 mm' }}
+              </span>
+            </div>
+            <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1">
+              <span class="text-[10px] font-bold text-zinc-500 block uppercase">Monitoreo</span>
+              <span class="text-xs font-black text-emerald-600">
+                Activo
+              </span>
+            </div>
+          </div>
+
+          <!-- Action Buttons inside Main (NO slot="footer" to eliminate empty gap) -->
+          <div class="pt-3 border-t border-zinc-100 flex items-center justify-between">
+            <button
+              type="button"
+              @click="closeProvinceModal"
+              class="px-4 py-2 text-xs font-bold text-zinc-600 hover:text-zinc-900 rounded-full hover:bg-zinc-100 transition-colors cursor-pointer"
+            >
+              Cerrar
+            </button>
+
+            <NuxtLink :to="`/provincia/${toSlug(selectedProvince.name)}`">
+              <moni-button
+                variant="filled"
+                shape="round"
+                size="small"
+                class="cursor-pointer"
+                @click="closeProvinceModal"
+              >
+                <AppIcon slot="icon" name="arrow-right" class="w-3.5 h-3.5 mr-1.5" />
+                Ver Pronóstico y Reportes
+              </moni-button>
+            </NuxtLink>
+          </div>
+        </div>
+      </moni-morph-modal>
+    </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
 import rawProvincesPaths from '~/assets/data/provincias-svg-paths.json'
 
 const activeView = ref<'mapa' | 'tabla'>('mapa')
+const activeAlertFilter = ref<'ALL' | 'ROJA' | 'AMARILLA' | 'VERDE' | 'NORMAL'>('ALL')
 const hoveredProvince = ref<any>(null)
 const selectedProvince = ref<any>(null)
 const tooltipPos = ref({ x: 0, y: 0 })
+const isProvinceModalOpen = ref(false)
+const currentModalTriggerSelector = ref<string>('#province-morph-modal')
+
+function isProvinceDimmed(alerta: string): boolean {
+  if (activeAlertFilter.value === 'ALL') return false
+  return activeAlertFilter.value !== alerta
+}
 
 // Exact 32 Provinces COE Alert mapping from official bulletin (image 2)
 const coeAlertasMap: Record<string, string> = {
@@ -636,16 +726,59 @@ function onLeave() {
   hoveredProvince.value = null
 }
 
-const isProvinceModalOpen = ref(false)
-
-function selectProvince(prov: any) {
+function selectProvince(prov: any, event?: MouseEvent) {
   selectedProvince.value = prov
+  currentModalTriggerSelector.value = `#prov-path-${prov.code}, #grid-${prov.code}`
   isProvinceModalOpen.value = true
+
+  if (import.meta.client) {
+    nextTick(() => {
+      const modal = document.getElementById('province-morph-modal') as any
+      const trigger = (event?.currentTarget as HTMLElement)
+        || document.getElementById(`prov-path-${prov.code}`)
+        || document.getElementById(`grid-${prov.code}`)
+      if (modal) {
+        if (trigger && typeof modal.showFrom === 'function') {
+          modal.showFrom(trigger)
+        } else if (typeof modal.show === 'function') {
+          modal.show()
+        }
+      }
+    })
+  }
 }
 
 function closeProvinceModal() {
   isProvinceModalOpen.value = false
+  if (import.meta.client) {
+    const modal = document.getElementById('province-morph-modal') as any
+    if (modal && typeof modal.hide === 'function') {
+      modal.hide()
+    }
+  }
 }
+
+onMounted(() => {
+  if (import.meta.client) {
+    nextTick(() => {
+      const modal = document.getElementById('province-morph-modal')
+      if (modal) {
+        modal.addEventListener('modal-close', closeProvinceModal)
+        modal.addEventListener('close', closeProvinceModal)
+      }
+    })
+  }
+})
+
+onUnmounted(() => {
+  if (import.meta.client) {
+    const modal = document.getElementById('province-morph-modal')
+    if (modal) {
+      modal.removeEventListener('modal-close', closeProvinceModal)
+      modal.removeEventListener('close', closeProvinceModal)
+    }
+  }
+})
 
 function getProvinceShape(alerta: string): string {
   switch (alerta) {
