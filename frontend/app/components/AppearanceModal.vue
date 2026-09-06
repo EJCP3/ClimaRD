@@ -13,7 +13,7 @@
       show-close-button
       placement="center"
       style="--surface-container-high: #ffffff; --on-surface: #18181b; --on-surface-variant: #71717a; --scrim: rgba(0, 0, 0, 0.3); --outline-variant: #e4e4e7; --active: #f4f4f5; --moni-morph-panel-radius: 1.75rem;"
-      class="appearance-morph-modal"
+      class="appearance-morph-modal [&::part(panel)]:!bg-white [&::part(panel)]:![backdrop-filter:none] [&::part(panel)]:!border [&::part(panel)]:!border-zinc-200 [&::part(panel)]:!shadow-2xl [&::part(backdrop)]:![backdrop-filter:none]"
     >
       <!-- Header Slot -->
       <div slot="header" class="flex items-center space-x-2.5">
@@ -216,21 +216,3 @@ onUnmounted(() => {
   if (modalObserver) modalObserver.disconnect()
 })
 </script>
-
-<style scoped>
-:deep(moni-morph-modal::part(backdrop)),
-:deep(.backdrop),
-moni-morph-modal::part(backdrop) {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-:deep(moni-morph-modal::part(panel)),
-moni-morph-modal::part(panel) {
-  background-color: #ffffff !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border: 1px solid #e4e4e7 !important;
-  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.12), 0 10px 15px -3px rgba(0, 0, 0, 0.06) !important;
-}
-</style>

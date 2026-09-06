@@ -20,6 +20,35 @@ export default {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+      },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' }
+        },
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(6px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
+        },
+        scaleUp: {
+          '0%': { opacity: '0', transform: 'scale(0.96)' },
+          '100%': { opacity: '1', transform: 'scale(1)' }
+        },
+        vtPageFadeOut: {
+          'from': { opacity: '1', transform: 'translateY(0) scale(1)' },
+          'to': { opacity: '0', transform: 'translateY(-8px) scale(0.995)' }
+        },
+        vtPageFadeIn: {
+          'from': { opacity: '0', transform: 'translateY(12px) scale(0.995)' },
+          'to': { opacity: '1', transform: 'translateY(0) scale(1)' }
+        }
+      },
+      animation: {
+        marquee: 'marquee 60s linear infinite',
+        fadeIn: 'fadeIn 0.25s ease-out forwards',
+        scaleUp: 'scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'vt-fade-out': 'vtPageFadeOut 180ms cubic-bezier(0.4, 0, 1, 1) both',
+        'vt-fade-in': 'vtPageFadeIn 260ms cubic-bezier(0, 0, 0.2, 1) both'
       }
     }
   },

@@ -1,14 +1,14 @@
 <template>
   <div class="min-h-screen flex flex-col bg-[#F6F6F8] text-zinc-900 font-sans antialiased selection:bg-zinc-200">
     <!-- Top Full-Width Bulletin Ticker (Spans 100% width of the screen, above navigation) -->
-    <BulletinTicker v-if="tickerPosition === 'top'" class="bulletin-ticker-elem" />
+    <BulletinTicker v-if="tickerPosition === 'top'" class="[view-transition-name:bulletin-ticker] !z-[1050]" />
 
     <!-- Application Body: Navigation + Content Area -->
     <div class="flex-1 flex flex-col md:flex-row min-w-0 relative">
       <!-- 1. Clásica: Drawer lateral estándar completo (M3 Navigation Drawer) -->
       <aside
       v-if="navStyle === 'clasica'"
-      class="hidden md:flex flex-col w-72 border-r border-zinc-200/80 bg-white p-5 space-y-4 shrink-0 transition-all app-sidebar-elem sticky self-start z-20"
+      class="hidden md:flex flex-col w-72 border-r border-zinc-200/80 bg-white p-5 space-y-4 shrink-0 transition-all [view-transition-name:app-sidebar] sticky self-start z-20"
       :class="tickerPosition === 'top' ? 'top-10 sm:top-11 h-[calc(100vh-2.5rem)] sm:h-[calc(100vh-2.75rem)]' : 'top-0 h-screen'"
     >
       <!-- App Brand -->
@@ -72,7 +72,7 @@
     <!-- 2. Guapa: Riel de navegación M3 compacto lateral (M3 Navigation Rail) -->
     <aside
       v-else-if="navStyle === 'guapa'"
-      class="hidden md:flex flex-col w-20 border-r border-zinc-200/80 bg-white py-4 items-center shrink-0 transition-all app-rail-elem sticky self-start z-20"
+      class="hidden md:flex flex-col w-20 border-r border-zinc-200/80 bg-white py-4 items-center shrink-0 transition-all [view-transition-name:app-rail] sticky self-start z-20"
       :class="tickerPosition === 'top' ? 'top-10 sm:top-11 h-[calc(100vh-2.5rem)] sm:h-[calc(100vh-2.75rem)]' : 'top-0 h-screen'"
     >
       <div class="mb-3 shrink-0">
@@ -236,28 +236,31 @@
       <!-- Bonita Mode Floating Nav Island on Desktop -->
       <div
         v-if="navStyle === 'bonita'"
-        class="hidden md:flex fixed z-30 items-center space-x-1.5 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300 app-floating-nav-elem"
+        class="hidden md:flex fixed z-30 items-center space-x-1.5 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300 [view-transition-name:app-floating-nav]"
         :class="tickerPosition === 'top' ? 'top-[52px] left-4' : 'top-3.5 left-4'"
       >
-        <div class="flex items-center space-x-2 mr-2">
-          <moni-shape name="flower" color="surface" :style="{ '--_shape-bg': 'var(--primary-container, #EAEAEB)', '--_shape-fg': 'var(--on-primary-container, #18181B)' }" size="small">
-            <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
+        <!-- App Mark inside Island -->
+        <NuxtLink to="/" class="flex items-center space-x-2 pr-2 border-r border-zinc-200/80 py-1">
+          <moni-shape name="flower" color="surface" size="small" class="shrink-0">
+            <AppIcon name="cloud-rain" class="w-3.5 h-3.5 text-zinc-900" />
           </moni-shape>
           <span class="font-extrabold text-xs text-zinc-950">Clima RD</span>
-        </div>
-
-        <NuxtLink
-          v-for="item in navItems"
-          :key="item.path"
-          :to="item.path"
-          class="px-3 py-1 rounded-full text-xs font-bold transition-all"
-          :style="$route.path === item.path ? { backgroundColor: 'var(--primary)', color: 'var(--on-primary)' } : {}"
-          :class="$route.path === item.path ? 'shadow-sm' : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'"
-        >
-          {{ item.shortLabel }}
         </NuxtLink>
 
-        <!-- Divider inside Nav -->
+        <!-- Navigation Links via moni-nav -->
+        <moni-nav class="flex items-center">
+          <moni-nav-item
+            v-for="item in navItems"
+            :key="item.path"
+            :href="item.path"
+            :label="item.label"
+            :active="$route.path === item.path"
+            @click.prevent="navigateTo(item.path)"
+          >
+            <AppIcon slot="icon" :name="item.icon" class="w-4 h-4" />
+          </moni-nav-item>
+        </moni-nav>
+
         <span class="w-px h-4 bg-zinc-200/80 mx-1"></span>
 
         <!-- Quick Reportar Button inside Nav -->
@@ -288,7 +291,7 @@
 
       <!-- Page View Content -->
       <main
-        class="flex-1 pb-24 md:pb-8 transition-all app-page-content"
+        class="flex-1 pb-24 md:pb-8 transition-all [view-transition-name:app-page-content]"
         :class="[
           (navStyle === 'bonita' || navStyle === 'tasks')
             ? 'pt-16 md:pt-20'
@@ -301,10 +304,10 @@
   </div>
 
   <!-- Animated Bulletin Ticker (Bottom Position - Full 100% Width) -->
-  <BulletinTicker v-if="tickerPosition === 'bottom'" class="bulletin-ticker-elem" />
+  <BulletinTicker v-if="tickerPosition === 'bottom'" class="[view-transition-name:bulletin-ticker] !z-[1050]" />
 
     <!-- Mobile Bottom Navigation Bar (Powered by moni-nav) -->
-    <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-zinc-200/80 app-mobile-nav-elem">
+    <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-zinc-200/80 [view-transition-name:app-mobile-nav]">
       <moni-nav placement="bottom" class="w-full">
         <moni-nav-item
           v-for="item in navItems"

@@ -71,13 +71,14 @@
               :key="prov.code"
               :d="prov.path"
               :fill="getProvinceColor(prov.alerta)"
-              class="province-path transition-all duration-200 cursor-pointer"
-              :class="{
-                'is-selected': selectedProvince?.code === prov.code,
-                'is-dimmed': selectedProvince && selectedProvince.code !== prov.code
-              }"
-              stroke="#FFFFFF"
-              stroke-width="1.6"
+              class="origin-center transition-all duration-200 cursor-pointer"
+              :class="[
+                selectedProvince?.code === prov.code
+                  ? 'brightness-110 drop-shadow-md stroke-zinc-950 [stroke-width:3px]'
+                  : selectedProvince
+                    ? 'opacity-70 stroke-white [stroke-width:1.6px] hover:opacity-100 hover:brightness-105 hover:stroke-zinc-900 hover:[stroke-width:2.2px] hover:drop-shadow-sm'
+                    : 'stroke-white [stroke-width:1.6px] hover:brightness-105 hover:stroke-zinc-900 hover:[stroke-width:2.2px] hover:drop-shadow-sm'
+              ]"
               stroke-linejoin="round"
               stroke-linecap="round"
               @mouseenter="onHover(prov, $event)"
@@ -624,34 +625,3 @@ function toSlug(name: string): string {
     .replace(/[^a-z0-9-]/g, '')
 }
 </script>
-
-<style scoped>
-.province-path {
-  transform-origin: center;
-}
-
-.province-path:hover {
-  filter: brightness(1.08) drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.25));
-  stroke: #18181b;
-  stroke-width: 2.2;
-}
-
-.province-path.is-selected {
-  filter: brightness(1.12) drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.3));
-  stroke: #09090b;
-  stroke-width: 3;
-}
-
-.province-path.is-dimmed {
-  opacity: 0.7;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.25s ease-out forwards;
-}
-</style>

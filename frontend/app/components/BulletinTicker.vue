@@ -16,12 +16,12 @@
       <!-- 1. Mode: Continuous Marquee (Slow, Smooth, Calm) -->
       <div
         v-if="tickerAnimation === 'marquee'"
-        class="flex-1 overflow-hidden relative ticker-container cursor-pointer mx-1"
+        class="flex-1 overflow-hidden relative group cursor-pointer mx-1"
         title="Pausa automática al posar el cursor"
         @click="navigateTo('/alertas')"
       >
         <div
-          class="ticker-track flex items-center space-x-8 text-xs font-medium whitespace-nowrap"
+          class="inline-flex items-center space-x-8 text-xs font-medium whitespace-nowrap will-change-transform animate-marquee group-hover:[animation-play-state:paused]"
           :style="{ animationDuration: marqueeDuration }"
         >
           <!-- Duplicated track for seamless continuous infinite loop -->
@@ -270,26 +270,3 @@ onUnmounted(() => {
   if (flipTimer) clearInterval(flipTimer)
 })
 </script>
-
-<style scoped>
-.ticker-container:hover .ticker-track {
-  animation-play-state: paused;
-}
-
-.ticker-track {
-  display: inline-flex;
-  animation-name: marquee;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  will-change: transform;
-}
-
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-</style>
