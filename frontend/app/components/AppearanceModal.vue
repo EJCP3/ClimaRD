@@ -2,7 +2,7 @@
   <ClientOnly>
     <moni-morph-modal
       id="appearance-morph-modal"
-      target="#appearance-trigger-btn, #appearance-tasks-trigger-btn, #appearance-sidebar-btn, #appearance-sidebar-btn-clasica, #appearance-mobile-trigger-btn"
+      target="#appearance-trigger-btn, #appearance-tasks-trigger-btn, #appearance-sidebar-btn, #appearance-sidebar-btn-clasica, #appearance-mobile-trigger-btn, #appearance-mobile-trigger-btn-bonita"
       :open="isAppearanceModalOpen"
       expanded-width="24rem"
       expanded-height="auto"
