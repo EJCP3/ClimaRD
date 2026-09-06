@@ -169,10 +169,16 @@
         </div>
 
         <div class="flex items-center space-x-2 shrink-0">
-          <NuxtLink to="/mapa">
+          <NuxtLink :to="`/provincia/${toSlug(selectedProvince.name)}`">
             <moni-button variant="filled" shape="round" size="small">
+              <AppIcon slot="icon" name="arrow-right" class="w-3.5 h-3.5 mr-1.5" />
+              Ver Detalles
+            </moni-button>
+          </NuxtLink>
+          <NuxtLink to="/mapa">
+            <moni-button variant="tonal" shape="round" size="small">
               <AppIcon slot="icon" name="map" class="w-3.5 h-3.5 mr-1.5" />
-              Ver en Mapa
+              Mapa
             </moni-button>
           </NuxtLink>
         </div>
@@ -188,11 +194,11 @@
     <!-- View 2: Grid Table Matrix (Original list, updated to 32 provinces) -->
     <div v-show="activeView === 'tabla'" class="p-5 md:p-6 space-y-4">
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 max-h-[460px] overflow-y-auto pr-1">
-        <div
+        <NuxtLink
           v-for="prov in provincesList"
           :key="`grid-${prov.code}`"
-          @click="selectProvince(prov); activeView = 'mapa'"
-          class="p-3 rounded-2xl border transition-all cursor-pointer hover:shadow-md"
+          :to="`/provincia/${toSlug(prov.name)}`"
+          class="p-3 rounded-2xl border transition-all cursor-pointer hover:shadow-md block no-underline"
           :class="getGridCardClass(prov.alerta)"
         >
           <div class="flex items-center justify-between">
@@ -205,7 +211,7 @@
           <span class="text-[10px] uppercase tracking-wider font-extrabold mt-1 block opacity-90">
             {{ prov.alerta === 'NORMAL' ? 'SIN ALERTA' : prov.alerta }}
           </span>
-        </div>
+        </NuxtLink>
       </div>
     </div>
   </div>
@@ -458,6 +464,15 @@ function onLeave() {
 
 function selectProvince(prov: any) {
   selectedProvince.value = prov
+}
+
+function toSlug(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
 }
 </script>
 
