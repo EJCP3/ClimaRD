@@ -2,7 +2,7 @@
   <div class="relative w-full h-[calc(100vh-4rem)]">
     <!-- Map Container -->
     <ClientOnly>
-      <MapaOperativo @openReportModal="openModal" />
+      <MapaOperativo />
       <template #fallback>
         <div class="w-full h-full flex items-center justify-center bg-zinc-50">
           <div class="text-center space-y-3">
@@ -17,8 +17,8 @@
     <ClientOnly>
       <moni-morph-modal
         id="report-incident-modal"
-        target="#report-incident-fab"
-        :open="isModalOpen"
+        target="#nav-report-btn-clasica, #nav-report-btn-guapa, #nav-report-btn-tasks, #nav-report-btn-bonita, #nav-report-btn-tasks-drawer, #nav-report-btn-mobile, .nav-report-btn"
+        :open="isReportModalOpen"
         expanded-width="32rem"
         expanded-height="auto"
         auto-height
@@ -132,11 +132,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import MapaOperativo from '~/components/mapa/MapaOperativo.client.vue'
 import AppIcon from '~/components/AppIcon.vue'
+import { useIncidentReport } from '~/composables/useIncidentReport'
 
-const isModalOpen = ref(false)
+const route = useRoute()
+const router = useRouter()
+const { isReportModalOpen, reportTriggerSelector, openReportModal, closeReportModal } = useIncidentReport()
+
 const currentStep = ref(1)
 const selectedCategory = ref<string | null>(null)
 const reportDescription = ref('')
@@ -176,9 +180,11 @@ const incidentCategories = [
   }
 ]
 
-function openModal(event?: Event) {
-  if (event) event.stopPropagation()
-  isModalOpen.value = true
+function openModal(triggerElementOrSelector?: HTMLElement | string | Event) {
+  if (triggerElementOrSelector instanceof Event) {
+    triggerElementOrSelector.stopPropagation()
+  }
+  isReportModalOpen.value = true
   currentStep.value = 1
   selectedCategory.value = null
   reportDescription.value = ''
@@ -186,9 +192,22 @@ function openModal(event?: Event) {
   if (import.meta.client) {
     nextTick(() => {
       const modal = document.getElementById('report-incident-modal') as any
-      const trigger = (event?.currentTarget as HTMLElement)
-        || document.getElementById('report-incident-fab')
-        || document.body
+      let trigger: HTMLElement | null = null
+
+      if (typeof triggerElementOrSelector === 'string') {
+        trigger = document.querySelector(triggerElementOrSelector)
+      } else if (triggerElementOrSelector instanceof HTMLElement) {
+        trigger = triggerElementOrSelector
+      } else if (triggerElementOrSelector instanceof Event && triggerElementOrSelector.currentTarget instanceof HTMLElement) {
+        trigger = triggerElementOrSelector.currentTarget
+      } else if (reportTriggerSelector.value) {
+        trigger = document.querySelector(reportTriggerSelector.value)
+      }
+
+      if (!trigger) {
+        trigger = document.querySelector('.nav-report-btn') || document.body
+      }
+
       if (modal) {
         if (trigger && typeof modal.showFrom === 'function') {
           modal.showFrom(trigger)
@@ -201,11 +220,14 @@ function openModal(event?: Event) {
 }
 
 function closeModal() {
-  isModalOpen.value = false
+  closeReportModal()
   if (import.meta.client) {
     const modalEl = document.getElementById('report-incident-modal') as any
     if (modalEl && typeof modalEl.hide === 'function') {
       modalEl.hide()
+    }
+    if (route.query.report) {
+      router.replace({ query: { ...route.query, report: undefined } })
     }
   }
 }
@@ -226,11 +248,29 @@ onMounted(() => {
   const modal = document.getElementById('report-incident-modal')
   if (modal) {
     mapaModalObserver = new MutationObserver(() => {
-      if (!modal.hasAttribute('open') && isModalOpen.value) {
-        isModalOpen.value = false
+      if (!modal.hasAttribute('open') && isReportModalOpen.value) {
+        closeModal()
       }
     })
     mapaModalObserver.observe(modal, { attributes: true, attributeFilter: ['open'] })
+  }
+
+  if (route.query.report || isReportModalOpen.value) {
+    openModal()
+  }
+})
+
+watch(() => route.query.report, (val) => {
+  if (val) {
+    openModal()
+  }
+})
+
+watch(isReportModalOpen, (isOpen) => {
+  if (isOpen) {
+    openModal()
+  } else {
+    closeModal()
   }
 })
 

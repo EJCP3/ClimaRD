@@ -39,11 +39,12 @@
         <div class="w-full h-px bg-zinc-200/80 my-2"></div>
 
         <moni-nav-item
+          id="nav-report-btn-clasica"
+          class="w-full nav-report-btn"
           href="/mapa"
           label="Reportar Incidencia"
-          :active="$route.path === '/mapa'"
-          @click.prevent="navigateTo('/mapa')"
-          class="w-full"
+          :active="$route.path === '/mapa' && isReportModalOpen"
+          @click.prevent="handleReportNav('#nav-report-btn-clasica')"
         >
           <AppIcon slot="icon" name="alert-triangle" class="w-5 h-5" />
         </moni-nav-item>
@@ -95,10 +96,12 @@
         <div class="w-8 h-px bg-zinc-200/80 my-2 self-center shrink-0"></div>
 
         <moni-nav-item
+          id="nav-report-btn-guapa"
+          class="nav-report-btn"
           href="/mapa"
           label="Reportar"
-          :active="$route.path === '/mapa'"
-          @click.prevent="navigateTo('/mapa')"
+          :active="$route.path === '/mapa' && isReportModalOpen"
+          @click.prevent="handleReportNav('#nav-report-btn-guapa')"
         >
           <AppIcon slot="icon" name="alert-triangle" class="w-5 h-5" />
         </moni-nav-item>
@@ -155,6 +158,17 @@
           <moni-badge v-if="item.badge" :value="item.badge"></moni-badge>
         </moni-nav-item>
 
+        <moni-nav-item
+          id="nav-report-btn-tasks-drawer"
+          class="nav-report-btn"
+          href="/mapa"
+          label="Reportar Incidencia"
+          :active="$route.path === '/mapa' && isReportModalOpen"
+          @click.prevent="isTasksDrawerOpen = false; handleReportNav('#nav-report-btn-tasks-drawer')"
+        >
+          <AppIcon slot="icon" name="alert-triangle" class="w-5 h-5" />
+        </moni-nav-item>
+
         <div slot="footer" class="p-4 border-t border-zinc-100 w-full space-y-3">
           <button
             id="appearance-sidebar-btn"
@@ -194,12 +208,17 @@
         <span class="w-px h-4 bg-zinc-200/80 mx-1"></span>
 
         <!-- Quick Reportar Button inside Nav -->
-        <NuxtLink to="/mapa">
-          <moni-button variant="filled" shape="round" size="small">
-            <AppIcon slot="icon" name="alert-triangle" class="w-3.5 h-3.5 mr-1" />
-            Reportar
-          </moni-button>
-        </NuxtLink>
+        <moni-button
+          id="nav-report-btn-tasks"
+          class="nav-report-btn"
+          variant="filled"
+          shape="round"
+          size="small"
+          @click="handleReportNav('#nav-report-btn-tasks')"
+        >
+          <AppIcon slot="icon" name="alert-triangle" class="w-3.5 h-3.5 mr-1" />
+          Reportar
+        </moni-button>
 
         <!-- Quick Appearance Button inside Nav -->
         <button
@@ -242,12 +261,17 @@
         <span class="w-px h-4 bg-zinc-200/80 mx-1"></span>
 
         <!-- Quick Reportar Button inside Nav -->
-        <NuxtLink to="/mapa">
-          <moni-button variant="filled" shape="round" size="small">
-            <AppIcon slot="icon" name="alert-triangle" class="w-3.5 h-3.5 mr-1" />
-            Reportar
-          </moni-button>
-        </NuxtLink>
+        <moni-button
+          id="nav-report-btn-bonita"
+          class="nav-report-btn"
+          variant="filled"
+          shape="round"
+          size="small"
+          @click="handleReportNav('#nav-report-btn-bonita')"
+        >
+          <AppIcon slot="icon" name="alert-triangle" class="w-3.5 h-3.5 mr-1" />
+          Reportar
+        </moni-button>
 
         <!-- Quick Appearance Button inside Nav -->
         <button
@@ -293,6 +317,15 @@
           <AppIcon slot="icon" :name="item.icon" class="w-5 h-5" />
         </moni-nav-item>
         <moni-nav-item
+          id="nav-report-btn-mobile"
+          class="nav-report-btn"
+          label="Reportar"
+          :active="$route.path === '/mapa' && isReportModalOpen"
+          @click.prevent="handleReportNav('#nav-report-btn-mobile')"
+        >
+          <AppIcon slot="icon" name="alert-triangle" class="w-5 h-5" />
+        </moni-nav-item>
+        <moni-nav-item
           id="appearance-mobile-trigger-btn"
           label="Tema"
           @click.prevent="openAppearanceModal($event)"
@@ -313,6 +346,10 @@ import AppIcon from '~/components/AppIcon.vue'
 import AppearanceModal from '~/components/AppearanceModal.vue'
 import BulletinTicker from '~/components/BulletinTicker.vue'
 import { useAppearance } from '~/composables/useAppearance'
+import { useIncidentReport } from '~/composables/useIncidentReport'
+
+const route = useRoute()
+const { isReportModalOpen, openReportModal } = useIncidentReport()
 
 const {
   isAppearanceModalOpen,
@@ -334,6 +371,14 @@ const navItems = [
 const handleTaskNav = (path: string) => {
   isTasksDrawerOpen.value = false
   navigateTo(path)
+}
+
+const handleReportNav = (selector?: string) => {
+  if (route.path === '/mapa') {
+    openReportModal(selector)
+  } else {
+    navigateTo({ path: '/mapa', query: { report: '1' } })
+  }
 }
 
 onMounted(() => {

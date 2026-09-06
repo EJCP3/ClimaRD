@@ -43,20 +43,6 @@
 
     <!-- Map Container -->
     <div ref="mapContainer" class="w-full h-full min-h-[calc(100vh-4rem)]"></div>
-
-    <!-- Moni UI Floating Action Button (M3 moni-button) -->
-    <div class="absolute bottom-6 right-6 z-20">
-      <moni-button
-        id="report-incident-fab"
-        variant="filled"
-        shape="round"
-        size="large"
-        @click.stop="$emit('openReportModal', $event)"
-      >
-        <AppIcon slot="icon" name="alert-triangle" class="w-4 h-4 mr-2 text-zinc-200" />
-        Reportar Incidencia
-      </moni-button>
-    </div>
   </div>
 </template>
 
@@ -65,8 +51,6 @@ import { ref, computed, onMounted, onUnmounted, markRaw } from 'vue'
 import maplibregl from 'maplibre-gl'
 import AppIcon from '~/components/AppIcon.vue'
 import postalCodes from '~/assets/data/codigos-postales-rd.json'
-
-defineEmits(['openReportModal'])
 
 const mapContainer = ref<HTMLElement | null>(null)
 let mapInstance: maplibregl.Map | null = null
