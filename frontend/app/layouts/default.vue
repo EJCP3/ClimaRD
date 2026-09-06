@@ -233,28 +233,28 @@
         </button>
       </div>
 
-      <!-- Bonita Mode Floating Nav Island on Desktop (Uber Eats Style) -->
+      <!-- Bonita Mode Floating Nav Island on Desktop (Bottom Dock with White Background) -->
       <nav
         v-if="navStyle === 'bonita'"
-        aria-label="Navegación Bonita Uber Eats"
-        class="hidden md:flex fixed z-30 items-center space-x-1.5 bg-zinc-950/95 backdrop-blur-xl p-1.5 rounded-full border border-zinc-800/90 shadow-[0_12px_40px_rgba(0,0,0,0.35)] transition-all duration-300 [view-transition-name:app-floating-nav]"
-        :class="tickerPosition === 'top' ? 'top-[52px] left-1/2 -translate-x-1/2' : 'top-3.5 left-1/2 -translate-x-1/2'"
+        aria-label="Navegación Bonita"
+        class="hidden md:flex fixed z-40 items-center space-x-1.5 bg-white/95 backdrop-blur-xl p-1.5 rounded-full border border-zinc-200/90 shadow-[0_12px_40px_rgba(0,0,0,0.12)] transition-all duration-300 [view-transition-name:app-floating-nav]"
+        :class="tickerPosition === 'bottom' ? 'bottom-[56px] left-1/2 -translate-x-1/2' : 'bottom-5 sm:bottom-6 left-1/2 -translate-x-1/2'"
       >
         <!-- App Mark inside Island -->
         <NuxtLink
           to="/"
-          class="flex items-center space-x-2 pl-2 pr-2.5 py-1 text-white hover:opacity-90 transition-opacity"
+          class="flex items-center space-x-2 pl-2 pr-2.5 py-1 text-zinc-950 hover:opacity-80 transition-opacity"
         >
-          <div class="w-7 h-7 rounded-full bg-zinc-800/90 border border-zinc-700/60 flex items-center justify-center text-white shrink-0 shadow-inner">
-            <AppIcon name="cloud-rain" class="w-4 h-4 text-white" />
+          <div class="w-7 h-7 rounded-full bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-900 shrink-0">
+            <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
           </div>
-          <span class="font-black text-xs text-white tracking-tight">Clima RD</span>
+          <span class="font-black text-xs text-zinc-950 tracking-tight">Clima RD</span>
         </NuxtLink>
 
         <!-- Vertical Divider -->
-        <span class="w-px h-4 bg-zinc-800 mx-0.5"></span>
+        <span class="w-px h-4 bg-zinc-200 mx-0.5"></span>
 
-        <!-- Nav Items (Uber Eats Capsule Style) -->
+        <!-- Nav Items (Uber Eats Capsule Style - Light) -->
         <div class="flex items-center space-x-1">
           <NuxtLink
             v-for="item in navItems"
@@ -263,26 +263,30 @@
             class="flex items-center space-x-1.5 text-xs rounded-full px-3 py-1.5 transition-all duration-200 select-none cursor-pointer"
             :class="[
               $route.path === item.path
-                ? 'bg-zinc-800 text-white font-black shadow-sm'
-                : 'text-zinc-400 hover:text-white hover:bg-zinc-900/90 font-semibold'
+                ? 'bg-zinc-100 text-zinc-950 font-black border border-zinc-200/80 shadow-xs'
+                : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100/70 font-semibold'
             ]"
           >
-            <AppIcon :name="item.icon" class="w-4 h-4 shrink-0" :class="$route.path === item.path ? 'text-white' : 'text-zinc-400'" />
+            <AppIcon
+              :name="item.icon"
+              class="w-4 h-4 shrink-0 transition-colors"
+              :class="$route.path === item.path ? 'text-zinc-950' : 'text-zinc-500'"
+            />
             <span class="truncate">{{ item.label }}</span>
           </NuxtLink>
         </div>
 
         <!-- Vertical Divider -->
-        <span class="w-px h-4 bg-zinc-800 mx-0.5"></span>
+        <span class="w-px h-4 bg-zinc-200 mx-0.5"></span>
 
-        <!-- Quick Reportar Button (High-Contrast Uber Eats Pill) -->
+        <!-- Quick Reportar Button (High-Contrast Solid Dark Pill) -->
         <button
           id="nav-report-btn-bonita"
           type="button"
-          class="nav-report-btn flex items-center space-x-1.5 bg-white text-zinc-950 hover:bg-zinc-200 active:scale-95 font-black text-xs px-3.5 py-1.5 rounded-full shadow-sm transition-all cursor-pointer"
+          class="nav-report-btn flex items-center space-x-1.5 bg-zinc-950 text-white hover:bg-zinc-800 active:scale-95 font-black text-xs px-3.5 py-1.5 rounded-full shadow-sm transition-all cursor-pointer"
           @click="handleReportNav('#nav-report-btn-bonita')"
         >
-          <AppIcon name="alert-triangle" class="w-3.5 h-3.5 text-zinc-950" />
+          <AppIcon name="alert-triangle" class="w-3.5 h-3.5 text-white" />
           <span>Reportar</span>
         </button>
 
@@ -291,21 +295,21 @@
           id="appearance-trigger-btn"
           type="button"
           @click.stop="openAppearanceModal($event)"
-          class="w-7 h-7 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800/80 flex items-center justify-center transition-all cursor-pointer group"
+          class="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950 border border-zinc-200/80 flex items-center justify-center transition-all cursor-pointer group"
           title="Personalizar Apariencia y Titular"
           aria-label="Personalizar apariencia"
         >
-          <AppIcon name="palette" class="w-3.5 h-3.5 text-zinc-400 group-hover:text-white group-hover:rotate-12 transition-transform" />
+          <AppIcon name="palette" class="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-950 group-hover:rotate-12 transition-transform" />
         </button>
       </nav>
 
       <!-- Page View Content -->
       <main
-        class="flex-1 pb-24 md:pb-8 transition-all [view-transition-name:app-page-content]"
+        class="flex-1 transition-all [view-transition-name:app-page-content]"
         :class="[
-          (navStyle === 'bonita' || navStyle === 'tasks')
-            ? 'pt-16 md:pt-20'
-            : 'pt-4 md:pt-6'
+          navStyle === 'tasks' ? 'pt-16 md:pt-20 pb-24 md:pb-8' : '',
+          navStyle === 'bonita' ? 'pt-4 md:pt-6 pb-28 md:pb-24' : '',
+          (navStyle !== 'tasks' && navStyle !== 'bonita') ? 'pt-4 md:pt-6 pb-24 md:pb-8' : ''
         ]"
       >
         <slot />
@@ -316,10 +320,11 @@
   <!-- Animated Bulletin Ticker (Bottom Position - Full 100% Width) -->
   <BulletinTicker v-if="tickerPosition === 'bottom'" class="[view-transition-name:bulletin-ticker] !z-[1050]" />
 
-    <!-- Mobile Navigation: Uber Eats floating pill when bonita is selected -->
+    <!-- Mobile Navigation: Floating white pill when bonita is selected -->
     <div
       v-if="navStyle === 'bonita'"
-      class="md:hidden fixed bottom-3 left-3 right-3 z-40 bg-zinc-950/95 backdrop-blur-xl p-1.5 rounded-full border border-zinc-800/90 shadow-[0_12px_40px_rgba(0,0,0,0.5)] flex items-center justify-between [view-transition-name:app-mobile-nav]"
+      class="md:hidden fixed z-40 bg-white/95 backdrop-blur-xl p-1.5 rounded-full border border-zinc-200/90 shadow-[0_12px_40px_rgba(0,0,0,0.12)] flex items-center justify-between [view-transition-name:app-mobile-nav]"
+      :class="tickerPosition === 'bottom' ? 'bottom-[52px] left-3 right-3' : 'bottom-3 left-3 right-3'"
     >
       <NuxtLink
         v-for="item in navItems"
@@ -328,8 +333,8 @@
         class="flex flex-col items-center justify-center py-1 px-2.5 rounded-full transition-all text-[11px]"
         :class="[
           $route.path === item.path
-            ? 'bg-zinc-800 text-white font-black'
-            : 'text-zinc-400 hover:text-white'
+            ? 'bg-zinc-100 text-zinc-950 font-black border border-zinc-200/80'
+            : 'text-zinc-500 hover:text-zinc-950'
         ]"
       >
         <AppIcon :name="item.icon" class="w-4 h-4" />
@@ -339,17 +344,17 @@
       <button
         id="nav-report-btn-mobile-bonita"
         type="button"
-        class="nav-report-btn bg-white text-zinc-950 font-black text-[11px] px-2.5 py-1.5 rounded-full flex items-center space-x-1 shadow-sm active:scale-95 transition-all cursor-pointer"
+        class="nav-report-btn bg-zinc-950 text-white font-black text-[11px] px-2.5 py-1.5 rounded-full flex items-center space-x-1 shadow-sm active:scale-95 transition-all cursor-pointer"
         @click="handleReportNav('#nav-report-btn-mobile-bonita')"
       >
-        <AppIcon name="alert-triangle" class="w-3.5 h-3.5 text-zinc-950" />
+        <AppIcon name="alert-triangle" class="w-3.5 h-3.5 text-white" />
         <span class="hidden sm:inline">Reportar</span>
       </button>
 
       <button
         id="appearance-mobile-trigger-btn-bonita"
         type="button"
-        class="w-7 h-7 rounded-full bg-zinc-900 text-zinc-400 hover:text-white flex items-center justify-center shrink-0 border border-zinc-800 cursor-pointer"
+        class="w-7 h-7 rounded-full bg-zinc-100 text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200 flex items-center justify-center shrink-0 border border-zinc-200 cursor-pointer"
         @click.prevent="openAppearanceModal($event)"
       >
         <AppIcon name="palette" class="w-3.5 h-3.5" />
