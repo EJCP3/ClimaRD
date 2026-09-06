@@ -88,7 +88,7 @@
           :id="`boletin-btn-${boletin.id}`"
           variant="outlined"
           class="p-6 rounded-[28px] bg-white border border-zinc-200/80 shadow-sm space-y-3 flex flex-col justify-between hover:shadow-md transition-all group cursor-pointer"
-          @click="openBoletin(boletin)"
+          @click.stop="openBoletin(boletin, $event)"
         >
           <div class="space-y-2.5">
             <div class="flex items-center justify-between">
@@ -121,6 +121,7 @@
     <ClientOnly>
       <moni-morph-modal
         id="boletin-morph-modal"
+        target="#boletin-btn-1, #boletin-btn-2, #boletin-btn-3"
         :open="isBoletinModalOpen"
         expanded-width="32rem"
         expanded-height="auto"
@@ -181,7 +182,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
 import MiniMapaCOE from '~/components/mapa/MiniMapaCOE.vue'
 
@@ -220,9 +221,26 @@ const boletines: Boletin[] = [
 const isBoletinModalOpen = ref(false)
 const activeBoletin = ref<Boletin | null>(null)
 
-const openBoletin = (b: Boletin) => {
+const openBoletin = (b: Boletin, event?: Event) => {
+  if (event) event.stopPropagation()
   activeBoletin.value = b
   isBoletinModalOpen.value = true
+
+  if (import.meta.client) {
+    nextTick(() => {
+      const modal = document.getElementById('boletin-morph-modal') as any
+      const trigger = (event?.currentTarget as HTMLElement)
+        || document.getElementById(`boletin-btn-${b.id}`)
+        || document.body
+      if (modal) {
+        if (trigger && typeof modal.showFrom === 'function') {
+          modal.showFrom(trigger)
+        } else if (typeof modal.show === 'function') {
+          modal.show()
+        }
+      }
+    })
+  }
 }
 
 const closeBoletin = () => {
@@ -234,4 +252,22 @@ const closeBoletin = () => {
     }
   }
 }
+
+let boletinObserver: MutationObserver | null = null
+
+onMounted(() => {
+  const modal = document.getElementById('boletin-morph-modal')
+  if (modal) {
+    boletinObserver = new MutationObserver(() => {
+      if (!modal.hasAttribute('open') && isBoletinModalOpen.value) {
+        isBoletinModalOpen.value = false
+      }
+    })
+    boletinObserver.observe(modal, { attributes: true, attributeFilter: ['open'] })
+  }
+})
+
+onUnmounted(() => {
+  if (boletinObserver) boletinObserver.disconnect()
+})
 </script>

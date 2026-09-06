@@ -131,7 +131,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import MapaOperativo from '~/components/mapa/MapaOperativo.client.vue'
 import AppIcon from '~/components/AppIcon.vue'
 
@@ -175,11 +175,28 @@ const incidentCategories = [
   }
 ]
 
-function openModal() {
+function openModal(event?: Event) {
+  if (event) event.stopPropagation()
   isModalOpen.value = true
   currentStep.value = 1
   selectedCategory.value = null
   reportDescription.value = ''
+
+  if (import.meta.client) {
+    nextTick(() => {
+      const modal = document.getElementById('report-incident-modal') as any
+      const trigger = (event?.currentTarget as HTMLElement)
+        || document.getElementById('report-incident-fab')
+        || document.body
+      if (modal) {
+        if (trigger && typeof modal.showFrom === 'function') {
+          modal.showFrom(trigger)
+        } else if (typeof modal.show === 'function') {
+          modal.show()
+        }
+      }
+    })
+  }
 }
 
 function closeModal() {
@@ -201,4 +218,22 @@ function submitReport() {
   alert('¡Reporte registrado exitosamente en la plataforma comunitaria!')
   closeModal()
 }
+
+let mapaModalObserver: MutationObserver | null = null
+
+onMounted(() => {
+  const modal = document.getElementById('report-incident-modal')
+  if (modal) {
+    mapaModalObserver = new MutationObserver(() => {
+      if (!modal.hasAttribute('open') && isModalOpen.value) {
+        isModalOpen.value = false
+      }
+    })
+    mapaModalObserver.observe(modal, { attributes: true, attributeFilter: ['open'] })
+  }
+})
+
+onUnmounted(() => {
+  if (mapaModalObserver) mapaModalObserver.disconnect()
+})
 </script>

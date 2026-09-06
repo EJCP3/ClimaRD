@@ -2,7 +2,7 @@
   <ClientOnly>
     <moni-morph-modal
       id="appearance-morph-modal"
-      target="#appearance-sidebar-btn"
+      target="#appearance-trigger-btn, #appearance-ticker-btn, #appearance-sidebar-btn"
       :open="isAppearanceModalOpen"
       expanded-width="24rem"
       expanded-height="auto"
@@ -142,6 +142,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted, nextTick, watch } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
 import {
   useAppearance,
@@ -164,6 +165,7 @@ const {
   setTickerPosition,
   setTickerAnimation,
   setTickerSpeed,
+  closeAppearanceModal,
 } = useAppearance()
 
 const navModes: { id: NavStyle; label: string }[] = [
@@ -190,4 +192,22 @@ const tickerSpeeds: { id: TickerSpeed; label: string }[] = [
   { id: 'normal', label: 'Normal' },
   { id: 'fast', label: 'Rápida' },
 ]
+
+let modalObserver: MutationObserver | null = null
+
+onMounted(() => {
+  const modal = document.getElementById('appearance-morph-modal')
+  if (modal) {
+    modalObserver = new MutationObserver(() => {
+      if (!modal.hasAttribute('open') && isAppearanceModalOpen.value) {
+        isAppearanceModalOpen.value = false
+      }
+    })
+    modalObserver.observe(modal, { attributes: true, attributeFilter: ['open'] })
+  }
+})
+
+onUnmounted(() => {
+  if (modalObserver) modalObserver.disconnect()
+})
 </script>

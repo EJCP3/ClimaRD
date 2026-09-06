@@ -134,6 +134,46 @@ export function useAppearance() {
     }
   }
 
+  const openAppearanceModal = (triggerEventOrEl?: Event | HTMLElement) => {
+    let el: HTMLElement | null = null
+    if (triggerEventOrEl instanceof Event) {
+      triggerEventOrEl.stopPropagation()
+      el = (triggerEventOrEl.currentTarget || triggerEventOrEl.target) as HTMLElement
+    } else if (triggerEventOrEl instanceof HTMLElement) {
+      el = triggerEventOrEl
+    }
+
+    isAppearanceModalOpen.value = true
+
+    if (import.meta.client) {
+      nextTick(() => {
+        const modal = document.getElementById('appearance-morph-modal') as any
+        const target = el
+          || document.getElementById('appearance-trigger-btn')
+          || document.getElementById('appearance-ticker-btn')
+          || document.getElementById('appearance-sidebar-btn')
+          || document.body
+        if (modal) {
+          if (target && typeof modal.showFrom === 'function') {
+            modal.showFrom(target)
+          } else if (typeof modal.show === 'function') {
+            modal.show()
+          }
+        }
+      })
+    }
+  }
+
+  const closeAppearanceModal = () => {
+    isAppearanceModalOpen.value = false
+    if (import.meta.client) {
+      const modal = document.getElementById('appearance-morph-modal') as any
+      if (modal && typeof modal.hide === 'function') {
+        modal.hide()
+      }
+    }
+  }
+
   return {
     primaryColor,
     navStyle,
@@ -147,6 +187,8 @@ export function useAppearance() {
     setTickerPosition,
     setTickerAnimation,
     setTickerSpeed,
+    openAppearanceModal,
+    closeAppearanceModal,
     initAppearance,
   }
 }

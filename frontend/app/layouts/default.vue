@@ -43,7 +43,7 @@
         <button
           id="appearance-sidebar-btn"
           type="button"
-          @click="isAppearanceModalOpen = true"
+          @click.stop="openAppearanceModal($event)"
           class="w-full flex items-center justify-center space-x-2 py-2.5 px-3 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold transition-all cursor-pointer"
           title="Personalizar Apariencia y Color"
         >
@@ -88,7 +88,7 @@
         <button
           id="appearance-sidebar-btn"
           type="button"
-          @click="isAppearanceModalOpen = true"
+          @click.stop="openAppearanceModal($event)"
           class="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 flex items-center justify-center transition-all cursor-pointer"
           title="Apariencia"
         >
@@ -143,7 +143,7 @@
           <button
             id="appearance-sidebar-btn"
             type="button"
-            @click="isAppearanceModalOpen = true; isTasksDrawerOpen = false"
+            @click.stop="openAppearanceModal($event); isTasksDrawerOpen = false"
             class="w-full flex items-center justify-center space-x-2 py-2 px-3 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold transition-all cursor-pointer"
           >
             <AppIcon name="palette" class="w-4 h-4" />
@@ -185,8 +185,9 @@
 
         <!-- Quick Appearance Button -->
         <button
+          id="appearance-trigger-btn"
           type="button"
-          @click="isAppearanceModalOpen = true"
+          @click.stop="openAppearanceModal($event)"
           class="w-8 h-8 rounded-full bg-white/95 backdrop-blur-md hover:bg-white border border-zinc-200/80 shadow-md text-zinc-800 flex items-center justify-center transition-all cursor-pointer group"
           title="Personalizar Apariencia y Titular"
           aria-label="Personalizar apariencia"
@@ -263,7 +264,13 @@ import AppearanceModal from '~/components/AppearanceModal.vue'
 import BulletinTicker from '~/components/BulletinTicker.vue'
 import { useAppearance } from '~/composables/useAppearance'
 
-const { isAppearanceModalOpen, navStyle, tickerPosition, initAppearance } = useAppearance()
+const {
+  isAppearanceModalOpen,
+  navStyle,
+  tickerPosition,
+  initAppearance,
+  openAppearanceModal
+} = useAppearance()
 const isTasksDrawerOpen = ref(false)
 
 const navItems = [

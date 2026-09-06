@@ -19,7 +19,7 @@
         variant="filled"
         shape="round"
         class="self-start sm:self-auto cursor-pointer"
-        @click="isUploadModalOpen = true"
+        @click.stop="openUploadModal($event)"
       >
         <AppIcon slot="icon" name="plus" class="w-4 h-4 mr-1.5" />
         Subir Nueva Evidencia
@@ -211,7 +211,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
 
 const activeFilter = ref('todos')
@@ -294,6 +294,26 @@ function shareReport(item: { tipo: string; ubicacion: string }) {
   }
 }
 
+function openUploadModal(event?: Event) {
+  if (event) event.stopPropagation()
+  isUploadModalOpen.value = true
+  if (import.meta.client) {
+    nextTick(() => {
+      const modal = document.getElementById('upload-evidence-modal') as any
+      const trigger = (event?.currentTarget as HTMLElement)
+        || document.getElementById('btn-subir-evidencia')
+        || document.body
+      if (modal) {
+        if (trigger && typeof modal.showFrom === 'function') {
+          modal.showFrom(trigger)
+        } else if (typeof modal.show === 'function') {
+          modal.show()
+        }
+      }
+    })
+  }
+}
+
 function closeUploadModal() {
   isUploadModalOpen.value = false
   if (import.meta.client) {
@@ -335,4 +355,22 @@ function submitNewEvidence() {
   newReportDescription.value = ''
   closeUploadModal()
 }
+
+let evidenciasModalObserver: MutationObserver | null = null
+
+onMounted(() => {
+  const modal = document.getElementById('upload-evidence-modal')
+  if (modal) {
+    evidenciasModalObserver = new MutationObserver(() => {
+      if (!modal.hasAttribute('open') && isUploadModalOpen.value) {
+        isUploadModalOpen.value = false
+      }
+    })
+    evidenciasModalObserver.observe(modal, { attributes: true, attributeFilter: ['open'] })
+  }
+})
+
+onUnmounted(() => {
+  if (evidenciasModalObserver) evidenciasModalObserver.disconnect()
+})
 </script>

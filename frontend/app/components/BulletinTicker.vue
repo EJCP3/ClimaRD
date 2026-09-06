@@ -150,7 +150,7 @@
         <button
           id="appearance-ticker-btn"
           type="button"
-          @click="isAppearanceModalOpen = true"
+          @click.stop="openAppearanceModal($event)"
           class="w-7 h-7 rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
           title="Personalizar Apariencia, Titular y Velocidad"
           aria-label="Personalizar apariencia"
@@ -167,7 +167,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
 import { useAppearance } from '~/composables/useAppearance'
 
-const { tickerPosition, tickerAnimation, tickerSpeed, isAppearanceModalOpen } = useAppearance()
+const { tickerPosition, tickerAnimation, tickerSpeed, isAppearanceModalOpen, openAppearanceModal } = useAppearance()
 
 // Comprehensive, Rich Official Bulletins Feed
 const tickerItems = [

@@ -51,7 +51,7 @@
         variant="filled"
         shape="round"
         size="large"
-        @click="$emit('openReportModal')"
+        @click.stop="$emit('openReportModal', $event)"
       >
         <AppIcon slot="icon" name="alert-triangle" class="w-4 h-4 mr-2 text-zinc-200" />
         Reportar Incidencia
