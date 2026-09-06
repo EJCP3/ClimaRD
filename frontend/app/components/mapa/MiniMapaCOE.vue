@@ -258,13 +258,13 @@
               :id="'prov-path-' + prov.code"
               :d="prov.path"
               :fill="getProvinceFill(prov)"
-              class="origin-center transition-all duration-200 cursor-pointer"
+              class="origin-center transition-all duration-200 cursor-pointer stroke-transparent [stroke-width:0px]"
               :class="[
                 selectedProvince?.code === prov.code
-                  ? 'brightness-110 drop-shadow-xl stroke-slate-950 [stroke-width:2.4px]'
+                  ? 'brightness-110 drop-shadow-xl !stroke-slate-950 ![stroke-width:2px]'
                   : isProvinceDimmed(prov.alerta)
-                    ? 'opacity-25 saturate-50 stroke-white/80 [stroke-width:1.2px]'
-                    : 'opacity-100 stroke-white [stroke-width:1.3px] hover:brightness-105 hover:stroke-slate-900/70 hover:[stroke-width:2px]'
+                    ? 'opacity-25 saturate-50'
+                    : 'opacity-100 hover:brightness-105 hover:!stroke-slate-900/60 hover:![stroke-width:1.5px]'
               ]"
               stroke-linejoin="round"
               stroke-linecap="round"
