@@ -178,7 +178,6 @@ const navModes: { id: NavStyle; label: string }[] = [
   { id: 'clasica', label: 'Clásica' },
   { id: 'bonita', label: 'Bonita' },
   { id: 'guapa', label: 'Guapa' },
-  { id: 'tasks', label: 'Tasks' },
 ]
 
 const tickerPositions: { id: TickerPosition; label: string }[] = [

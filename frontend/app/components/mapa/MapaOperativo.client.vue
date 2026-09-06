@@ -102,25 +102,36 @@ const MAP_STYLES = {
   light: {
     version: 8,
     sources: {
-      'carto-light': {
+      'esri-canvas-base': {
         type: 'raster',
         tiles: [
-          'https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}@2x.png',
-          'https://b.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}@2x.png',
-          'https://c.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}@2x.png',
-          'https://d.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}@2x.png'
+          'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
         ],
         tileSize: 256,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        attribution: '&copy; Esri, HERE, Garmin, &copy; OpenStreetMap'
+      },
+      'esri-canvas-ref': {
+        type: 'raster',
+        tiles: [
+          'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}'
+        ],
+        tileSize: 256
       }
     },
     layers: [
       {
-        id: 'carto-light-layer',
+        id: 'esri-canvas-base-layer',
         type: 'raster',
-        source: 'carto-light',
+        source: 'esri-canvas-base',
         minzoom: 0,
-        maxzoom: 20
+        maxzoom: 19
+      },
+      {
+        id: 'esri-canvas-ref-layer',
+        type: 'raster',
+        source: 'esri-canvas-ref',
+        minzoom: 0,
+        maxzoom: 19
       }
     ]
   },
@@ -133,7 +144,7 @@ const MAP_STYLES = {
           'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
         ],
         tileSize: 256,
-        attribution: '&copy; <a href="https://www.esri.com/">Esri</a>, Earthstar Geographics'
+        attribution: '&copy; Esri, Maxar, Earthstar Geographics'
       }
     },
     layers: [
@@ -149,25 +160,36 @@ const MAP_STYLES = {
   dark: {
     version: 8,
     sources: {
-      'carto-dark': {
+      'esri-dark-base': {
         type: 'raster',
         tiles: [
-          'https://a.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png',
-          'https://b.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png',
-          'https://c.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png',
-          'https://d.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png'
+          'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
         ],
         tileSize: 256,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        attribution: '&copy; Esri, HERE, Garmin, &copy; OpenStreetMap'
+      },
+      'esri-dark-ref': {
+        type: 'raster',
+        tiles: [
+          'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}'
+        ],
+        tileSize: 256
       }
     },
     layers: [
       {
-        id: 'carto-dark-layer',
+        id: 'esri-dark-base-layer',
         type: 'raster',
-        source: 'carto-dark',
+        source: 'esri-dark-base',
         minzoom: 0,
-        maxzoom: 20
+        maxzoom: 19
+      },
+      {
+        id: 'esri-dark-ref-layer',
+        type: 'raster',
+        source: 'esri-dark-ref',
+        minzoom: 0,
+        maxzoom: 19
       }
     ]
   }
@@ -208,6 +230,8 @@ const mockIncidents = [
     lat: 18.476,
     severity: 'ALTO',
     time: 'Hace 12 min',
+    image: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=600&q=80',
+    mediaCaption: 'Inundación en calzada activa',
     svgIcon: '<path d="M2 12h20"/><path d="M20 12v8H4v-8"/><path d="M4 12c1-2 2-3 4-3s3 1 4 3c1-2 2-3 4-3s3 1 4 3"/>'
   },
   {
@@ -219,6 +243,8 @@ const mockIncidents = [
     lat: 18.468,
     severity: 'MEDIO',
     time: 'Hace 28 min',
+    image: 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&w=600&q=80',
+    mediaCaption: 'Congestionamiento por lluvias',
     svgIcon: '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>'
   },
   {
@@ -230,6 +256,8 @@ const mockIncidents = [
     lat: 18.471,
     severity: 'ALTO',
     time: 'Hace 45 min',
+    image: 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=600&q=80',
+    mediaCaption: 'Árbol caído sobre cableado',
     svgIcon: '<path d="M12 19v3"/><path d="M12 2a5 5 0 0 0-4.9 4.1 4.5 4.5 0 0 0-1.6 7.4 5 5 0 0 0 6.5 5.5 5 5 0 0 0 6.5-5.5 4.5 4.5 0 0 0-1.6-7.4A5 5 0 0 0 12 2z"/>'
   },
   {
@@ -241,6 +269,8 @@ const mockIncidents = [
     lat: 18.489,
     severity: 'EXTREMO',
     time: 'Hace 1 hora',
+    video: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+    mediaCaption: 'Monitoreo preventivo',
     svgIcon: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/>'
   }
 ]
@@ -278,15 +308,44 @@ function renderMarkers(map: maplibregl.Map) {
         ? 'bg-amber-100 text-amber-800'
         : 'bg-zinc-100 text-zinc-800'
 
-    const popupHTML = `
-      <div class="p-4 space-y-3 min-w-[260px] max-w-[300px]">
-        <div class="flex items-center justify-between gap-2 border-b border-zinc-100 pb-2.5">
-          <div class="flex items-center space-x-1.5">
-            <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: var(--primary, #18181b);"></span>
-            <span class="text-[10px] font-black uppercase tracking-wider text-zinc-500">${inc.category}</span>
+    // Build media preview if image or video is present
+    let mediaHTML = ''
+    if (inc.image) {
+      mediaHTML = `
+        <div class="relative w-full rounded-2xl overflow-hidden aspect-video bg-zinc-100 border border-zinc-200/80 shadow-inner group/img">
+          <img src="${inc.image}" alt="${inc.title}" class="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105" loading="lazy" />
+          <div class="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[9px] font-bold text-white flex items-center space-x-1 pointer-events-none">
+            <svg class="w-3 h-3 text-white fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            <span>${inc.mediaCaption || 'Fotografía adjunta'}</span>
           </div>
-          <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${severityClass}">${inc.severity}</span>
         </div>
+      `
+    } else if (inc.video) {
+      mediaHTML = `
+        <div class="relative w-full rounded-2xl overflow-hidden aspect-video bg-black border border-zinc-200/80 shadow-inner">
+          <video src="${inc.video}" controls playsinline preload="metadata" class="w-full h-full object-cover"></video>
+          <div class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[9px] font-bold text-white flex items-center space-x-1 pointer-events-none">
+            <svg class="w-3 h-3 text-white fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>${inc.mediaCaption || 'Video del reporte'}</span>
+          </div>
+        </div>
+      `
+    }
+
+    const popupHTML = `
+      <div class="p-4 space-y-3 min-w-[280px] max-w-[320px]">
+        <!-- Header: pr-8 prevents close button collision with severity badge -->
+        <div class="flex items-center justify-between gap-2 border-b border-zinc-100 pb-2.5 pr-8">
+          <div class="flex items-center space-x-1.5 truncate">
+            <span class="w-2 h-2 rounded-full shrink-0 animate-pulse" style="background-color: var(--primary, #18181b);"></span>
+            <span class="text-[10px] font-black uppercase tracking-wider text-zinc-500 truncate">${inc.category}</span>
+          </div>
+          <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full shrink-0 ${severityClass}">${inc.severity}</span>
+        </div>
+
+        <!-- Attached Media (Image / Video if present) -->
+        ${mediaHTML}
+
         <div>
           <h4 class="font-extrabold text-sm text-zinc-950 tracking-tight leading-snug">${inc.title}</h4>
           <p class="text-xs text-zinc-600 leading-relaxed mt-1 font-normal">${inc.desc}</p>

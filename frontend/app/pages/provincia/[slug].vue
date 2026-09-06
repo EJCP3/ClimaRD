@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="p-4 md:p-8 max-w-5xl mx-auto space-y-6">
     <NuxtLink to="/alertas" class="inline-flex items-center space-x-1.5 text-xs font-bold text-zinc-500 hover:text-zinc-900 transition-colors group">
       <AppIcon name="arrow-right" class="w-3.5 h-3.5 rotate-180 group-hover:-translate-x-0.5 transition-transform" />
@@ -38,8 +38,43 @@
           <div class="space-y-3"><div v-for="boletin in bulletins" :key="boletin.id" class="p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-1.5"><div class="flex items-center justify-between"><span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase" :class="boletin.severityClass">{{ boletin.severity }}</span><div class="flex items-center space-x-1 text-zinc-400"><AppIcon name="clock" class="w-3 h-3" /><span class="text-[10px] font-bold">{{ boletin.time }}</span></div></div><h4 class="text-xs font-extrabold text-zinc-950 leading-snug">{{ boletin.title }}</h4><p class="text-[11px] text-zinc-600 leading-relaxed">{{ boletin.desc }}</p></div></div>
         </div>
         <div class="bg-white rounded-[24px] border border-zinc-200/80 shadow-sm p-5 space-y-4">
-          <div class="flex items-center space-x-2"><moni-shape name="arch" color="surface" size="small"><AppIcon name="alert-triangle" class="w-4 h-4 text-zinc-900" /></moni-shape><h3 class="font-extrabold text-sm text-zinc-950 tracking-tight">Incidencias Reportadas</h3></div>
-          <div class="space-y-3"><div v-for="inc in incidents" :key="inc.id" class="flex items-start space-x-3 p-3 bg-zinc-50 rounded-2xl border border-zinc-200/60"><div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :style="{ backgroundColor: 'var(--primary-container)', color: 'var(--on-primary-container)' }"><AppIcon :name="inc.icon" class="w-4 h-4" /></div><div class="flex-1 min-w-0 space-y-0.5"><h4 class="text-xs font-extrabold text-zinc-950 truncate">{{ inc.title }}</h4><p class="text-[11px] text-zinc-600 leading-snug">{{ inc.location }}</p><div class="flex items-center space-x-1 text-zinc-400"><AppIcon name="clock" class="w-3 h-3" /><span class="text-[10px] font-bold">{{ inc.time }}</span></div></div></div></div>
+          <div class="flex items-center space-x-2">
+            <moni-shape name="arch" color="surface" size="small"><AppIcon name="alert-triangle" class="w-4 h-4 text-zinc-900" /></moni-shape>
+            <h3 class="font-extrabold text-sm text-zinc-950 tracking-tight">Incidencias Reportadas</h3>
+          </div>
+          <div class="space-y-3">
+            <div v-for="inc in incidents" :key="inc.id" class="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200/60 space-y-2.5">
+              <div class="flex items-start space-x-3">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :style="{ backgroundColor: 'var(--primary-container)', color: 'var(--on-primary-container)' }">
+                  <AppIcon :name="inc.icon" class="w-4 h-4" />
+                </div>
+                <div class="flex-1 min-w-0 space-y-0.5">
+                  <h4 class="text-xs font-extrabold text-zinc-950 truncate">{{ inc.title }}</h4>
+                  <p class="text-[11px] text-zinc-600 leading-snug">{{ inc.location }}</p>
+                  <div class="flex items-center space-x-1 text-zinc-400">
+                    <AppIcon name="clock" class="w-3 h-3" />
+                    <span class="text-[10px] font-bold">{{ inc.time }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Media Attachment (Image or Video) -->
+              <div v-if="inc.image" class="relative rounded-xl overflow-hidden aspect-video bg-zinc-100 border border-zinc-200/80 shadow-inner group/img">
+                <img :src="inc.image" :alt="inc.title" class="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105" loading="lazy" />
+                <span class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[9px] font-bold text-white flex items-center space-x-1 pointer-events-none">
+                  <AppIcon name="camera" class="w-3 h-3" />
+                  <span>Foto del reporte</span>
+                </span>
+              </div>
+              <div v-else-if="inc.video" class="relative rounded-xl overflow-hidden aspect-video bg-black border border-zinc-200/80 shadow-inner">
+                <video :src="inc.video" controls playsinline preload="metadata" class="w-full h-full object-cover"></video>
+                <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[9px] font-bold text-white flex items-center space-x-1 pointer-events-none">
+                  <AppIcon name="camera" class="w-3 h-3" />
+                  <span>Video capturado</span>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="rounded-[24px] p-5 border space-y-2" :class="recommendationBannerClass">
@@ -103,7 +138,44 @@ const advisoryText = computed(() => { if (!province.value) return ''; const n = 
 const currentConditions = computed(() => { if (!province.value) return []; const p = province.value; return [ { icon: 'thermometer', label: 'Temperatura', value: p.temp + ' C' }, { icon: 'droplets', label: 'Humedad', value: p.humidity + '%' }, { icon: 'wind', label: 'Viento', value: p.wind + ' km/h' }, { icon: 'cloud-rain', label: 'Lluvia', value: p.rainChance + '%' } ] })
 const forecast = computed(() => { if (!province.value) return []; const b = province.value.temp; return [ { name: 'Hoy', icon: 'cloud-rain', high: '' + b, low: '' + (b - 6) }, { name: 'Mar', icon: 'cloud-rain', high: '' + (b - 1), low: '' + (b - 7) }, { name: 'Mie', icon: 'cloud-rain', high: '' + (b - 2), low: '' + (b - 8) }, { name: 'Jue', icon: 'sun', high: '' + (b + 1), low: '' + (b - 5) }, { name: 'Vie', icon: 'sun', high: '' + (b + 2), low: '' + (b - 4) } ] })
 const bulletins = computed(() => { if (!province.value) return []; const a = province.value.alerta; const n = province.value.name; return [ { id: 'b1', severity: a === 'ROJA' ? 'Urgente' : a === 'AMARILLA' ? 'Importante' : 'Informativo', severityClass: a === 'ROJA' ? 'bg-rose-100 text-rose-800' : a === 'AMARILLA' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800', time: '18:00', title: 'Boletin Meteorologico Especial No. 47 para ' + n, desc: 'Se mantienen las condiciones de inestabilidad atmosferica. Lluvias de moderadas a fuertes previstas.' }, { id: 'b2', severity: 'Seguimiento', severityClass: 'bg-zinc-100 text-zinc-800', time: '14:30', title: 'Aviso de Seguimiento COE para ' + n, desc: 'Actualizacion del nivel de alerta vigente. Las brigadas de respuesta continuan en posicion.' }, { id: 'b3', severity: 'Oficial', severityClass: 'bg-sky-100 text-sky-800', time: '12:00', title: 'Pronostico Extendido INDOMET - Region ' + n, desc: 'Vaguada en niveles medios de la troposfera continuara generando aguaceros durante las proximas 48 horas.' } ] })
-const incidents = computed(() => { if (!province.value) return []; const n = province.value.name; return [ { id: 'i1', icon: 'water', title: 'Inundacion en via principal', location: 'Sector centro, ' + n, time: 'Hace 25 min' }, { id: 'i2', icon: 'tree', title: 'Arbol caido sobre calzada', location: 'Carretera principal, ' + n, time: 'Hace 1 hora' }, { id: 'i3', icon: 'car', title: 'Vehiculos varados', location: 'Paso a desnivel, ' + n, time: 'Hace 2 horas' } ] })
+const incidents = computed(() => {
+  if (!province.value) return []
+  const n = province.value.name
+  return [
+    {
+      id: 'i1',
+      icon: 'water',
+      title: 'Inundación en vía principal',
+      location: 'Sector centro, ' + n,
+      time: 'Hace 25 min',
+      image: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+      id: 'i2',
+      icon: 'tree',
+      title: 'Árbol caído sobre calzada',
+      location: 'Carretera principal, ' + n,
+      time: 'Hace 1 hora',
+      image: 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+      id: 'i3',
+      icon: 'car',
+      title: 'Vehículos varados',
+      location: 'Paso a desnivel, ' + n,
+      time: 'Hace 2 horas',
+      video: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4'
+    },
+    {
+      id: 'i4',
+      icon: 'alert-triangle',
+      title: 'Monitoreo de filtraciones',
+      location: 'Puente peatonal norte, ' + n,
+      time: 'Hace 3 horas'
+      // No media: tests graceful rendering without empty box
+    }
+  ]
+})
 const recommendationBannerClass = computed(() => { if (!province.value) return 'bg-zinc-50 border-zinc-200 text-zinc-800'; switch (province.value.alerta) { case 'ROJA': return 'bg-rose-50 border-rose-200 text-rose-900'; case 'AMARILLA': return 'bg-amber-50 border-amber-200 text-amber-900'; case 'VERDE': return 'bg-emerald-50 border-emerald-200 text-emerald-900'; default: return 'bg-zinc-50 border-zinc-200 text-zinc-800' } })
 const recommendations = computed(() => { if (!province.value) return []; switch (province.value.alerta) { case 'ROJA': return ['No cruce rios, canadas ni zonas inundadas a pie o en vehiculo.', 'Mantenga contacto permanente con la Defensa Civil (809-472-0909).', 'Tenga preparado un kit de emergencia con documentos, medicinas y agua.', 'Desconecte aparatos electricos para evitar corto circuitos.']; case 'AMARILLA': return ['Extreme precaucion en calles y pasos a desnivel durante las lluvias.', 'Asegure objetos en techos, balcones y patios contra el viento.', 'Tenga lista una mochila de emergencia con lo esencial.', 'Monitoree los boletines oficiales de INDOMET y COE.']; case 'VERDE': return ['Atienda los boletines periodicos ante posibles vaguadas vespertinas.', 'Evite estacionarse en zonas propensas a inundaciones.', 'Mantenga limpia las alcantarillas y drenajes cercanos a su vivienda.']; default: return ['No se preveen impactos criticos durante las proximas 24 horas.', 'Mantenga un plan familiar de emergencia actualizado.', 'Siga las redes oficiales del COE para actualizaciones.'] } })
 </script>

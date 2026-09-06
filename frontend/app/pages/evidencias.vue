@@ -48,18 +48,31 @@
       >
         <!-- Card Header Banner -->
         <div class="h-44 relative bg-zinc-950 overflow-hidden flex items-center justify-center">
-          <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-900/60 to-zinc-800/40"></div>
-          
-          <!-- Moni UI Expressive Shape Watermark -->
-          <moni-shape
-            :name="item.shape"
-            color="surface"
-            style="--_shape-bg: #27272a; --_shape-fg: #f4f4f5;"
-            size="large"
-            class="opacity-20 group-hover:scale-110 transition-transform duration-500 scale-110"
-          >
-            <AppIcon :name="item.icon" class="w-10 h-10" />
-          </moni-shape>
+          <!-- Attached Image -->
+          <template v-if="item.image">
+            <img :src="item.image" :alt="item.tipo" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/40 to-zinc-950/20"></div>
+          </template>
+
+          <!-- Attached Video -->
+          <template v-else-if="item.video">
+            <video :src="item.video" class="absolute inset-0 w-full h-full object-cover" muted loop playsinline autoplay></video>
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/40 to-zinc-950/20"></div>
+          </template>
+
+          <!-- Fallback Moni UI Expressive Shape Watermark -->
+          <template v-else>
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-900/60 to-zinc-800/40"></div>
+            <moni-shape
+              :name="item.shape"
+              color="surface"
+              style="--_shape-bg: #27272a; --_shape-fg: #f4f4f5;"
+              size="large"
+              class="opacity-20 group-hover:scale-110 transition-transform duration-500 scale-110"
+            >
+              <AppIcon :name="item.icon" class="w-10 h-10" />
+            </moni-shape>
+          </template>
 
           <!-- Floating Badges Top -->
           <div class="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between">
@@ -236,7 +249,8 @@ const evidencias = ref([
     ubicacion: 'Av. Luperón con Gustavo Mejía Ricart',
     tiempo: 'Hace 12 min',
     descripcion: 'Nivel del agua superando acera e impidiendo el paso de vehículos pequeños. Drenaje completamente tapado por escombros.',
-    votos: 34
+    votos: 34,
+    image: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: 2,
@@ -248,7 +262,8 @@ const evidencias = ref([
     ubicacion: 'Calle El Conde, Zona Colonial',
     tiempo: 'Hace 28 min',
     descripcion: 'Rama grande obstaculiza el paso peatonal. Cables del tendido eléctrico están comprometidos en la esquina.',
-    votos: 19
+    votos: 19,
+    image: 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: 3,
@@ -260,7 +275,21 @@ const evidencias = ref([
     ubicacion: 'Av. 27 de Febrero casi Winston Churchill',
     tiempo: 'Hace 45 min',
     descripcion: 'Vehículo varado en carril derecho por falla mecánica bajo lluvia persistente. Tránsito muy lento.',
-    votos: 42
+    votos: 42,
+    video: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4'
+  },
+  {
+    id: 4,
+    categoria: 'inundacion',
+    tipo: 'Monitoreo de Cañada',
+    badgeClass: 'bg-zinc-900/90 text-white border border-zinc-700',
+    icon: 'water',
+    shape: 'arch',
+    ubicacion: 'Sector La Ciénaga, D.N.',
+    tiempo: 'Hace 1 hora',
+    descripcion: 'Vigilancia comunitaria preventiva sin incidencias mayores registradas hasta el momento.',
+    votos: 12
+    // Fallback without media: displays Moni UI shape watermark
   }
 ])
 
