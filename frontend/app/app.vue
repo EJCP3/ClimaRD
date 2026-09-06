@@ -112,15 +112,18 @@ moni-chip {
 }
 .maplibregl-popup {
   @apply !z-30;
+  max-width: 380px !important;
 }
 .maplibregl-popup-content {
-  @apply !bg-white !backdrop-blur-md !rounded-3xl !border !border-zinc-200 !shadow-2xl !p-0 !overflow-hidden font-sans;
+  @apply !bg-white !backdrop-blur-md !rounded-[28px] !border !border-zinc-200 !shadow-2xl !p-0 !overflow-hidden font-sans;
+  max-width: 380px !important;
 }
 .maplibregl-popup-tip {
   @apply !border-t-white;
 }
 .maplibregl-popup-close-button {
-  @apply !top-2.5 !right-2.5 !w-6 !h-6 !rounded-full !bg-zinc-100 hover:!bg-zinc-200 !text-zinc-500 hover:!text-zinc-900 !border-0 !p-0 flex !items-center !justify-center text-sm transition-colors cursor-pointer;
+  @apply !top-3 !right-3 !w-7 !h-7 !rounded-full !bg-zinc-100 hover:!bg-zinc-200 !text-zinc-500 hover:!text-zinc-950 !border-0 !p-0 flex !items-center !justify-center !text-sm transition-colors cursor-pointer !outline-none focus:!outline-none focus:!ring-0;
+  line-height: 1 !important;
 }
 .maplibregl-ctrl-attrib {
   @apply !bg-white/90 !backdrop-blur-sm !rounded-full !px-2.5 !py-0.5 !text-[10px] !text-zinc-400 !border !border-zinc-200 !m-2.5;

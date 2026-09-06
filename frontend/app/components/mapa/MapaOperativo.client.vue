@@ -312,20 +312,21 @@ function renderMarkers(map: maplibregl.Map) {
     let mediaHTML = ''
     if (inc.image) {
       mediaHTML = `
-        <div class="relative w-full rounded-2xl overflow-hidden aspect-video bg-zinc-100 border border-zinc-200/80 shadow-inner group/img">
+        <div class="relative w-full rounded-2xl overflow-hidden aspect-[16/10] bg-zinc-100 border border-zinc-200/80 shadow-sm group/img">
           <img src="${inc.image}" alt="${inc.title}" class="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105" loading="lazy" />
-          <div class="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[9px] font-bold text-white flex items-center space-x-1 pointer-events-none">
-            <svg class="w-3 h-3 text-white fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
+          <div class="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-white flex items-center space-x-1.5 pointer-events-none">
+            <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
             <span>${inc.mediaCaption || 'Fotografía adjunta'}</span>
           </div>
         </div>
       `
     } else if (inc.video) {
       mediaHTML = `
-        <div class="relative w-full rounded-2xl overflow-hidden aspect-video bg-black border border-zinc-200/80 shadow-inner">
+        <div class="relative w-full rounded-2xl overflow-hidden aspect-[16/10] bg-zinc-950 border border-zinc-200/80 shadow-sm">
           <video src="${inc.video}" controls playsinline preload="metadata" class="w-full h-full object-cover"></video>
-          <div class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[9px] font-bold text-white flex items-center space-x-1 pointer-events-none">
-            <svg class="w-3 h-3 text-white fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <div class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md text-[10px] font-bold text-white flex items-center space-x-1.5 pointer-events-none shadow-sm">
+            <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             <span>${inc.mediaCaption || 'Video del reporte'}</span>
           </div>
         </div>
@@ -333,37 +334,58 @@ function renderMarkers(map: maplibregl.Map) {
     }
 
     const popupHTML = `
-      <div class="p-4 space-y-3 min-w-[280px] max-w-[320px]">
-        <!-- Header: pr-8 prevents close button collision with severity badge -->
-        <div class="flex items-center justify-between gap-2 border-b border-zinc-100 pb-2.5 pr-8">
-          <div class="flex items-center space-x-1.5 truncate">
-            <span class="w-2 h-2 rounded-full shrink-0 animate-pulse" style="background-color: var(--primary, #18181b);"></span>
-            <span class="text-[10px] font-black uppercase tracking-wider text-zinc-500 truncate">${inc.category}</span>
-          </div>
-          <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full shrink-0 ${severityClass}">${inc.severity}</span>
+      <div class="p-4 space-y-3 w-[300px] sm:w-[330px] font-sans antialiased text-zinc-900 select-none">
+        <!-- Header: Category + Severity grouped on left, pr-10 reserves top-right for close button -->
+        <div class="flex items-center space-x-2 pr-10 pb-2.5 border-b border-zinc-100">
+          <span class="relative flex h-2.5 w-2.5 shrink-0">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background-color: var(--primary, #18181b);"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5" style="background-color: var(--primary, #18181b);"></span>
+          </span>
+          <span class="text-[11px] font-black uppercase tracking-wider text-zinc-500 truncate">${inc.category}</span>
+          <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 ${severityClass}">${inc.severity}</span>
         </div>
 
         <!-- Attached Media (Image / Video if present) -->
         ${mediaHTML}
 
-        <div>
-          <h4 class="font-extrabold text-sm text-zinc-950 tracking-tight leading-snug">${inc.title}</h4>
-          <p class="text-xs text-zinc-600 leading-relaxed mt-1 font-normal">${inc.desc}</p>
+        <div class="space-y-1">
+          <h4 class="font-black text-[15px] text-zinc-950 tracking-tight leading-snug font-sans">${inc.title}</h4>
+          <p class="text-xs text-zinc-600 leading-relaxed font-normal">${inc.desc}</p>
         </div>
-        <div class="bg-zinc-50 rounded-xl p-2.5 space-y-1 text-[11px] border border-zinc-200/60 font-medium">
-          <div class="flex items-center justify-between text-zinc-500">
-            <span>Coordenadas GPS:</span>
-            <span class="font-mono font-bold text-zinc-900">${inc.lat.toFixed(4)}° N, ${Math.abs(inc.lng).toFixed(4)}° W</span>
+
+        <!-- Information / Metadata Box -->
+        <div class="bg-zinc-50 rounded-2xl p-3 space-y-2 border border-zinc-200/80 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="text-zinc-500 font-medium flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-zinc-400 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 10 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+              <span class="text-[11px]">Ubicación</span>
+            </span>
+            <span class="font-mono font-bold text-zinc-900 text-[11px]">${inc.lat.toFixed(4)}° N, ${Math.abs(inc.lng).toFixed(4)}° W</span>
           </div>
-          <div class="flex items-center justify-between text-zinc-500">
-            <span>Actualizado:</span>
-            <span class="text-zinc-700 font-semibold">${inc.time}</span>
+          <div class="flex items-center justify-between">
+            <span class="text-zinc-500 font-medium flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-zinc-400 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span class="text-[11px]">Actualizado</span>
+            </span>
+            <span class="text-zinc-700 font-bold text-[11px]">${inc.time}</span>
           </div>
+        </div>
+
+        <!-- Action Footer -->
+        <div class="pt-1 flex items-center justify-between text-xs">
+          <span class="inline-flex items-center space-x-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span>Verificado</span>
+          </span>
+          <a href="/evidencias" class="text-[11px] font-extrabold text-zinc-700 hover:text-zinc-950 flex items-center space-x-1 hover:underline">
+            <span>Ver evidencias</span>
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
         </div>
       </div>
     `
 
-    const popup = new maplibregl.Popup({ offset: 22, closeButton: true })
+    const popup = new maplibregl.Popup({ offset: 20, closeButton: true, maxWidth: '360px', className: 'm3-incident-popup' })
       .setHTML(popupHTML)
 
     const marker = new maplibregl.Marker({ element: el, anchor: 'bottom' })
