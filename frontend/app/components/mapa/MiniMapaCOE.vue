@@ -18,28 +18,26 @@
       </div>
 
       <!-- View Mode Selector -->
-      <div class="flex items-center space-x-1.5 self-end sm:self-auto bg-zinc-200/60 p-1 rounded-full text-xs font-semibold">
+      <div class="flex items-center space-x-1 self-end sm:self-auto bg-zinc-100 p-1 rounded-full border border-zinc-200/80 text-xs">
         <button
           @click="activeView = 'mapa'"
-          class="px-3 py-1 rounded-full transition-all text-xs font-bold"
-          :class="activeView === 'mapa' ? 'shadow-sm' : 'text-zinc-600 hover:text-zinc-900'"
-          :style="activeView === 'mapa' ? { backgroundColor: 'var(--primary)', color: 'var(--on-primary)' } : {}"
+          class="px-3 py-1.5 rounded-full transition-all text-xs font-bold cursor-pointer"
+          :class="activeView === 'mapa' ? 'bg-zinc-950 text-white shadow-sm font-black' : 'text-zinc-600 hover:text-zinc-950'"
         >
           Mapa Gráfico
         </button>
         <button
           @click="activeView = 'tabla'"
-          class="px-3 py-1 rounded-full transition-all text-xs font-bold"
-          :class="activeView === 'tabla' ? 'shadow-sm' : 'text-zinc-600 hover:text-zinc-900'"
-          :style="activeView === 'tabla' ? { backgroundColor: 'var(--primary)', color: 'var(--on-primary)' } : {}"
+          class="px-3 py-1.5 rounded-full transition-all text-xs font-bold cursor-pointer"
+          :class="activeView === 'tabla' ? 'bg-zinc-950 text-white shadow-sm font-black' : 'text-zinc-600 hover:text-zinc-950'"
         >
           Cuadrícula
         </button>
       </div>
     </div>
 
-    <!-- View 1: Graphical SVG Map (Exact design from COE official bulletin image) -->
-    <div v-show="activeView === 'mapa'" class="relative p-3 md:p-6 bg-[#FAFBFD] flex-1 flex flex-col justify-between">
+    <!-- View 1: Graphical SVG Map (Harmonized design) -->
+    <div v-show="activeView === 'mapa'" class="relative p-3 md:p-6 bg-gradient-to-br from-slate-50/50 via-sky-50/20 to-zinc-50/60 flex-1 flex flex-col justify-between">
       <!-- Top Map Controls & Quick Filter -->
       <div class="flex flex-wrap items-center justify-between gap-2 mb-2 z-10">
         <div class="flex items-center space-x-2 text-[11px] text-zinc-500">
@@ -50,7 +48,7 @@
         <div v-if="selectedProvince" class="flex items-center space-x-2">
           <button
             @click="selectedProvince = null"
-            class="text-[11px] font-bold text-zinc-600 hover:text-zinc-950 underline"
+            class="text-[11px] font-bold text-zinc-600 hover:text-zinc-950 underline cursor-pointer"
           >
             Limpiar selección
           </button>
@@ -61,11 +59,18 @@
       <div class="relative w-full aspect-[800/520] max-h-[520px] mx-auto select-none">
         <svg
           viewBox="0 0 800 550"
-          class="w-full h-full drop-shadow-sm filter"
+          class="w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <defs>
+            <!-- Elevation drop shadow for Dominican Republic island -->
+            <filter id="island-shadow" x="-5%" y="-5%" width="115%" height="115%">
+              <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#09090b" flood-opacity="0.08" />
+            </filter>
+          </defs>
+
           <!-- Province Polygons -->
-          <g class="provinces-group">
+          <g class="provinces-group" filter="url(#island-shadow)">
             <path
               v-for="prov in provincesList"
               :key="prov.code"
@@ -74,10 +79,10 @@
               class="origin-center transition-all duration-200 cursor-pointer"
               :class="[
                 selectedProvince?.code === prov.code
-                  ? 'brightness-110 drop-shadow-md stroke-zinc-950 [stroke-width:3px]'
+                  ? 'brightness-110 drop-shadow-md stroke-zinc-950 [stroke-width:2.8px]'
                   : selectedProvince
-                    ? 'opacity-70 stroke-white [stroke-width:1.6px] hover:opacity-100 hover:brightness-105 hover:stroke-zinc-900 hover:[stroke-width:2.2px] hover:drop-shadow-sm'
-                    : 'stroke-white [stroke-width:1.6px] hover:brightness-105 hover:stroke-zinc-900 hover:[stroke-width:2.2px] hover:drop-shadow-sm'
+                    ? 'opacity-70 stroke-white [stroke-width:1.8px] hover:opacity-100 hover:brightness-105 hover:stroke-zinc-900 hover:[stroke-width:2.4px]'
+                    : 'stroke-white [stroke-width:1.8px] hover:brightness-105 hover:stroke-zinc-900 hover:[stroke-width:2.4px]'
               ]"
               stroke-linejoin="round"
               stroke-linecap="round"
@@ -95,9 +100,8 @@
                 :y="getCentroid(prov)[1]"
                 text-anchor="middle"
                 dominant-baseline="central"
-                class="font-black uppercase tracking-tight fill-zinc-950"
-                :class="getLabelFontSize(prov.code)"
-                style="paint-order: stroke fill; stroke: #ffffff; stroke-width: 2.2px; stroke-linejoin: round;"
+                class="font-sans select-none pointer-events-none transition-all duration-150"
+                :style="getLabelStyle(prov.alerta, prov.code)"
               >
                 {{ getShortLabel(prov.code, prov.name) }}
               </text>
@@ -111,7 +115,7 @@
           class="absolute pointer-events-none z-30 transition-all duration-75 transform -translate-x-1/2 -translate-y-full mb-3"
           :style="{ left: `${tooltipPos.x}px`, top: `${tooltipPos.y}px` }"
         >
-          <div class="bg-zinc-950 text-white p-3 rounded-2xl shadow-2xl border border-zinc-700/60 min-w-[180px] space-y-1">
+          <div class="bg-zinc-950/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-2xl border border-zinc-700/60 min-w-[180px] space-y-1">
             <div class="flex items-center justify-between space-x-2">
               <p class="font-extrabold text-xs text-white">{{ hoveredProvince.name }}</p>
               <span
@@ -128,22 +132,22 @@
         </div>
 
         <!-- Official COE Bulletin Legend (Matches bottom right of the uploaded user image) -->
-        <div class="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 z-20 bg-white/95 backdrop-blur-md p-3.5 sm:p-4 rounded-2xl border border-zinc-200/90 shadow-md space-y-2 text-[11px]">
+        <div class="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 z-20 bg-white/95 backdrop-blur-md p-3 sm:p-4 rounded-2xl border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-2 text-[11px]">
           <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#EF4444] shadow-sm shrink-0"></span>
+            <span class="w-3.5 h-3.5 rounded-md bg-[#E11D48] shadow-xs shrink-0"></span>
             <span class="font-bold text-zinc-800">7 provincias en alerta roja</span>
           </div>
           <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#FACC15] shadow-sm shrink-0"></span>
+            <span class="w-3.5 h-3.5 rounded-md bg-[#F59E0B] shadow-xs shrink-0"></span>
             <span class="font-bold text-zinc-800">8 provincias en alerta amarilla</span>
           </div>
           <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#22C55E] shadow-sm shrink-0"></span>
+            <span class="w-3.5 h-3.5 rounded-md bg-[#10B981] shadow-xs shrink-0"></span>
             <span class="font-bold text-zinc-800">7 provincias en alerta verde</span>
           </div>
           <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#CBD5E1] shadow-sm shrink-0"></span>
-            <span class="font-bold text-zinc-500">10 provincias sin alerta</span>
+            <span class="w-3.5 h-3.5 rounded-md bg-[#E2E8F0] border border-zinc-300 shadow-xs shrink-0"></span>
+            <span class="font-semibold text-zinc-500">10 provincias sin alerta</span>
           </div>
         </div>
       </div>
@@ -401,24 +405,24 @@ const provincesList = computed(() => {
 function getProvinceColor(alerta: string): string {
   switch (alerta) {
     case 'ROJA':
-      return '#EF4444' // Vibrant COE Red
+      return '#E11D48' // Refined Crimson Red (Rose-600)
     case 'AMARILLA':
-      return '#FACC15' // Vibrant COE Yellow
+      return '#F59E0B' // Refined Warm Amber (Amber-500)
     case 'VERDE':
-      return '#22C55E' // Vibrant COE Green
+      return '#10B981' // Refined Emerald Green (Emerald-500)
     default:
-      return '#CBD5E1' // Light Gray (Sin alerta)
+      return '#E2E8F0' // Modern Clean Slate (Slate-200)
   }
 }
 
 function getBadgeColorClass(alerta: string): string {
   switch (alerta) {
     case 'ROJA':
-      return 'bg-[#EF4444] text-white'
+      return 'bg-[#E11D48] text-white'
     case 'AMARILLA':
-      return 'bg-[#FACC15] text-zinc-950 font-black'
+      return 'bg-[#F59E0B] text-zinc-950 font-black'
     case 'VERDE':
-      return 'bg-[#22C55E] text-white'
+      return 'bg-[#10B981] text-white'
     default:
       return 'bg-zinc-400 text-white'
   }
@@ -426,10 +430,10 @@ function getBadgeColorClass(alerta: string): string {
 
 function getDotColorClass(alerta: string): string {
   switch (alerta) {
-    case 'ROJA': return 'bg-[#EF4444]'
-    case 'AMARILLA': return 'bg-[#FACC15]'
-    case 'VERDE': return 'bg-[#22C55E]'
-    default: return 'bg-zinc-400'
+    case 'ROJA': return 'bg-[#E11D48]'
+    case 'AMARILLA': return 'bg-[#F59E0B]'
+    case 'VERDE': return 'bg-[#10B981]'
+    default: return 'bg-zinc-300'
   }
 }
 
@@ -472,39 +476,40 @@ function getProvinceAdvice(alerta: string, name: string): string {
   }
 }
 
+// Clean, elegant Title Case labels matching the modern application typography
 const customLabels: Record<string, string> = {
   '01': 'D.N.',
-  '02': 'AZUA',
-  '03': 'BAORUCO',
-  '04': 'BARAHONA',
-  '05': 'DAJABÓN',
-  '06': 'DUARTE',
-  '07': 'ELÍAS PIÑA',
-  '08': 'EL SEIBO',
-  '09': 'ESPAILLAT',
-  '10': 'INDEP.',
-  '11': 'ALTAGRACIA',
-  '12': 'LA ROMANA',
-  '13': 'LA VEGA',
-  '14': 'M.T. SÁNCHEZ',
-  '15': 'MTE. CRISTI',
-  '16': 'PEDERNALES',
-  '17': 'PERAVIA',
-  '18': 'PTO. PLATA',
-  '19': 'H. MIRABAL',
-  '20': 'SAMANÁ',
-  '21': 'S. CRISTÓBAL',
-  '22': 'SAN JUAN',
+  '02': 'Azua',
+  '03': 'Baoruco',
+  '04': 'Barahona',
+  '05': 'Dajabón',
+  '06': 'Duarte',
+  '07': 'Elías Piña',
+  '08': 'El Seibo',
+  '09': 'Espaillat',
+  '10': 'Indep.',
+  '11': 'Altagracia',
+  '12': 'La Romana',
+  '13': 'La Vega',
+  '14': 'M.T. Sánchez',
+  '15': 'Mte. Cristi',
+  '16': 'Pedernales',
+  '17': 'Peravia',
+  '18': 'Pto. Plata',
+  '19': 'H. Mirabal',
+  '20': 'Samaná',
+  '21': 'S. Cristóbal',
+  '22': 'San Juan',
   '23': 'S.P.M.',
-  '24': 'S. RAMÍREZ',
-  '25': 'SANTIAGO',
-  '26': 'STGO. RGUEZ.',
-  '27': 'VALVERDE',
-  '28': 'M. NOUEL',
-  '29': 'MONTE PLATA',
-  '30': 'HATO MAYOR',
-  '31': 'S.J. OCOA',
-  '32': 'STO. DGO.',
+  '24': 'S. Ramírez',
+  '25': 'Santiago',
+  '26': 'Stgo. Rguez.',
+  '27': 'Valverde',
+  '28': 'M. Nouel',
+  '29': 'Monte Plata',
+  '30': 'Hato Mayor',
+  '31': 'S.J. Ocoa',
+  '32': 'Sto. Dgo.',
 }
 
 const centroidOverrides: Record<string, [number, number]> = {
@@ -554,12 +559,65 @@ function getShortLabel(code: string, name: string): string {
   return name
 }
 
-function getLabelFontSize(code: string): string {
+function getLabelPixelSize(code: string): string {
   // Ultra-compact labels for smaller geographic areas
   if (['01', '19', '27', '31', '24', '10', '28'].includes(code)) {
-    return 'text-[6px] sm:text-[6.8px]'
+    return '8.5px'
   }
-  return 'text-[7px] sm:text-[8px]'
+  // Larger areas
+  if (['22', '25', '13', '02', '11', '18', '29', '04', '15', '16'].includes(code)) {
+    return '10.5px'
+  }
+  return '9.5px'
+}
+
+function getLabelStyle(alerta: string, code: string): Record<string, string> {
+  const fontSize = getLabelPixelSize(code)
+  const baseStyle: Record<string, string> = {
+    fontSize,
+    fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    paintOrder: 'stroke fill',
+    strokeLinejoin: 'round'
+  }
+
+  switch (alerta) {
+    case 'ROJA':
+      return {
+        ...baseStyle,
+        fill: '#ffffff',
+        fontWeight: '700',
+        letterSpacing: '0.015em',
+        stroke: 'rgba(159, 18, 57, 0.9)', // deep crimson halo for clean contrast
+        strokeWidth: '1.6px'
+      }
+    case 'VERDE':
+      return {
+        ...baseStyle,
+        fill: '#ffffff',
+        fontWeight: '700',
+        letterSpacing: '0.015em',
+        stroke: 'rgba(6, 78, 59, 0.9)', // deep emerald halo
+        strokeWidth: '1.6px'
+      }
+    case 'AMARILLA':
+      return {
+        ...baseStyle,
+        fill: '#18181b', // dark charcoal
+        fontWeight: '800',
+        letterSpacing: '0.01em',
+        stroke: '#ffffff', // clean white halo
+        strokeWidth: '2.2px'
+      }
+    default: // NORMAL
+      return {
+        ...baseStyle,
+        fill: '#3f3f46', // zinc-700
+        fontWeight: '700',
+        letterSpacing: '0.01em',
+        stroke: '#ffffff', // clean white halo
+        strokeWidth: '2px'
+      }
+  }
 }
 
 function onHover(prov: any, evt: MouseEvent) {
