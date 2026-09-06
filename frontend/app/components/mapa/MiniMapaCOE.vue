@@ -409,19 +409,16 @@
           :key="`grid-${prov.code}`"
           :id="`grid-${prov.code}`"
           @click="selectProvince(prov, $event)"
-          class="p-3 rounded-2xl border transition-all cursor-pointer hover:shadow-md flex items-center justify-between gap-2.5 group select-none"
+          class="py-2.5 px-3.5 rounded-2xl border transition-all cursor-pointer hover:shadow-md flex items-center justify-between gap-2.5 group select-none"
           :class="[
             getGridCardClass(prov.alerta),
             isProvinceDimmed(prov.alerta) ? 'opacity-30' : 'opacity-100'
           ]"
         >
           <div class="min-w-0 flex-1">
-            <p class="font-bold text-xs truncate text-zinc-900 group-hover:text-zinc-950">
+            <p class="font-extrabold text-xs truncate text-zinc-900 group-hover:text-zinc-950 tracking-tight">
               {{ prov.name }}
             </p>
-            <span class="text-[10px] uppercase tracking-wider font-extrabold mt-0.5 block" :class="getAlertSubtextColor(prov.alerta)">
-              {{ prov.alerta === 'NORMAL' ? 'SIN ALERTA' : `ALERTA ${prov.alerta}` }}
-            </span>
           </div>
 
           <!-- Organic Moni-Shape replacing circular dot -->
