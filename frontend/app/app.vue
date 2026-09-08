@@ -8,10 +8,55 @@
       :options="toastHostOptions"
     />
   </ClientOnly>
+  <!-- Glimm Canvas for Transitions -->
+  <canvas id="glimm-canvas" class="fixed inset-0 w-screen h-screen z-[9999] pointer-events-none opacity-0 invisible" />
 </template>
 
 <script setup lang="ts">
 import { ToastHost, toast } from 'super-beautiful-toast'
+import { useRouter } from 'vue-router'
+import { useGlimmSweep, getProvinceAlert } from '~/composables/useGlimmSweep'
+
+const router = useRouter()
+
+if (import.meta.client) {
+  let isNavigatingWithGlimm = false
+
+  router.beforeEach(async (to, from) => {
+    // Si ya estamos en medio del barrido de glimm o es la misma ruta, dejamos continuar
+    if (isNavigatingWithGlimm || to.path === from.path) {
+      return true
+    }
+
+    // Si el destino es una provincia (o viene de una alerta a una provincia)
+    if (to.path.startsWith('/provincia/')) {
+      const slug = to.params.slug as string
+      const alerta = getProvinceAlert(slug)
+
+      isNavigatingWithGlimm = true
+      const { sweep } = useGlimmSweep()
+
+      sweep(alerta, async () => {
+        // En el midpoint (cuando la franja cubre el centro de la pantalla), ejecutamos la navegación
+        await router.push(to.fullPath)
+        await nextTick()
+        // Doble rAF (técnica exacta de Paseito-main): deja que el layout de la nueva página
+        // termine de pintarse antes de que la franja descubra el contenido.
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+      })
+
+      // Liberar el flag al finalizar el tiempo de animación (sweepMs: 900 + outroMs: 450)
+      setTimeout(() => {
+        isNavigatingWithGlimm = false
+      }, 1400)
+
+      // Cancelamos la navegación inmediata para esperar al midpoint
+      return false
+    }
+
+    return true
+  })
+}
 
 // Physics & animation tuning for super-beautiful-toast
 const toastHostOptions = {
@@ -139,5 +184,17 @@ if (import.meta.client) {
   ::view-transition-new(*) {
     animation: none !important;
   }
+}
+
+/* Disable native View Transitions while Glimm is sweeping to prevent frozen WebGL frames */
+html.glimm-active ::view-transition-group(*),
+html.glimm-active ::view-transition-old(*),
+html.glimm-active ::view-transition-new(*) {
+  animation: none !important;
+}
+
+#glimm-canvas {
+  view-transition-name: none !important;
+  transition: opacity 120ms ease-out;
 }
 </style>

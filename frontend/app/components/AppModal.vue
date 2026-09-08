@@ -22,6 +22,10 @@
       :aria-labelledby="ariaLabelledby"
       :close-button="false"
       :modal-class="computedModalClass"
+      :flying-text-class="flyingTextClass"
+      :label="resolvedLabel"
+      :flying-mode="flyingMode"
+      :label-offset-x="labelOffsetX"
       @update:model-value="onModelValueUpdate"
       @close="onClose"
     >
@@ -87,6 +91,10 @@ const props = withDefaults(
     contentBlur?: boolean
     ariaLabel?: string
     ariaLabelledby?: string
+    flyingTextClass?: string | null
+    label?: string | any
+    flyingMode?: string | null
+    labelOffsetX?: number
   }>(),
   {
     modelValue: undefined,
@@ -110,7 +118,11 @@ const props = withDefaults(
     lockScroll: false,
     contentBlur: false,
     ariaLabel: undefined,
-    ariaLabelledby: undefined
+    ariaLabelledby: undefined,
+    flyingTextClass: null,
+    label: null,
+    flyingMode: null,
+    labelOffsetX: 24
   }
 )
 
@@ -123,6 +135,11 @@ const emit = defineEmits<{
 const morphRef = ref<any>(null)
 const internalOpen = ref(false)
 const customOrigin = ref<any>(null)
+const customLabel = ref<string | any>(null)
+
+const resolvedLabel = computed(() => {
+  return customLabel.value !== null && customLabel.value !== undefined ? customLabel.value : props.label
+})
 
 const isOpen = computed(() => {
   if (props.modelValue !== undefined) return props.modelValue
@@ -138,7 +155,7 @@ const maxWidthClass = computed(() => {
 
 const computedOverlayClass = computed(() => {
   return [
-    'bg-black/45',
+    props.overlayDark ? 'bg-black/45' : '',
     props.overlayBlur ? 'backdrop-blur-sm' : '',
     props.overlayClass || ''
   ].filter(Boolean).join(' ')
@@ -181,6 +198,9 @@ function resolveOrigin(rawInput: any) {
   // 1. MouseEvent or DOM Event
   if (typeof Event !== 'undefined' && raw instanceof Event) {
     const target = (raw.currentTarget || raw.target) as HTMLElement | SVGElement | null
+    if (typeof HTMLElement !== 'undefined' && target instanceof HTMLElement) {
+      return target
+    }
     if (target && typeof target.getBoundingClientRect === 'function') {
       const rect = target.getBoundingClientRect()
       return {
@@ -258,9 +278,12 @@ const resolvedOrigin = computed(() => {
   return resolveOrigin(originToUse)
 })
 
-const open = (origin?: any) => {
-  if (origin) {
+const open = (origin?: any, label?: any) => {
+  if (origin !== undefined) {
     customOrigin.value = origin
+  }
+  if (label !== undefined) {
+    customLabel.value = label
   }
   internalOpen.value = true
   emit('update:modelValue', true)
@@ -277,6 +300,7 @@ const close = () => {
 const onModelValueUpdate = (val: boolean) => {
   if (!val) {
     customOrigin.value = null
+    customLabel.value = null
     internalOpen.value = false
     emit('update:modelValue', false)
     emit('update:open', false)
@@ -285,6 +309,7 @@ const onModelValueUpdate = (val: boolean) => {
 
 const onClose = () => {
   customOrigin.value = null
+  customLabel.value = null
   internalOpen.value = false
   emit('update:modelValue', false)
   emit('update:open', false)

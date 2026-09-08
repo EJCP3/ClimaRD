@@ -9,9 +9,6 @@
         <div>
           <div class="flex items-center space-x-2">
             <h3 class="font-extrabold text-base text-zinc-950 tracking-tight">Mapa de Alerta por Ciclón / Vaguada</h3>
-            <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black uppercase tracking-wider animate-pulse">
-              En Vivo
-            </span>
           </div>
           <p class="text-xs text-zinc-500 mt-0.5">Centro de Operaciones de Emergencias (COE) • 32 Provincias</p>
         </div>
@@ -121,6 +118,7 @@
 
       <!-- DominicanGo Style Oceanic SVG Map Container -->
       <div
+        ref="mapContainerRef"
         class="relative w-full aspect-[960/500] max-h-[560px] mx-auto select-none rounded-[28px] overflow-hidden border border-sky-200/60 shadow-sm"
         style="background: linear-gradient(180deg, #e8f4f8 0%, #d4eef7 30%, #e2f0e8 60%, #eef6fa 100%);"
       >
@@ -332,25 +330,7 @@
           </div>
         </div>
 
-        <!-- Official COE Bulletin Legend (Bottom right overlay) -->
-        <div class="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 z-20 bg-white/95 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-1.5 text-[11px]">
-          <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#E11D48] shadow-xs shrink-0"></span>
-            <span class="font-bold text-zinc-800">7 provincias en alerta roja</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#F59E0B] shadow-xs shrink-0"></span>
-            <span class="font-bold text-zinc-800">8 provincias en alerta amarilla</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#10B981] shadow-xs shrink-0"></span>
-            <span class="font-bold text-zinc-800">7 provincias en alerta verde</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#94A3B8] shadow-xs shrink-0"></span>
-            <span class="font-semibold text-zinc-500">10 provincias sin alerta</span>
-          </div>
-        </div>
+
       </div>
 
       <!-- Selected Province Inspector Drawer -->
@@ -398,6 +378,30 @@
         </div>
       </div>
 
+      <!-- Export Actions -->
+      <div class="mt-4 flex justify-end">
+        <div class="flex items-center space-x-1 bg-white p-1.5 rounded-full border border-zinc-200/80 text-xs shadow-sm">
+          <button
+            @click="downloadMap"
+            type="button"
+            class="px-3 py-1.5 rounded-full transition-all text-[11px] font-bold cursor-pointer text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 flex items-center space-x-1.5"
+            title="Descargar mapa como imagen"
+          >
+            <AppIcon name="download" class="w-4 h-4" />
+            <span>Descargar</span>
+          </button>
+          <button
+            @click="shareMap"
+            type="button"
+            class="px-3 py-1.5 rounded-full transition-all text-[11px] font-bold cursor-pointer text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 flex items-center space-x-1.5"
+            title="Compartir mapa"
+          >
+            <MorphIcon :icon="isShared ? Check : Share" class="w-4 h-4" />
+            <span>Compartir</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Institutional Footer Note matching COE image -->
       <div class="pt-3 mt-2 border-t border-zinc-200/60 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-zinc-500 gap-1">
         <span>Información técnica oficial en coordinación con INDOMET</span>
@@ -442,7 +446,10 @@
     <AppModal
       v-model="isProvinceModalOpen"
       :origin-ref="selectedProvinceTrigger"
-      maxWidth="max-w-lg"
+      max-width="max-w-lg"
+      :overlay-blur="false"
+      :overlay-dark="false"
+      overlay-class="bg-transparent"
     >
       <template #header>
         <div class="flex items-center space-x-3" v-if="selectedProvince">
@@ -537,7 +544,10 @@
 </template>
 
 <script setup lang="ts">
+import { MorphIcon } from 'morphicons/vue'
+import { Share, Check } from 'lucide'
 import { ref, computed } from 'vue'
+import html2canvas from 'html2canvas'
 import AppIcon from '~/components/AppIcon.vue'
 import AppButton from '~/components/AppButton.vue'
 import AppShape from '~/components/AppShape.vue'
@@ -552,6 +562,63 @@ const selectedProvince = ref<any>(null)
 const tooltipPos = ref({ x: 0, y: 0 })
 const isProvinceModalOpen = ref(false)
 const selectedProvinceTrigger = ref<any>(null)
+const mapContainerRef = ref<HTMLElement | null>(null)
+
+async function captureMap() {
+  if (!mapContainerRef.value) return null;
+  // Hide tooltip temporarily to avoid it appearing in capture if left active
+  const prevHovered = hoveredProvince.value;
+  hoveredProvince.value = null;
+  
+  try {
+    const canvas = await html2canvas(mapContainerRef.value, {
+      useCORS: true,
+      scale: 2,
+      backgroundColor: null,
+    });
+    return canvas;
+  } catch (err) {
+    console.error('Error capturing map:', err);
+    return null;
+  } finally {
+    hoveredProvince.value = prevHovered;
+  }
+}
+
+async function downloadMap() {
+  const canvas = await captureMap();
+  if (!canvas) return;
+  
+  const link = document.createElement('a');
+  link.download = `mapa-alertas-${new Date().toISOString().slice(0, 10)}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+async function shareMap() {
+  const canvas = await captureMap();
+  if (!canvas) return;
+  
+  canvas.toBlob(async (blob) => {
+    if (!blob) return;
+    const file = new File([blob], 'mapa-alertas.png', { type: 'image/png' });
+    
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          title: 'Mapa de Alertas COE',
+          text: 'Consulta el mapa de alertas meteorológicas.',
+          files: [file]
+        });
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      // Fallback: download if share is not supported
+      downloadMap();
+    }
+  }, 'image/png');
+}
 
 function isProvinceDimmed(alerta: string): boolean {
   if (activeAlertFilter.value === 'ALL') return false

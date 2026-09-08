@@ -139,7 +139,7 @@
     </template>
 
     <!-- close -->
-    <template v-else-if="name === 'close'">
+    <template v-else-if="name === 'close' || name === 'x'">
       <line x1="18" x2="6" y1="6" y2="18" />
       <line x1="6" x2="18" y1="6" y2="18" />
     </template>
@@ -213,6 +213,13 @@
       <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
     </template>
 
+    <!-- download -->
+    <template v-else-if="name === 'download'">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" x2="12" y1="15" y2="3" />
+    </template>
+
     <!-- palette / appearance -->
     <template v-else-if="name === 'palette'">
       <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
@@ -245,6 +252,18 @@
     <template v-else-if="name === 'copy'">
       <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
       <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+    </template>
+
+    <!-- external-link -->
+    <template v-else-if="name === 'external-link'">
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </template>
+
+    <!-- chevron-left -->
+    <template v-else-if="name === 'chevron-left'">
+      <path d="m15 18-6-6 6-6" />
     </template>
 
     <!-- chevron-right -->

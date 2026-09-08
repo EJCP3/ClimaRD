@@ -1,9 +1,16 @@
 <template>
   <div class="relative w-full h-full overflow-hidden font-sans">
     <!-- Centered Material 3 Pill Search Bar -->
-    <div class="absolute top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-[480px] z-20 space-y-2">
+    <div
+      class="absolute top-4 left-4 right-4 z-20 space-y-2 pointer-events-none"
+      :class="[
+        isBonita
+          ? 'md:left-1/2 md:-translate-x-1/2 md:w-[380px] lg:w-[440px] xl:w-[480px]'
+          : 'md:left-1/2 md:-translate-x-1/2 md:w-[480px]'
+      ]"
+    >
       <div
-        class="bg-white/95 backdrop-blur-xl shadow-xl rounded-full p-2 pl-4 border border-zinc-200/80 flex items-center space-x-3 transition-all focus-within:ring-2 focus-within:ring-zinc-900/10 focus-within:border-zinc-300"
+        class="pointer-events-auto bg-white/95 backdrop-blur-xl shadow-xl rounded-full p-2 pl-4 border border-zinc-200/80 flex items-center space-x-3 transition-all focus-within:ring-2 focus-within:ring-zinc-900/10 focus-within:border-zinc-300"
       >
         <AppIcon name="search" class="w-5 h-5 text-zinc-400 shrink-0" />
         <input
@@ -26,7 +33,7 @@
       <!-- Autocomplete Dropdown (M3 Card Container) -->
       <ul
         v-if="filteredPlaces.length > 0"
-        class="bg-white/95 backdrop-blur-xl rounded-[22px] shadow-2xl border border-zinc-200/80 max-h-64 overflow-y-auto divide-y divide-zinc-100 text-xs p-1.5 animate-fadeIn"
+        class="pointer-events-auto bg-white/95 backdrop-blur-xl rounded-[22px] shadow-2xl border border-zinc-200/80 max-h-64 overflow-y-auto divide-y divide-zinc-100 text-xs p-1.5 animate-fadeIn"
       >
         <li
           v-for="item in filteredPlaces"
@@ -47,22 +54,26 @@
       </ul>
     </div>
 
-    <!-- Map Layers Selector Pill (Bottom-Left) -->
+    <!-- Map Layers Selector Pill -->
     <div
       class="absolute z-20 hidden sm:flex items-center space-x-1 bg-white/95 backdrop-blur-xl p-1 rounded-full border border-zinc-200/80 shadow-lg transition-all duration-300"
-      :class="tickerPosition === 'bottom' ? 'bottom-16 left-4 sm:left-6' : 'bottom-6 sm:bottom-7 left-4 sm:left-6'"
+      :class="[
+        isBonita
+          ? 'top-4 left-4 sm:left-6'
+          : (tickerPosition === 'bottom' ? 'bottom-16 left-4 sm:left-6' : 'bottom-6 sm:bottom-7 left-4 sm:left-6')
+      ]"
     >
       <button
         v-for="layer in layerOptions"
         :key="layer.id"
         type="button"
         @click="switchLayer(layer.id)"
-        class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
+        class="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
         :style="currentLayer === layer.id ? { backgroundColor: 'var(--primary, #18181b)', color: 'var(--on-primary, #ffffff)' } : {}"
         :class="currentLayer === layer.id ? 'shadow-sm' : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'"
       >
         <AppIcon :name="layer.icon" class="w-3.5 h-3.5" />
-        <span>{{ layer.label }}</span>
+        <span :class="isBonita ? 'hidden md:inline' : 'inline'">{{ layer.label }}</span>
       </button>
 
       <span class="w-px h-3.5 bg-zinc-200 mx-0.5"></span>
@@ -75,22 +86,30 @@
         title="Ver toda la República Dominicana"
       >
         <AppIcon name="maximize" class="w-3.5 h-3.5" />
-        <span class="hidden md:inline">Enfocar RD</span>
+        <span :class="isBonita ? 'hidden lg:inline' : 'hidden md:inline'">Enfocar RD</span>
       </button>
     </div>
 
-    <!-- Live Emergency Legend / Incidents Status Pill (Bottom-Right) -->
+    <!-- Live Emergency Legend / Incidents Status Pill -->
     <div
-      class="absolute z-20 hidden sm:flex items-center space-x-2 bg-white/95 backdrop-blur-xl px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300"
-      :class="tickerPosition === 'bottom' ? 'bottom-16 right-4 sm:right-6' : 'bottom-7 sm:bottom-8 right-4 sm:right-6'"
+      class="absolute z-20 hidden sm:flex items-center space-x-2 bg-white/95 backdrop-blur-xl px-3 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300"
+      :class="[
+        isBonita
+          ? 'top-4 right-16 sm:right-18'
+          : (tickerPosition === 'bottom' ? 'bottom-16 right-4 sm:right-6' : 'bottom-7 sm:bottom-8 right-4 sm:right-6')
+      ]"
     >
       <span class="relative flex h-2.5 w-2.5">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
       </span>
-      <span class="text-xs font-extrabold text-zinc-900">4 Incidencias en Vivo</span>
-      <span class="w-px h-3 bg-zinc-200"></span>
-      <span class="text-[10px] font-mono text-zinc-500 font-bold uppercase">Gran Santo Domingo</span>
+      <span class="text-xs font-extrabold text-zinc-900 whitespace-nowrap">
+        {{ isBonita ? '4 en Vivo' : '4 Incidencias en Vivo' }}
+      </span>
+      <span class="w-px h-3 bg-zinc-200" :class="isBonita ? 'hidden xl:inline' : ''"></span>
+      <span class="text-[10px] font-mono text-zinc-500 font-bold uppercase whitespace-nowrap" :class="isBonita ? 'hidden xl:inline' : ''">
+        Gran Santo Domingo
+      </span>
     </div>
 
     <!-- Map Container -->
@@ -104,23 +123,26 @@
     <AppModal
       v-model="isIncidentModalOpen"
       :origin-ref="selectedIncidentTrigger"
-      max-width="max-w-lg"
-      overlay-blur
+      max-width="max-w-lg md:max-w-2xl"
+      modal-class="!p-4 sm:!p-5"
+      :overlay-blur="false"
+      :overlay-dark="false"
+      overlay-class="bg-transparent"
       @close="closeIncidentModal"
     >
       <template #header>
         <div v-if="selectedIncident" class="flex items-center space-x-3 select-none">
           <AppShape
             :name="selectedIncident.shape || 'flower'"
-            size="medium"
+            size="small"
             class="shrink-0"
             :style="getModalShapeStyle(selectedIncident)"
           >
-            <AppIcon :name="selectedIncident.icon || 'alert-triangle'" class="w-6 h-6" />
+            <AppIcon :name="selectedIncident.icon || 'alert-triangle'" class="w-5 h-5" />
           </AppShape>
           <div>
             <div class="flex items-center space-x-2">
-              <span class="text-[11px] font-black uppercase tracking-wider text-zinc-500">
+              <span class="text-[10px] font-black uppercase tracking-wider text-zinc-500">
                 {{ selectedIncident.category }}
               </span>
               <span
@@ -130,94 +152,116 @@
                 {{ selectedIncident.severity }}
               </span>
             </div>
-            <h3 class="font-black text-lg text-zinc-950 tracking-tight leading-tight mt-0.5">
+            <h3 class="font-black text-base text-zinc-950 tracking-tight leading-tight mt-0.5">
               {{ selectedIncident.title }}
             </h3>
           </div>
         </div>
       </template>
 
-      <!-- Body Content -->
-      <div v-if="selectedIncident" class="space-y-4 py-2 text-xs select-none">
-        <!-- Media Preview (Image or Video) -->
-        <div
-          v-if="selectedIncident.image"
-          class="relative w-full rounded-2xl overflow-hidden aspect-[16/10] bg-zinc-100 border border-zinc-200/80 shadow-sm group/img"
-        >
-          <img
-            :src="selectedIncident.image"
-            :alt="selectedIncident.title"
-            class="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
-            loading="lazy"
-          />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
-          <div class="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-white flex items-center space-x-1.5 pointer-events-none">
-            <AppIcon name="camera" class="w-3.5 h-3.5 text-white" />
-            <span>{{ selectedIncident.mediaCaption || 'Fotografía en el lugar' }}</span>
+      <!-- Body Content (Compact 2 Columns on PC) -->
+      <div
+        v-if="selectedIncident"
+        class="py-1 text-xs select-none"
+        :class="(selectedIncident.image || selectedIncident.video) ? 'grid grid-cols-1 md:grid-cols-[220px_1fr] lg:grid-cols-[240px_1fr] gap-3.5' : 'space-y-2.5'"
+      >
+        <!-- Column 1: Media Preview (Image or Video) -->
+        <div v-if="selectedIncident.image || selectedIncident.video" class="w-full h-full flex flex-col">
+          <!-- Image -->
+          <div
+            v-if="selectedIncident.image"
+            class="relative w-full h-[180px] md:h-full md:min-h-[220px] md:max-h-[260px] rounded-xl overflow-hidden bg-zinc-100 border border-zinc-200/80 shadow-sm group/img"
+          >
+            <img
+              :src="selectedIncident.image"
+              :alt="selectedIncident.title"
+              class="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
+              loading="lazy"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent pointer-events-none"></div>
+            <div class="absolute bottom-2 left-2 right-2 flex items-center space-x-1.5 px-2 py-1 rounded-lg bg-black/65 backdrop-blur-md text-[9px] font-bold text-white pointer-events-none">
+              <AppIcon name="camera" class="w-3 h-3 text-white shrink-0" />
+              <span class="truncate">{{ selectedIncident.mediaCaption || 'Fotografía en el lugar' }}</span>
+            </div>
           </div>
-        </div>
 
-        <div
-          v-else-if="selectedIncident.video"
-          class="relative w-full rounded-2xl overflow-hidden aspect-[16/10] bg-zinc-950 border border-zinc-200/80 shadow-sm"
-        >
-          <video
-            :src="selectedIncident.video"
-            controls
-            playsinline
-            preload="metadata"
-            class="w-full h-full object-cover"
-          ></video>
-          <div class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md text-[10px] font-bold text-white flex items-center space-x-1.5 pointer-events-none shadow-sm">
-            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-            <span>{{ selectedIncident.mediaCaption || 'Video del reporte en vivo' }}</span>
-          </div>
-        </div>
-
-        <!-- Description Box -->
-        <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="inline-flex items-center space-x-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span>Reporte Ciudadano Verificado</span>
-            </span>
-            <span class="text-[11px] text-zinc-500 font-medium">{{ selectedIncident.time }}</span>
-          </div>
-          <p class="text-sm text-zinc-800 leading-relaxed font-normal">{{ selectedIncident.desc }}</p>
-        </div>
-
-        <!-- Location Information Box -->
-        <div class="bg-zinc-50 rounded-2xl p-3.5 space-y-2 border border-zinc-200/80">
-          <div class="flex items-center justify-between">
-            <span class="text-zinc-500 font-medium flex items-center space-x-1.5">
-              <AppIcon name="map-pin" class="w-4 h-4 text-zinc-700 shrink-0" />
-              <span class="text-xs font-semibold text-zinc-800">{{ selectedIncident.sector || 'Ubicación' }}</span>
-            </span>
-            <div class="flex items-center space-x-1.5">
-              <span class="font-mono font-bold text-zinc-950 text-xs">
-                {{ selectedIncident.lat.toFixed(4) }}° N, {{ Math.abs(selectedIncident.lng).toFixed(4) }}° W
-              </span>
-              <button
-                type="button"
-                @click="copyCoordinates(selectedIncident)"
-                class="p-1.5 rounded-lg hover:bg-zinc-200 text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer"
-                title="Copiar coordenadas GPS"
-              >
-                <AppIcon name="copy" class="w-3.5 h-3.5" />
-              </button>
+          <!-- Video -->
+          <div
+            v-else-if="selectedIncident.video"
+            class="relative w-full h-[180px] md:h-full md:min-h-[220px] md:max-h-[260px] rounded-xl overflow-hidden bg-zinc-950 border border-zinc-200/80 shadow-sm flex items-center justify-center"
+          >
+            <video
+              :src="selectedIncident.video"
+              controls
+              playsinline
+              preload="metadata"
+              class="w-full h-full object-cover"
+            ></video>
+            <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-[9px] font-bold text-white flex items-center space-x-1.5 pointer-events-none shadow-sm">
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+              <span>{{ selectedIncident.mediaCaption || 'Video del reporte en vivo' }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Official Civil Protection Advisory -->
-        <div class="p-3.5 rounded-2xl border space-y-1.5" :class="getAdvisoryCardClass(selectedIncident.severity)">
-          <div class="flex items-center space-x-1.5">
-            <AppIcon name="shield" class="w-4 h-4 shrink-0 text-zinc-900" />
-            <span class="text-xs font-black uppercase tracking-wider">Aviso y Prevención Ciudadana</span>
+        <!-- Column 2: Content Container (Description, Location, Civil Advisory) -->
+        <div class="flex flex-col space-y-2.5">
+          <!-- Description Box -->
+          <div class="p-2.5 sm:p-3 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center space-x-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-full">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>Reporte Ciudadano Verificado</span>
+              </span>
+              <span class="text-[10px] text-zinc-500 font-medium">{{ selectedIncident.time }}</span>
+            </div>
+            <p class="text-xs text-zinc-800 leading-relaxed font-normal">{{ selectedIncident.desc }}</p>
           </div>
-          <p class="text-[11px] text-zinc-700 leading-relaxed">
-            {{ selectedIncident.recommendation || 'Manténgase informado y siga las indicaciones de las autoridades del COE y Defensa Civil.' }}
-          </p>
+
+          <!-- Location Information Box -->
+          <div class="bg-zinc-50 rounded-xl p-2.5 space-y-1.5 border border-zinc-200/80">
+            <div class="flex items-center space-x-1.5 text-zinc-500">
+              <AppIcon name="map-pin" class="w-3.5 h-3.5 text-zinc-700 shrink-0" />
+              <span class="text-[11px] font-semibold text-zinc-800 leading-tight truncate">{{ selectedIncident.sector || 'Ubicación' }}</span>
+            </div>
+            <div class="flex items-center justify-between pt-1 border-t border-zinc-200/60 text-[11px]">
+              <span class="font-mono font-bold text-zinc-950">
+                {{ selectedIncident.lat.toFixed(4) }}° N, {{ Math.abs(selectedIncident.lng).toFixed(4) }}° W
+              </span>
+              <div class="flex items-center space-x-1">
+                <button
+                  type="button"
+                  @click="copyCoordinates(selectedIncident)"
+                  class="p-1 rounded-md transition-all cursor-pointer flex items-center space-x-1 text-[10px]"
+                  :class="isCopied ? 'bg-emerald-100 text-emerald-700 font-bold' : 'hover:bg-zinc-200 text-zinc-500 hover:text-zinc-800'"
+                  :title="isCopied ? '¡Coordenadas GPS copiadas!' : 'Copiar coordenadas GPS'"
+                >
+                  <MorphIcon :icon="isCopied ? Check : Copy" class="w-3 h-3" />
+                  <span v-if="isCopied">Copiado</span>
+                </button>
+                <a
+                  :href="`https://www.google.com/maps/search/?api=1&query=${selectedIncident.lat},${selectedIncident.lng}`"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="p-1 rounded-md hover:bg-zinc-200 text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer inline-flex items-center"
+                  title="Abrir ubicación en Google Maps"
+                >
+                  <AppIcon name="external-link" class="w-3 h-3" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Official Civil Protection Advisory -->
+          <div class="p-2.5 rounded-xl border space-y-1" :class="getAdvisoryCardClass(selectedIncident.severity)">
+            <div class="flex items-center space-x-1.5">
+              <AppIcon name="shield" class="w-3.5 h-3.5 shrink-0 text-zinc-900" />
+              <span class="text-[10px] font-black uppercase tracking-wider">Aviso y Prevención Ciudadana</span>
+            </div>
+            <p class="text-[10px] text-zinc-700 leading-snug">
+              {{ selectedIncident.recommendation || 'Manténgase informado y siga las indicaciones de las autoridades del COE y Defensa Civil.' }}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -243,6 +287,8 @@
 </template>
 
 <script setup lang="ts">
+import { MorphIcon } from 'morphicons/vue'
+import { Copy, Check } from 'lucide'
 import { ref, computed, onMounted, onUnmounted, markRaw } from 'vue'
 import maplibregl from 'maplibre-gl'
 import AppIcon from '~/components/AppIcon.vue'
@@ -255,7 +301,8 @@ import drBorderData from '~/assets/data/dr-border.json'
 import { useAppearance } from '~/composables/useAppearance'
 import { toast } from 'super-beautiful-toast'
 
-const { tickerPosition } = useAppearance()
+const { navStyle, tickerPosition } = useAppearance()
+const isBonita = computed(() => navStyle.value === 'bonita')
 
 const mapContainer = ref<HTMLElement | null>(null)
 let mapInstance: maplibregl.Map | null = null
@@ -265,8 +312,11 @@ let activeMarkers: maplibregl.Marker[] = []
 const isIncidentModalOpen = ref(false)
 const selectedIncident = ref<any>(null)
 const selectedIncidentTrigger = ref<HTMLElement | null>(null)
+const isCopied = ref(false)
+let copyTimeout: any = null
 
 function openIncidentDetails(inc: any, el: HTMLElement) {
+  isCopied.value = false
   selectedIncident.value = inc
   selectedIncidentTrigger.value = el
   isIncidentModalOpen.value = true
@@ -275,14 +325,20 @@ function openIncidentDetails(inc: any, el: HTMLElement) {
 function closeIncidentModal() {
   isIncidentModalOpen.value = false
   selectedIncidentTrigger.value = null
+  isCopied.value = false
 }
 
 function copyCoordinates(inc: any) {
   if (!inc) return
-  const text = `${inc.lat.toFixed(4)}, ${inc.lng.toFixed(4)}`
+  const text = `${inc.lat.toFixed(5)}, ${inc.lng.toFixed(5)}`
   if (typeof navigator !== 'undefined' && navigator.clipboard) {
     navigator.clipboard.writeText(text)
+    isCopied.value = true
     toast.success('Coordenadas GPS copiadas al portapapeles')
+    clearTimeout(copyTimeout)
+    copyTimeout = setTimeout(() => {
+      isCopied.value = false
+    }, 2000)
   }
 }
 
