@@ -580,6 +580,7 @@
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import { WissPopMorph } from 'wisspop/vue'
 import { toast } from 'super-beautiful-toast'
 import AppIcon from '~/components/AppIcon.vue'
@@ -769,6 +770,10 @@ function closeIncidentModal() {
   isIncidentModalOpen.value = false
   isCopied.value = false
 }
+
+onBeforeRouteLeave(() => {
+  closeIncidentModal()
+})
 
 function onModalClosed() {
   isLightboxOpen.value = false

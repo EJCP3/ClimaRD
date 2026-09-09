@@ -388,6 +388,7 @@
                 <NuxtLink
                   :to="`/provincia/${currentEvidence.weather?.provinceSlug || 'distrito-nacional'}`"
                   class="inline-flex items-center space-x-1 text-xs font-bold text-zinc-700 hover:text-zinc-950 hover:underline"
+                  @click="closeDetailModal"
                 >
                   <span>Ver provincia</span>
                   <AppIcon name="chevron-right" class="w-3.5 h-3.5" />
@@ -514,6 +515,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import { toast } from 'super-beautiful-toast'
 import { WissPopMorph } from 'wisspop/vue'
 import AppIcon from '~/components/AppIcon.vue'
@@ -884,6 +886,10 @@ function onModalClosed() {
   isLightboxOpen.value = false
   isCopied.value = false
 }
+
+onBeforeRouteLeave(() => {
+  closeDetailModal()
+})
 
 onBeforeUnmount(() => {
   if (typeof window !== 'undefined') {

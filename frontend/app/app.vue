@@ -9,52 +9,76 @@
     />
   </ClientOnly>
   <!-- Glimm Canvas for Transitions -->
-  <canvas id="glimm-canvas" class="fixed inset-0 w-screen h-screen z-[9999] pointer-events-none opacity-0 invisible" />
+  <canvas id="glimm-canvas" class="fixed inset-0 w-screen h-screen z-[9999] pointer-events-none" />
 </template>
 
 <script setup lang="ts">
 import { ToastHost, toast } from 'super-beautiful-toast'
-import { useRouter } from 'vue-router'
+import { useRouter, START_LOCATION } from 'vue-router'
 import { useGlimmSweep, getProvinceAlert } from '~/composables/useGlimmSweep'
 
 const router = useRouter()
 
 if (import.meta.client) {
   let isNavigatingWithGlimm = false
+  let isMidpointResolving = false
 
   router.beforeEach(async (to, from) => {
-    // Si ya estamos en medio del barrido de glimm o es la misma ruta, dejamos continuar
-    if (isNavigatingWithGlimm || to.path === from.path) {
+    // Si la llamada a router.push proviene del midpoint del sweep, permitimos el swap de ruta
+    if (isMidpointResolving) {
       return true
     }
 
-    // Si el destino es una provincia (o viene de una alerta a una provincia)
-    if (to.path.startsWith('/provincia/')) {
-      const slug = to.params.slug as string
-      const alerta = getProvinceAlert(slug)
-
-      isNavigatingWithGlimm = true
-      const { sweep } = useGlimmSweep()
-
-      sweep(alerta, async () => {
-        // En el midpoint (cuando la franja cubre el centro de la pantalla), ejecutamos la navegación
-        await router.push(to.fullPath)
-        await nextTick()
-        // Doble rAF (técnica exacta de Paseito-main): deja que el layout de la nueva página
-        // termine de pintarse antes de que la franja descubra el contenido.
-        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
-      })
-
-      // Liberar el flag al finalizar el tiempo de animación (sweepMs: 900 + outroMs: 450)
-      setTimeout(() => {
-        isNavigatingWithGlimm = false
-      }, 1400)
-
-      // Cancelamos la navegación inmediata para esperar al midpoint
+    // Evitar navegación repetida si ya hay un sweep en curso o es la misma URL
+    if (isNavigatingWithGlimm || to.fullPath === from.fullPath) {
       return false
     }
 
-    return true
+    // Ignorar en la carga inicial / refresh de la página
+    if (from === START_LOCATION || (!from.name && from.matched.length === 0)) {
+      return true
+    }
+
+    const isEnteringProvince = to.path.startsWith('/provincia/')
+    const isExitingProvince = from.path.startsWith('/provincia/')
+
+    // Solo aplicamos glimm para entrar o salir de una provincia
+    if (!isEnteringProvince && !isExitingProvince) {
+      return true
+    }
+
+    // Determinar la alerta: si entra a provincia, usamos la alerta de destino; si sale, la de origen
+    const slug = isEnteringProvince
+      ? (to.params.slug as string || to.path.split('/')[2])
+      : (from.params.slug as string || from.path.split('/')[2])
+    const alerta = getProvinceAlert(slug)
+
+    isNavigatingWithGlimm = true
+    const { sweep } = useGlimmSweep()
+
+    sweep(
+      alerta,
+      async () => {
+        isMidpointResolving = true
+        try {
+          await router.push(to.fullPath)
+          await nextTick()
+          // Doble rAF (técnica exacta de Paseito): deja que el layout de la nueva página
+          // termine de pintarse antes de que la franja descubra el contenido.
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+        } catch (e) {
+          console.error('[glimm] navigation error:', e)
+        } finally {
+          isMidpointResolving = false
+        }
+      },
+      () => {
+        isNavigatingWithGlimm = false
+      }
+    )
+
+    // Cancelamos la navegación sincrónica inmediata; la navegación real ocurrirá en onMidpoint
+    return false
   })
 }
 
@@ -121,80 +145,12 @@ if (import.meta.client) {
   --sbt-edge-offset: 20px;
 }
 
-/* View Transitions API (Native Browser Transitions) */
-::view-transition-old(app-page-content) {
-  animation: 180ms cubic-bezier(0.4, 0, 1, 1) both vtPageFadeOut;
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.2s ease;
 }
-
-::view-transition-new(app-page-content) {
-  animation: 240ms cubic-bezier(0, 0, 0.2, 1) both vtPageFadeIn;
-}
-
-::view-transition-old(root) {
-  animation: 140ms ease both vtFadeOut;
-}
-
-::view-transition-new(root) {
-  animation: 180ms ease both vtFadeIn;
-}
-
-@keyframes vtPageFadeOut {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-}
-
-@keyframes vtPageFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes vtFadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes vtFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
-  }
-}
-
-/* Disable native View Transitions while Glimm is sweeping to prevent frozen WebGL frames */
-html.glimm-active ::view-transition-group(*),
-html.glimm-active ::view-transition-old(*),
-html.glimm-active ::view-transition-new(*) {
-  animation: none !important;
-}
-
-#glimm-canvas {
-  view-transition-name: none !important;
-  transition: opacity 120ms ease-out;
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
 }
 </style>

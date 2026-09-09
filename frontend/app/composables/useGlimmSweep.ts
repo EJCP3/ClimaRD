@@ -64,31 +64,21 @@ export function getAlertPalette(alerta: string): Palette {
 let ctrl: ShaderController | null | undefined
 
 export function useGlimmSweep() {
-  function sweep(paletteOrAlert: Palette | string, onMidpoint: () => void | Promise<void>) {
-    if (typeof window === 'undefined') {
-      onMidpoint()
-      return
-    }
-
-    const canvas = document.getElementById('glimm-canvas') as HTMLCanvasElement | null
-    if (!canvas) {
-      onMidpoint()
-      return
-    }
-
+  function sweep(
+    paletteOrAlert: Palette | string,
+    onMidpoint: () => void | Promise<void>,
+    onComplete?: () => void
+  ) {
     if (ctrl === undefined) {
-      ctrl = createShader({ canvas })
+      const canvas = document.getElementById('glimm-canvas') as HTMLCanvasElement | null
+      ctrl = canvas ? createShader({ canvas }) : null
     }
 
     if (!ctrl) {
       onMidpoint()
+      onComplete?.()
       return
     }
-
-    // 1. Mostrar canvas para la animación
-    canvas.style.visibility = 'visible'
-    canvas.style.opacity = '1'
-    document.documentElement.classList.add('glimm-active')
 
     const palette: Palette = typeof paletteOrAlert === 'string'
       ? getAlertPalette(paletteOrAlert)
@@ -101,22 +91,9 @@ export function useGlimmSweep() {
       midpoint: 0.5,
       onMidpoint,
       onComplete: () => {
-        // Al terminar:
-        // A. Asegurar que el shader quede en alpha 0 absoluto
         ctrl?.setAlpha(0)
-
-        // B. Limpiar el búfer WebGL completamente a transparente puro rgba(0,0,0,0)
-        const gl = canvas.getContext('webgl') as WebGLRenderingContext | null
-        if (gl) {
-          gl.clearColor(0, 0, 0, 0)
-          gl.clear(gl.COLOR_BUFFER_BIT)
-        }
-
-        // C. Ocultar el canvas inmediatamente para que NO quede ningún velo,
-        // tinte residual ("un chin del color") ni partículas sobre el fondo blanco.
-        canvas.style.opacity = '0'
-        canvas.style.visibility = 'hidden'
-        document.documentElement.classList.remove('glimm-active')
+        ctrl?.setProgress(0)
+        onComplete?.()
       }
     })
   }
