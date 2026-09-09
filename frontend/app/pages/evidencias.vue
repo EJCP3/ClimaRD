@@ -74,7 +74,34 @@
     </div>
 
     <!-- Cards Grid with AppCard and AppShape -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    <!-- Loading State -->
+    <div
+      v-if="isLoading"
+      class="flex flex-col items-center justify-center py-20 text-zinc-400 space-y-3"
+    >
+      <svg class="w-8 h-8 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+      </svg>
+      <p class="text-xs font-semibold">Cargando evidencias…</p>
+    </div>
+
+    <!-- Empty State -->
+    <div
+      v-else-if="filteredEvidencias.length === 0"
+      class="flex flex-col items-center justify-center py-20 text-center space-y-3"
+    >
+      <div class="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center">
+        <AppIcon name="camera" class="w-7 h-7 text-zinc-300" />
+      </div>
+      <div>
+        <p class="text-sm font-black text-zinc-800">Aún no hay evidencias aquí</p>
+        <p class="text-xs text-zinc-500 mt-1">
+          Sé el primero en reportar una incidencia y ayúdale a tu comunidad.
+        </p>
+      </div>
+    </div>
+
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       <AppCard
         v-for="item in filteredEvidencias"
         :key="item.id"
@@ -378,6 +405,13 @@
               class="w-full p-3 rounded-2xl bg-zinc-50 border border-zinc-200/90 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-950"
               @input="handleLocationInput"
             />
+            <div class="flex items-center space-x-1 text-[10px] text-zinc-400 font-medium">
+              <AppIcon name="map-pin" class="w-3 h-3 text-zinc-500" />
+              <span>
+                Punto capturado: {{ reportLat.toFixed(4) }}, {{ reportLng.toFixed(4) }}
+                <span v-if="isLocating" class="text-zinc-400">· localizando…</span>
+              </span>
+            </div>
           </div>
 
           <!-- 3. LIVE WEATHER ENRICHMENT PREVIEW (Devuelve la información meteorológica oficial antes de enviar) -->
@@ -437,22 +471,79 @@
             ></textarea>
           </div>
 
-          <!-- 5. Foto / Video Placeholder -->
-          <div class="p-3 bg-zinc-50 border border-dashed border-zinc-300 rounded-2xl flex items-center justify-center space-x-2 cursor-pointer hover:bg-zinc-100 transition-colors">
-            <AppIcon name="camera" class="w-4 h-4 text-zinc-500" />
-            <span class="font-semibold text-zinc-600">Adjuntar foto o video capturado</span>
+          <!-- 5. Foto / Video con preview y captura móvil -->
+          <div class="space-y-1.5">
+            <label class="font-bold text-zinc-900">Evidencia multimedia (foto o video):</label>
+            <input
+              ref="fileInputEl"
+              type="file"
+              accept="image/*,video/*"
+              capture="environment"
+              class="hidden"
+              @change="onFileSelected"
+            />
+
+            <div
+              v-if="attachedPreview"
+              class="relative rounded-2xl overflow-hidden border border-zinc-200/90 bg-zinc-950"
+            >
+              <video
+                v-if="isAttachedVideo"
+                :src="attachedPreview"
+                class="w-full h-44 object-cover"
+                muted
+                loop
+                playsinline
+                controls
+              ></video>
+              <img
+                v-else
+                :src="attachedPreview"
+                class="w-full h-44 object-cover"
+                alt="Vista previa de la evidencia adjunta"
+              />
+              <button
+                type="button"
+                @click="clearAttachment"
+                class="absolute top-2.5 right-2.5 p-1.5 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors cursor-pointer"
+                title="Quitar archivo"
+              >
+                <AppIcon name="close" class="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <button
+              v-else
+              type="button"
+              @click="fileInputEl?.click()"
+              class="w-full p-3 bg-zinc-50 border border-dashed border-zinc-300 rounded-2xl flex items-center justify-center space-x-2 cursor-pointer hover:bg-zinc-100 hover:border-zinc-400 transition-colors"
+            >
+              <AppIcon name="camera" class="w-4 h-4 text-zinc-500" />
+              <span class="font-semibold text-zinc-600">Adjuntar foto o video capturado</span>
+            </button>
           </div>
 
         <!-- Action Buttons inside Main -->
         <div class="flex items-center justify-end space-x-2.5 pt-3 border-t border-zinc-100">
-          <AppButton variant="text" shape="round" @click="closeUploadModal">
+          <AppButton variant="text" shape="round" :disabled="isSubmitting" @click="isSubmitting ? null : closeUploadModal()">
             Cancelar
           </AppButton>
-          <AppButton variant="filled" shape="round" @click="submitNewEvidence($event)">
+          <AppButton variant="filled" shape="round" :disabled="isSubmitting" @click="submitNewEvidence($event)">
             <template #icon>
-              <AppIcon name="check" class="w-4 h-4 mr-1" />
+              <svg
+                v-if="isSubmitting"
+                class="w-4 h-4 mr-1 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              <AppIcon v-else name="check" class="w-4 h-4 mr-1" />
             </template>
-            Publicar en el Muro
+            {{ isSubmitting ? 'Publicando…' : 'Publicar en el Muro' }}
           </AppButton>
         </div>
       </div>
@@ -461,9 +552,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import imageCompression from 'browser-image-compression'
 import { toast } from 'super-beautiful-toast'
 import AppIcon from '~/components/AppIcon.vue'
+import { useApi } from '~/composables/useApi'
 import {
   detectProvinceFromText,
   getEnrichedEvidenceData,
@@ -472,7 +565,7 @@ import {
 } from '~/composables/useWeatherEnrichment'
 
 interface EvidenciaItem {
-  id: number
+  id: string
   categoria: string
   tipo: string
   badgeClass: string
@@ -487,10 +580,12 @@ interface EvidenciaItem {
   weather?: EnrichedWeatherData
 }
 
+const api = useApi()
+
 const activeFilter = ref('todos')
-const userVotes = ref<number[]>([])
-const expandedWeatherCards = ref<number[]>([])
-const shareSuccessId = ref<number | null>(null)
+const userVotes = ref<string[]>([])
+const expandedWeatherCards = ref<string[]>([])
+const shareSuccessId = ref<string | null>(null)
 
 // Modal State
 const isUploadModalOpen = ref(false)
@@ -500,6 +595,19 @@ const newReportLocation = ref('')
 const newReportTimeMode = ref('ahora')
 const newReportCustomTime = ref('')
 const newReportDescription = ref('')
+
+// Submit & media state
+const isSubmitting = ref(false)
+const isLoading = ref(false)
+const fileInputEl = ref<HTMLInputElement | null>(null)
+const attachedFile = ref<File | null>(null)
+const attachedPreview = ref<string | null>(null)
+const isAttachedVideo = ref(false)
+
+// Geolocation
+const reportLat = ref(18.4861)
+const reportLng = ref(-69.9312)
+const isLocating = ref(false)
 
 const provinceOptions = computed(() => {
   return Object.values(PROVINCES_DATA).map(p => ({
@@ -521,7 +629,8 @@ const previewEnrichedData = computed(() => {
   return getEnrichedEvidenceData(loc, timeStr, newReportProvince.value)
 })
 
-// Auto-detect province when typing location in modal
+// Auto-detect province + geocode when typing location in modal
+let geocodeTimer: ReturnType<typeof setTimeout> | null = null
 function handleLocationInput() {
   if (newReportLocation.value.length > 3) {
     const detectedSlug = detectProvinceFromText(newReportLocation.value)
@@ -529,68 +638,139 @@ function handleLocationInput() {
       newReportProvince.value = detectedSlug
     }
   }
+
+  if (newReportLocation.value.trim().length >= 5) {
+    if (geocodeTimer) clearTimeout(geocodeTimer)
+    geocodeTimer = setTimeout(geocodeLocation, 900)
+  }
 }
 
-// Initial Evidences pre-populated with official enriched weather data
-const initialEvidencias: EvidenciaItem[] = [
-  {
-    id: 1,
-    categoria: 'inundacion',
-    tipo: 'Inundación Callejera',
-    badgeClass: 'bg-zinc-900/90 text-white border border-zinc-700',
-    icon: 'water',
-    shape: 'flower',
-    ubicacion: 'Av. Luperón con Gustavo Mejía Ricart, D.N.',
-    tiempo: 'Hace 12 min',
-    descripcion: 'Nivel del agua superando acera e impidiendo el paso de vehículos pequeños. Drenaje completamente tapado por escombros.',
-    votos: 34,
-    image: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=600&q=80',
-    weather: getEnrichedEvidenceData('Av. Luperón, Distrito Nacional', 'Hace 12 min')
-  },
-  {
-    id: 2,
-    categoria: 'arbol',
-    tipo: 'Árbol Caído',
-    badgeClass: 'bg-zinc-900/90 text-white border border-zinc-700',
-    icon: 'tree',
-    shape: '12-sided-cookie',
-    ubicacion: 'Calle El Conde, Zona Colonial, D.N.',
-    tiempo: 'Hace 28 min',
-    descripcion: 'Rama grande obstaculiza el paso peatonal. Cables del tendido eléctrico están comprometidos en la esquina.',
-    votos: 19,
-    image: 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=600&q=80',
-    weather: getEnrichedEvidenceData('Calle El Conde, Distrito Nacional', 'Hace 28 min')
-  },
-  {
-    id: 3,
-    categoria: 'bloqueo',
-    tipo: 'Vía Bloqueada',
-    badgeClass: 'bg-zinc-900/90 text-white border border-zinc-700',
-    icon: 'car',
-    shape: 'soft-burst',
-    ubicacion: 'Av. 27 de Febrero casi Winston Churchill, D.N.',
-    tiempo: 'Hace 45 min',
-    descripcion: 'Vehículo varado en carril derecho por falla mecánica bajo lluvia persistente. Tránsito muy lento.',
-    votos: 42,
-    video: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-    weather: getEnrichedEvidenceData('Av. 27 de Febrero con Churchill, Distrito Nacional', 'Hace 45 min')
-  },
-  {
-    id: 4,
-    categoria: 'inundacion',
-    tipo: 'Monitoreo de Cañada',
-    badgeClass: 'bg-zinc-900/90 text-white border border-zinc-700',
-    icon: 'water',
-    shape: 'arch',
-    ubicacion: 'Sector La Ciénaga, D.N.',
-    tiempo: 'Hace 1 hora',
-    descripcion: 'Vigilancia comunitaria preventiva sin incidencias mayores registradas hasta el momento.',
-    votos: 12,
-    weather: getEnrichedEvidenceData('La Ciénaga, Distrito Nacional', 'Hace 1 hora')
+async function geocodeLocation() {
+  const q = newReportLocation.value.trim()
+  if (q.length < 5) return
+  isLocating.value = true
+  try {
+    const results = await $fetch<Array<{ lat: string; lon: string }>>(
+      'https://nominatim.openstreetmap.org/search',
+      {
+        query: { q: `${q}, República Dominicana`, format: 'json', limit: 1 }
+      }
+    )
+    if (results.length) {
+      reportLat.value = parseFloat(results[0].lat)
+      reportLng.value = parseFloat(results[0].lon)
+    }
+  } catch {
+    /* red geocoding no disponible, se mantiene el punto capturado */
+  } finally {
+    isLocating.value = false
   }
-]
+}
 
-const evidencias = ref<EvidenciaItem[]>(initialEvidencias)
+function captureGPS() {
+  if (!navigator.geolocation) return
+  isLocating.value = true
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      reportLat.value = pos.coords.latitude
+      reportLng.value = pos.coords.longitude
+      isLocating.value = false
+    },
+    () => {
+      isLocating.value = false
+    },
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
+  )
+}
+
+function onFileSelected(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  if (file.size > 5 * 1024 * 1024 && !file.type.startsWith('image/')) {
+    toast.warning('El video excede el límite de 5MB. Intenta uno más corto.')
+    return
+  }
+  attachedFile.value = file
+  attachedPreview.value = URL.createObjectURL(file)
+  isAttachedVideo.value = file.type.startsWith('video/')
+}
+
+async function compressIfNeeded(file: File): Promise<File> {
+  if (!file.type.startsWith('image/') || file.size <= 5 * 1024 * 1024) return file
+  return imageCompression(file, { maxSizeMB: 5, useWebWorker: true })
+}
+
+function clearAttachment() {
+  if (attachedPreview.value) URL.revokeObjectURL(attachedPreview.value)
+  attachedFile.value = null
+  attachedPreview.value = null
+  isAttachedVideo.value = false
+  if (fileInputEl.value) fileInputEl.value.value = ''
+}
+
+onBeforeUnmount(() => {
+  if (geocodeTimer) clearTimeout(geocodeTimer)
+  if (attachedPreview.value) URL.revokeObjectURL(attachedPreview.value)
+})
+
+// ── Mappers desde la API hacia las tarjetas ──
+const CATEGORY_META: Record<string, { title: string; icon: string; shape: string }> = {
+  inundacion: { title: 'Inundación Callejera', icon: 'water', shape: 'flower' },
+  arbol: { title: 'Árbol Caído', icon: 'tree', shape: '12-sided-cookie' },
+  bloqueo: { title: 'Vía Bloqueada', icon: 'car', shape: 'soft-burst' }
+}
+
+function relativeTime(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime()
+  const mins = Math.floor(ms / 60000)
+  if (mins < 1) return 'Ahora mismo'
+  if (mins < 60) return `Hace ${mins} min`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `Hace ${hrs} hora${hrs === 1 ? '' : 's'}`
+  return new Date(iso).toLocaleDateString('es-DO', { day: 'numeric', month: 'short' })
+}
+
+function mediaKind(url: string): 'image' | 'video' {
+  return /\.(mp4|webm|mov|ogg)$/i.test(url) ? 'video' : 'image'
+}
+
+function mapReporteToCard(r: any): EvidenciaItem {
+  const meta = CATEGORY_META[r.tipo] || CATEGORY_META.inundacion
+  const mediaUrl = r.foto_url ? api.resolveMediaUrl(r.foto_url) : null
+  const tiempo = relativeTime(r.creado_en)
+  const lugar = r.lugar || r.provincia
+  return {
+    id: r.id,
+    categoria: r.tipo,
+    tipo: meta.title,
+    badgeClass: 'bg-zinc-900/90 text-white border border-zinc-700',
+    icon: meta.icon,
+    shape: meta.shape,
+    ubicacion: `${lugar}, ${r.provincia}`,
+    tiempo,
+    descripcion: r.descripcion || 'Reporte ciudadano recibido en tiempo real. Validado con estación meteorológica local.',
+    votos: r.votos_activo,
+    image: mediaUrl && mediaKind(mediaUrl) === 'image' ? mediaUrl : undefined,
+    video: mediaUrl && mediaKind(mediaUrl) === 'video' ? mediaUrl : undefined,
+    weather: getEnrichedEvidenceData(lugar, tiempo, detectProvinceFromText(r.provincia))
+  }
+}
+
+async function loadEvidencias() {
+  isLoading.value = true
+  try {
+    const reportes = await api.getReportes()
+    evidencias.value = reportes.map(mapReporteToCard)
+  } catch {
+    toast.error('No se pudo conectar con el servidor. Revisa que el backend esté activo.')
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const evidencias = ref<EvidenciaItem[]>([])
+
+onMounted(loadEvidencias)
 
 const dynamicFilters = computed(() => {
   return [
@@ -606,7 +786,7 @@ const filteredEvidencias = computed(() => {
   return evidencias.value.filter(e => e.categoria === activeFilter.value)
 })
 
-function toggleVote(id: number, event?: MouseEvent) {
+function toggleVote(id: string, event?: MouseEvent) {
   if (userVotes.value.includes(id)) {
     userVotes.value = userVotes.value.filter(v => v !== id)
   } else {
@@ -617,7 +797,7 @@ function toggleVote(id: number, event?: MouseEvent) {
   }
 }
 
-function toggleWeatherCard(id: number) {
+function toggleWeatherCard(id: string) {
   if (expandedWeatherCards.value.includes(id)) {
     expandedWeatherCards.value = expandedWeatherCards.value.filter(c => c !== id)
   } else {
@@ -642,7 +822,7 @@ function shareReport(item: EvidenciaItem, event?: MouseEvent) {
   }
 }
 
-function triggerCopiedFeedback(id: number, origin?: HTMLElement) {
+function triggerCopiedFeedback(id: string, origin?: HTMLElement) {
   shareSuccessId.value = id
   toast.neutral('Enlace copiado al portapapeles.', { origin })
   setTimeout(() => {
@@ -661,6 +841,7 @@ function openUploadModal(event?: MouseEvent) {
     uploadModalTrigger.value = '#btn-subir-evidencia'
   }
   isUploadModalOpen.value = true
+  captureGPS()
 }
 
 function closeUploadModal() {
@@ -673,58 +854,58 @@ async function submitNewEvidence(event?: any) {
     return
   }
 
-  const itemCategoryMap: Record<string, { title: string; icon: string; shape: string }> = {
-    inundacion: { title: 'Inundación Callejera', icon: 'water', shape: 'flower' },
-    arbol: { title: 'Árbol Caído', icon: 'tree', shape: '12-sided-cookie' },
-    bloqueo: { title: 'Vía Bloqueada', icon: 'car', shape: 'soft-burst' }
-  }
-
-  const meta = itemCategoryMap[newReportType.value] || itemCategoryMap.inundacion
-
-  let timeDisplay = 'Ahora mismo'
-  if (newReportTimeMode.value === '15m') timeDisplay = 'Hace 15 min'
-  else if (newReportTimeMode.value === '30m') timeDisplay = 'Hace 30 min'
-  else if (newReportTimeMode.value === '1h') timeDisplay = 'Hace 1 hora'
-  else if (newReportTimeMode.value === 'custom' && newReportCustomTime.value) timeDisplay = newReportCustomTime.value
-
-  // Automatic weather & alert enrichment by place and hour
-  const enrichedWeather = getEnrichedEvidenceData(
-    newReportLocation.value,
-    timeDisplay,
-    newReportProvince.value
-  )
-
-  const newEvidenceItem: EvidenciaItem = {
-    id: Date.now(),
-    categoria: newReportType.value,
-    tipo: meta.title,
-    badgeClass: 'bg-zinc-900/90 text-white border border-zinc-700',
-    icon: meta.icon,
-    shape: meta.shape,
-    ubicacion: `${newReportLocation.value}, ${enrichedWeather.provinceName}`,
-    tiempo: timeDisplay,
-    descripcion: newReportDescription.value || 'Reporte ciudadano recibido en tiempo real. Validado con estación meteorológica local.',
-    votos: 1,
-    weather: enrichedWeather
-  }
-
+  isSubmitting.value = true
   const originEl = (event?.currentTarget?.$el || event?.currentTarget || (event?.target as HTMLElement)?.closest('button')) as HTMLElement
 
-  evidencias.value.unshift(newEvidenceItem)
-  userVotes.value.push(newEvidenceItem.id)
-  expandedWeatherCards.value.push(newEvidenceItem.id)
+  try {
+    let fotoUrl = ''
+    if (attachedFile.value) {
+      const file = await compressIfNeeded(attachedFile.value)
+      const uploaded = await api.uploadMedia(file)
+      fotoUrl = uploaded.url
+    }
 
-  toast.success(`¡Evidencia publicada y enriquecida con datos de ${enrichedWeather.provinceName}!`, {
-    origin: originEl || undefined
-  })
+    let timeDisplay = 'Ahora mismo'
+    if (newReportTimeMode.value === '15m') timeDisplay = 'Hace 15 min'
+    else if (newReportTimeMode.value === '30m') timeDisplay = 'Hace 30 min'
+    else if (newReportTimeMode.value === '1h') timeDisplay = 'Hace 1 hora'
+    else if (newReportTimeMode.value === 'custom' && newReportCustomTime.value) timeDisplay = newReportCustomTime.value
 
-  await nextTick()
+    const form = new FormData()
+    form.append('tipo', newReportType.value)
+    form.append('ubicacion', newReportLocation.value.trim())
+    form.append('descripcion', newReportDescription.value.trim())
+    form.append('latitud', String(reportLat.value))
+    form.append('longitud', String(reportLng.value))
+    form.append('provincia', PROVINCES_DATA[newReportProvince.value]?.name || 'Distrito Nacional')
+    if (fotoUrl) form.append('foto_url', fotoUrl)
 
-  newReportLocation.value = ''
-  newReportDescription.value = ''
-  newReportCustomTime.value = ''
-  newReportTimeMode.value = 'ahora'
-  closeUploadModal()
+    const creado = await api.postReporte(form)
+    const newEvidenceItem = mapReporteToCard(creado)
+
+    evidencias.value.unshift(newEvidenceItem)
+    userVotes.value.push(newEvidenceItem.id)
+    expandedWeatherCards.value.push(newEvidenceItem.id)
+
+    toast.success(`¡Evidencia publicada y enriquecida con datos de ${creado.provincia}!`, {
+      origin: originEl || undefined
+    })
+
+    await nextTick()
+
+    clearAttachment()
+    newReportLocation.value = ''
+    newReportDescription.value = ''
+    newReportCustomTime.value = ''
+    newReportTimeMode.value = 'ahora'
+    closeUploadModal()
+  } catch {
+    toast.error('No se pudo publicar el reporte. Revisa que el backend esté activo e intenta de nuevo.', {
+      origin: originEl || undefined
+    })
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 // ── Interactive demo helpers for testing physics & animations ──

@@ -71,6 +71,26 @@ python -m venv .venv
 source .venv/bin/activate
 
 pip install -r requirements.txt
+```
+
+**Configurar la base de datos (una sola vez por dev):**
+
+Necesitas un PostgreSQL local (PostGIS opcional). Crea el rol y la base `climard` usando tu superusuario:
+
+```bash
+psql -h localhost -U postgres -f scripts/setup_db.sql
+```
+
+Luego crea tu archivo de entorno local (no se comparte por git):
+
+```bash
+cp .env.example .env
+# Edita DATABASE_URL con tu usuario/contraseña/puerto de PostgreSQL
+```
+
+**Levantar el servidor:**
+
+```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
