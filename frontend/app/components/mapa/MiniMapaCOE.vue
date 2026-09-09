@@ -112,7 +112,7 @@
 
         <div class="flex items-center space-x-2 text-[11px] text-zinc-500 font-medium">
           <AppIcon name="map-pin" class="w-3.5 h-3.5 text-zinc-700" />
-          <span class="hidden sm:inline">Posa o haz clic en una provincia</span>
+          <span class="hidden sm:inline">Pasa el cursor o haz clic sobre una provincia.</span>
         </div>
       </div>
 

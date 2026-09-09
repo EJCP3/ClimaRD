@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     S3_BUCKET: str = "climard-evidencias"
     S3_ACCESS_KEY: str = "minioadmin"
     S3_SECRET_KEY: str = "minioadmin"
+    MEDIA_UPLOAD_DIR: str = "uploads"
+    MAX_UPLOAD_MB: int = 5
 
     class Config:
         env_file = ".env"
