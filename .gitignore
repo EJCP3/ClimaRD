@@ -28,6 +28,9 @@ htmlcov/
 .env.production.local
 !.env.example
 
+# Evidencias subidas por los usuarios (backend)
+backend/uploads/
+
 # IDEs & System
 .vscode/
 .idea/
