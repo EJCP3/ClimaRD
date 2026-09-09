@@ -1,7 +1,46 @@
 <template>
   <div class="p-4 md:p-8 max-w-5xl mx-auto space-y-6">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight">Muro de Evidencias Urbanas</h2>
+        <p class="text-xs sm:text-sm text-zinc-500 mt-1">
+          Reportes ciudadanos verificados en tiempo real ante eventos meteorológicos, inundaciones y vías anegadas.
+        </p>
+      </div>
+
+      <!-- Trigger for Upload Modal -->
+      <AppButton
+        id="btn-subir-evidencia"
+        variant="filled"
+        shape="round"
+        class="self-start sm:self-auto cursor-pointer"
+        @click="openUploadModal($event)"
+      >
+        <template #icon>
+          <AppIcon name="plus" class="w-4 h-4 mr-1.5" />
+        </template>
+        Subir Nueva Evidencia
+      </AppButton>
+    </div>
+
+    <!-- Loading State -->
+    <div v-if="isLoading" class="flex items-center justify-center gap-2.5 py-16 text-zinc-500">
+      <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+      </svg>
+      <span class="text-sm font-semibold">Cargando evidencias...</span>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="!images.length" class="py-16 text-center space-y-2">
+      <AppIcon name="camera" class="w-8 h-8 mx-auto text-zinc-300" />
+      <p class="text-sm font-bold text-zinc-700">Aún no hay evidencias publicadas</p>
+      <p class="text-xs text-zinc-500">Sé el primero en reportar una situación: pulsa «Subir Nueva Evidencia».</p>
+    </div>
+
     <!-- Vue FLIP Image Gallery (Adapted with Wisspop FLIP Modal) -->
-    <div class="gallery-container">
+    <div v-else class="gallery-container">
       <div ref="galleryRef" class="gallery">
         <div
           v-for="(image, id) in images"
@@ -326,20 +365,20 @@
                   <div class="p-3 rounded-xl bg-zinc-50/90 border border-zinc-200/80 space-y-2">
                     <div class="flex items-center justify-between text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                       <span>Condición y Meteorología</span>
-                      <span class="text-zinc-700 font-mono font-black">{{ currentEvidence.weather?.source || 'ONAMET / COE' }}</span>
+                      <span class="text-zinc-700 font-mono font-black">{{ currentEvidence.weather?.conditionText || 'ONAMET / COE' }}</span>
                     </div>
                     <div class="grid grid-cols-3 gap-2 text-center pt-1 border-t border-zinc-200/60">
                       <div class="bg-white rounded-lg p-1.5 border border-zinc-200/60">
                         <span class="text-[9px] text-zinc-400 font-medium block">Temperatura</span>
-                        <span class="text-xs font-black text-zinc-900 font-mono">{{ currentEvidence.weather?.temp || '28°C' }}</span>
+                        <span class="text-xs font-black text-zinc-900 font-mono">{{ currentEvidence.weather ? currentEvidence.weather.temp + '°C' : '28°C' }}</span>
                       </div>
                       <div class="bg-white rounded-lg p-1.5 border border-zinc-200/60">
                         <span class="text-[9px] text-zinc-400 font-medium block">Precipitación</span>
-                        <span class="text-xs font-black text-zinc-900 font-mono">{{ currentEvidence.weather?.rainProbability || '70%' }}</span>
+                        <span class="text-xs font-black text-zinc-900 font-mono">{{ currentEvidence.weather ? currentEvidence.weather.rainChance + '%' : '70%' }}</span>
                       </div>
                       <div class="bg-white rounded-lg p-1.5 border border-zinc-200/60">
                         <span class="text-[9px] text-zinc-400 font-medium block">Viento</span>
-                        <span class="text-xs font-black text-zinc-900 font-mono">{{ currentEvidence.weather?.windSpeed || '18 km/h' }}</span>
+                        <span class="text-xs font-black text-zinc-900 font-mono">{{ currentEvidence.weather ? currentEvidence.weather.wind + ' km/h' : '18 km/h' }}</span>
                       </div>
                     </div>
                   </div>
@@ -489,6 +528,187 @@
         </Transition>
       </Teleport>
     </ClientOnly>
+
+    <!-- Modal Subir Evidencia Ciudadana -->
+    <ClientOnly>
+      <Teleport to="body">
+        <Transition
+          enter-active-class="transition duration-200 ease-out"
+          enter-from-class="opacity-0 scale-95"
+          enter-to-class="opacity-100 scale-100"
+          leave-active-class="transition duration-150 ease-in"
+          leave-from-class="opacity-100 scale-100"
+          leave-to-class="opacity-0 scale-95"
+        >
+          <div
+            v-if="isUploadModalOpen"
+            class="fixed inset-0 z-[99998] flex items-center justify-center p-3 sm:p-5"
+            style="background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);"
+            @click.self="closeUploadModal"
+          >
+            <div class="w-full max-w-xl max-h-[92vh] overflow-y-auto custom-scrollbar bg-white text-zinc-950 rounded-3xl border border-zinc-200/90 shadow-2xl p-4 sm:p-6 select-none">
+              <!-- Header -->
+              <div class="flex items-center justify-between pb-4 border-b border-zinc-100">
+                <div class="flex items-center space-x-2.5">
+                  <AppShape name="flower" size="small">
+                    <AppIcon name="camera" class="w-4 h-4 text-zinc-900" />
+                  </AppShape>
+                  <div>
+                    <h3 class="font-black text-lg text-zinc-950">Subir Evidencia Ciudadana</h3>
+                    <p class="text-xs text-zinc-500">Reporte georreferenciado para la red del COE</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="p-1.5 rounded-full hover:bg-zinc-100 text-zinc-400 hover:text-zinc-800 transition-colors cursor-pointer"
+                  aria-label="Cerrar modal"
+                  @click="closeUploadModal"
+                >
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Body -->
+              <div class="space-y-4 py-4 text-xs text-zinc-800">
+                <!-- 1. Tipo de Incidencia -->
+                <div class="space-y-1.5">
+                  <label class="font-bold text-zinc-900">Tipo de Incidencia:</label>
+                  <select
+                    v-model="newReportType"
+                    class="w-full p-3 rounded-2xl bg-zinc-50 border border-zinc-200/90 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-950"
+                  >
+                    <option value="inundacion">Inundación Callejera / Desborde de Cañada</option>
+                    <option value="arbol">Árbol Caído / Cables de Alta Tensión</option>
+                    <option value="bloqueo">Vía Bloqueada / Vehículos Varados</option>
+                  </select>
+                </div>
+
+                <!-- 2. Provincia -->
+                <div class="space-y-1.5">
+                  <label class="font-bold text-zinc-900">Provincia / Demarcación:</label>
+                  <select
+                    v-model="newReportProvince"
+                    class="w-full p-3 rounded-2xl bg-zinc-50 border border-zinc-200/90 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-950"
+                  >
+                    <option v-for="prov in provinceOptions" :key="prov.slug" :value="prov.slug">
+                      {{ prov.name }} ({{ prov.alerta }})
+                    </option>
+                  </select>
+                </div>
+
+                <!-- 3. Ubicación específica + GPS -->
+                <div class="space-y-1.5">
+                  <label class="font-bold text-zinc-900">Sector, Calle o Vía en RD:</label>
+                  <input
+                    v-model="newReportLocation"
+                    type="text"
+                    placeholder="Ej. Av. Winston Churchill casi 27 de Febrero"
+                    class="w-full p-3 rounded-2xl bg-zinc-50 border border-zinc-200/90 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-950"
+                    @input="handleLocationInput"
+                  />
+                  <div class="flex items-center space-x-1 text-[10px] text-zinc-400 font-medium">
+                    <AppIcon name="map-pin" class="w-3 h-3 text-zinc-500" />
+                    <span>
+                      Punto capturado: {{ reportLat.toFixed(4) }}, {{ reportLng.toFixed(4) }}
+                      <span v-if="isLocating">· localizando...</span>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- 4. Descripción detallada -->
+                <div class="space-y-1.5">
+                  <label class="font-bold text-zinc-900">Descripción detallada de la situación:</label>
+                  <textarea
+                    v-model="newReportDescription"
+                    rows="2"
+                    placeholder="Describe lo que está ocurriendo (nivel de agua, vehículos afectados, postes comprometidos)..."
+                    class="w-full p-3 rounded-2xl bg-zinc-50 border border-zinc-200/90 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-950 resize-none"
+                  ></textarea>
+                </div>
+
+                <!-- 5. Foto / Video con preview y captura móvil -->
+                <div class="space-y-1.5">
+                  <label class="font-bold text-zinc-900">Evidencia multimedia (foto o video):</label>
+                  <input
+                    ref="fileInputEl"
+                    type="file"
+                    accept="image/*,video/*"
+                    capture="environment"
+                    class="hidden"
+                    @change="onFileSelected"
+                  />
+
+                  <div
+                    v-if="attachedPreview"
+                    class="relative rounded-2xl overflow-hidden border border-zinc-200/90 bg-zinc-950"
+                  >
+                    <video
+                      v-if="isAttachedVideo"
+                      :src="attachedPreview"
+                      class="w-full h-44 object-cover"
+                      muted
+                      loop
+                      playsinline
+                      controls
+                    ></video>
+                    <img
+                      v-else
+                      :src="attachedPreview"
+                      class="w-full h-44 object-cover"
+                      alt="Vista previa de la evidencia adjunta"
+                    />
+                    <button
+                      type="button"
+                      @click="clearAttachment"
+                      class="absolute top-2.5 right-2.5 p-1.5 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors cursor-pointer"
+                      title="Quitar archivo"
+                    >
+                      <AppIcon name="close" class="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <button
+                    v-else
+                    type="button"
+                    @click="fileInputEl?.click()"
+                    class="w-full p-3 bg-zinc-50 border border-dashed border-zinc-300 rounded-2xl flex items-center justify-center space-x-2 cursor-pointer hover:bg-zinc-100 hover:border-zinc-400 transition-colors"
+                  >
+                    <AppIcon name="camera" class="w-4 h-4 text-zinc-500" />
+                    <span class="font-semibold text-zinc-600">Adjuntar foto o video capturado</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex items-center justify-end space-x-2.5 pt-4 border-t border-zinc-100">
+                <AppButton variant="text" shape="round" :disabled="isSubmitting" @click="isSubmitting ? null : closeUploadModal()">
+                  Cancelar
+                </AppButton>
+                <AppButton variant="filled" shape="round" :disabled="isSubmitting" @click="submitNewEvidence($event)">
+                  <template #icon>
+                    <svg
+                      v-if="isSubmitting"
+                      class="w-4 h-4 mr-1 animate-spin"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    >
+                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                    </svg>
+                    <AppIcon v-else name="check" class="w-4 h-4 mr-1" />
+                  </template>
+                  {{ isSubmitting ? 'Publicando...' : 'Publicar en el Muro' }}
+                </AppButton>
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </Teleport>
+    </ClientOnly>
   </div>
 </template>
 
@@ -496,14 +716,18 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { toast } from 'super-beautiful-toast'
+import imageCompression from 'browser-image-compression'
 import { WissPopMorph } from 'wisspop/vue'
 import AppIcon from '~/components/AppIcon.vue'
 import AppShape from '~/components/AppShape.vue'
 import AppButton from '~/components/AppButton.vue'
 import { MorphIcon } from 'morphicons/vue'
 import { Copy, Share, Check } from 'lucide'
+import { useApi } from '~/composables/useApi'
 import {
   getEnrichedEvidenceData,
+  detectProvinceFromText,
+  PROVINCES_DATA,
   type EnrichedWeatherData
 } from '~/composables/useWeatherEnrichment'
 
@@ -540,163 +764,92 @@ interface GalleryImageItem {
   weather: EnrichedWeatherData
 }
 
-// ── Realistic Dominican Republic Weather / Urban Evidences ──
-const IMAGES: GalleryImageItem[] = [
-  {
-    id: 0,
-    url: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=1200&q=80',
-    fallbackUrl: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Inundación Urbana',
-    title: 'Acumulación de Agua Pluvial en Calzada',
-    tipo: 'Inundación Urbana',
-    category: 'Inundación Callejera',
-    ubicacion: 'Av. Luperón esq. Gustavo Mejía Ricart, D.N.',
-    ubicacionShort: 'Av. Luperón, D.N.',
-    tiempo: 'Hace 15 min',
-    descripcion: 'Nivel del agua superando la acera e impidiendo el paso de vehículos pequeños tras intensas lluvias en el Distrito Nacional. Drenajes colapsados temporalmente por arrastre de sedimentos.',
-    alerta: 'Alerta Amarilla',
-    alertaShort: 'Amarilla',
-    severity: 'ALTO',
-    badgeBg: 'bg-amber-500',
-    icon: 'water',
-    shape: 'flower',
-    votos: 38,
-    lat: 18.4760,
-    lng: -69.9650,
-    mediaCaption: 'Inundación activa en calzada vehicular',
-    recommendation: 'Evite circular a pie o en vehículos livianos por zonas con anegamiento. Utilice rutas perimetrales elevadas.',
-    weather: getEnrichedEvidenceData('Av. Luperón, Distrito Nacional', 'Hace 15 min')
-  },
-  {
-    id: 1,
-    url: 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=1200&q=80',
-    fallbackUrl: 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Árbol Caído',
-    title: 'Árbol y Tendido Eléctrico Colapsado',
-    tipo: 'Árbol Caído',
-    category: 'Obstáculo en Vía',
-    ubicacion: 'Calle Las Damas esq. El Conde, Zona Colonial, D.N.',
-    ubicacionShort: 'Zona Colonial, D.N.',
-    tiempo: 'Hace 32 min',
-    descripcion: 'Caída de rama mayor sobre cableado eléctrico y calzada histórica. Paso peatonal bloqueado preventivamente por brigadas de auxilio.',
-    alerta: 'Alerta Amarilla',
-    alertaShort: 'Amarilla',
-    severity: 'ALTO',
-    badgeBg: 'bg-amber-500',
-    icon: 'tree',
-    shape: '12-sided-cookie',
-    votos: 24,
-    lat: 18.4710,
-    lng: -69.8850,
-    mediaCaption: 'Árbol y tendido sobre la vía pública',
-    recommendation: 'Peligro inminente de electrocución: mantenga distancia prudencial de cables en el suelo. Unidad de rescate en camino.',
-    weather: getEnrichedEvidenceData('Calle El Conde, Distrito Nacional', 'Hace 32 min')
-  },
-  {
-    id: 2,
-    url: 'https://images.unsplash.com/photo-1517483000871-1dbf64a6e1c6?auto=format&fit=crop&w=1200&q=80',
-    fallbackUrl: 'https://images.unsplash.com/photo-1517483000871-1dbf64a6e1c6?auto=format&fit=crop&w=1200&q=80',
-    video: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-    alt: 'Vía Anegada y Tránsito',
-    title: 'Tránsito Paralizado por Vaguada Severa',
-    tipo: 'Vía Anegada y Tránsito',
-    category: 'Vía Bloqueada',
-    ubicacion: 'Av. 27 de Febrero esq. Winston Churchill, D.N.',
-    ubicacionShort: 'Av. 27 de Febrero, D.N.',
-    tiempo: 'Hace 48 min',
-    descripcion: 'Congestionamiento vehicular crítico debido al escurrimiento superficial pluvial en el paso a desnivel y carriles centrales. Vehículos transitando con lentitud.',
-    alerta: 'Alerta Amarilla',
-    alertaShort: 'Amarilla',
-    severity: 'MEDIO',
-    badgeBg: 'bg-amber-500',
-    icon: 'car',
-    shape: 'soft-burst',
-    votos: 47,
-    lat: 18.4680,
-    lng: -69.9400,
-    mediaCaption: 'Video del reporte en vivo del tránsito',
-    recommendation: 'Siga las indicaciones de los agentes de DIGESETT y tome desvíos preventivos por vías alternas despejadas.',
-    weather: getEnrichedEvidenceData('Av. 27 de Febrero con Churchill, Distrito Nacional', 'Hace 48 min')
-  },
-  {
-    id: 3,
-    url: 'https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?auto=format&fit=crop&w=1200&q=80',
-    fallbackUrl: 'https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?auto=format&fit=crop&w=1200&q=80',
-    video: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-    alt: 'Crecida de Cañada',
-    title: 'Monitoreo de Talud y Desborde Ozama',
-    tipo: 'Crecida de Cañada',
-    category: 'Derrumbe / Grieta',
-    ubicacion: 'Margen Río Ozama, Sector La Ciénaga, D.N.',
-    ubicacionShort: 'La Ciénaga, D.N.',
-    tiempo: 'Hace 1 hora',
-    descripcion: 'Aumento súbito del caudal de la cañada y saturación hídrica del talud. Brigadas comunitarias y de la Defensa Civil monitorean evacuaciones en zonas bajas.',
-    alerta: 'Alerta Roja',
-    alertaShort: 'Roja',
-    severity: 'EXTREMO',
-    badgeBg: 'bg-rose-600',
-    icon: 'alert-triangle',
-    shape: 'burst',
-    votos: 63,
-    lat: 18.4890,
-    lng: -69.8890,
-    mediaCaption: 'Monitoreo preventivo de estabilidad geotécnica',
-    recommendation: 'Alerta máxima en ribera de río. Evacuación preventiva obligatoria para familias en bordes vulnerables.',
-    weather: getEnrichedEvidenceData('La Ciénaga, Distrito Nacional', 'Hace 1 hora')
-  },
-  {
-    id: 4,
-    url: 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&w=1200&q=80',
-    fallbackUrl: 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Oleaje Anómalo',
-    title: 'Oleaje Anómalo y Rompiente en Calzada',
-    tipo: 'Oleaje Anómalo',
-    category: 'Condición Costera',
-    ubicacion: 'Av. George Washington (Malecón), Santo Domingo, D.N.',
-    ubicacionShort: 'Malecón, D.N.',
-    tiempo: 'Hace 1 hora y media',
-    descripcion: 'Fuerte resaca marina y olas sobrepasando el muro del malecón con proyección de agua y escombros. Tránsito restringido en el carril sur.',
-    alerta: 'Alerta Amarilla',
-    alertaShort: 'Amarilla',
-    severity: 'ALTO',
-    badgeBg: 'bg-amber-500',
-    icon: 'cloud-rain',
-    shape: 'flower',
-    votos: 35,
-    lat: 18.4620,
-    lng: -69.9120,
-    mediaCaption: 'Rompiente sobrepasando el muro perimetral',
-    recommendation: 'Prohibido el acercamiento al arrecife o calzada. Conductores deben desviar hacia la Av. Independencia.',
-    weather: getEnrichedEvidenceData('Malecón, Distrito Nacional', 'Hace 1 hora y media')
-  },
-  {
-    id: 5,
-    url: 'https://images.unsplash.com/photo-1498084393753-b411b2d26b34?auto=format&fit=crop&w=1200&q=80',
-    fallbackUrl: 'https://images.unsplash.com/photo-1498084393753-b411b2d26b34?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Ráfagas y Aguaceros',
-    title: 'Ráfagas y Aguaceros en Autopista Duarte',
-    tipo: 'Ráfagas y Aguaceros',
-    category: 'Visibilidad Reducida',
-    ubicacion: 'Autopista Duarte km 8, Entrada Santiago de los Caballeros',
-    ubicacionShort: 'Autopista Duarte, Santiago',
-    tiempo: 'Hace 2 horas',
-    descripcion: 'Aguaceros dispersos de moderada a fuerte intensidad acompañados de ráfagas de viento. Pavimento altamente resbaladizo.',
-    alerta: 'Alerta Verde',
-    alertaShort: 'Verde',
-    severity: 'MEDIO',
-    badgeBg: 'bg-emerald-600',
-    icon: 'wind',
-    shape: 'soft-burst',
-    votos: 21,
-    lat: 19.4517,
-    lng: -70.6970,
-    mediaCaption: 'Precipitación y viento en autopista interurbana',
-    recommendation: 'Reduzca la velocidad a menos de 60 km/h, encienda luces intermitentes y mantenga distancia de seguridad.',
-    weather: getEnrichedEvidenceData('Santiago', 'Hace 2 horas', 'santiago')
-  }
-]
+// ── Datos reales desde el backend (Clima RD API) ──
+const api = useApi()
+const images = ref<GalleryImageItem[]>([])
+const isLoading = ref(false)
 
-const images = ref<GalleryImageItem[]>([...IMAGES])
+const CATEGORY_META: Record<string, { title: string; icon: string; shape: string }> = {
+  inundacion: { title: 'Inundación Callejera', icon: 'water', shape: 'flower' },
+  arbol: { title: 'Árbol Caído', icon: 'tree', shape: '12-sided-cookie' },
+  bloqueo: { title: 'Vía Bloqueada', icon: 'car', shape: 'soft-burst' }
+}
+
+// Poster de respaldo cuando el reporte es un video (la miniatura de la galería es una imagen)
+const VIDEO_POSTER = 'https://images.unsplash.com/photo-1517483000871-1dbf64a6e1c6?auto=format&fit=crop&w=1200&q=80'
+
+function relativeTime(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime()
+  const mins = Math.floor(ms / 60000)
+  if (mins < 1) return 'Ahora mismo'
+  if (mins < 60) return `Hace ${mins} min`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `Hace ${hrs} hora${hrs === 1 ? '' : 's'}`
+  return new Date(iso).toLocaleDateString('es-DO', { day: 'numeric', month: 'short' })
+}
+
+function mediaKind(url: string): 'image' | 'video' {
+  return /\.(mp4|webm|mov|ogg)$/i.test(url) ? 'video' : 'image'
+}
+
+function alertMeta(alerta?: string): { texto: string; corta: 'Roja' | 'Amarilla' | 'Verde' | 'Normal'; badgeBg: string; severity: 'EXTREMO' | 'ALTO' | 'MEDIO' | 'BAJO' } {
+  if (alerta === 'ROJA') return { texto: 'Alerta Roja', corta: 'Roja', badgeBg: 'bg-rose-600', severity: 'EXTREMO' }
+  if (alerta === 'AMARILLA') return { texto: 'Alerta Amarilla', corta: 'Amarilla', badgeBg: 'bg-amber-500', severity: 'ALTO' }
+  if (alerta === 'VERDE') return { texto: 'Alerta Verde', corta: 'Verde', badgeBg: 'bg-emerald-600', severity: 'MEDIO' }
+  return { texto: 'Normal', corta: 'Normal', badgeBg: 'bg-zinc-600', severity: 'BAJO' }
+}
+
+function mapReporteToCard(r: any): GalleryImageItem {
+  const meta = CATEGORY_META[r.tipo] || CATEGORY_META.inundacion
+  const mediaUrl = r.foto_url ? api.resolveMediaUrl(r.foto_url) : null
+  const kind = mediaUrl ? mediaKind(mediaUrl) : 'image'
+  const lugar = r.lugar || r.provincia
+  const tiempo = relativeTime(r.creado_en)
+  const enriched = getEnrichedEvidenceData(lugar, tiempo, detectProvinceFromText(r.provincia))
+  const alerta = alertMeta(enriched.alerta)
+
+  return {
+    id: r.id,
+    url: kind === 'video' ? VIDEO_POSTER : (mediaUrl || VIDEO_POSTER),
+    fallbackUrl: VIDEO_POSTER,
+    alt: meta.title,
+    title: `${meta.title} en ${lugar}`,
+    tipo: meta.title,
+    category: meta.title,
+    ubicacion: `${lugar}, ${r.provincia}`,
+    ubicacionShort: r.provincia,
+    tiempo,
+    descripcion: r.descripcion || 'Reporte ciudadano recibido en tiempo real y validado con la estación meteorológica local.',
+    alerta: alerta.texto,
+    alertaShort: alerta.corta,
+    severity: alerta.severity,
+    badgeBg: alerta.badgeBg,
+    icon: meta.icon,
+    shape: meta.shape,
+    votos: r.votos_activo,
+    lat: r.latitud,
+    lng: r.longitud,
+    video: kind === 'video' ? mediaUrl : undefined,
+    mediaCaption: kind === 'video' ? 'Video del reporte en vivo' : undefined,
+    recommendation: enriched.advisoryText,
+    weather: enriched
+  }
+}
+
+async function loadEvidencias() {
+  isLoading.value = true
+  try {
+    const reportes = await api.getReportes()
+    images.value = reportes.map(mapReporteToCard)
+    await nextTick()
+    initGalleryClasses()
+  } catch {
+    toast.error('No se pudo conectar con el servidor. Revisa que el backend esté activo.')
+  } finally {
+    isLoading.value = false
+  }
+}
+
 const galleryRef = ref<HTMLElement | null>(null)
 const selectedImageId = ref<number>(0)
 const userVotes = ref<Array<number | string>>([])
@@ -797,6 +950,19 @@ function selectImage(id: number) {
   })
 }
 
+function initGalleryClasses() {
+  if (!galleryRef.value) return
+  const wrappers = galleryRef.value.querySelectorAll<HTMLElement>(`.${WRAPPER_SELECTOR}`)
+  wrappers.forEach((child, i) => {
+    child.style.transform = DEFAULT_TRANSFORM
+    if (i === selectedImageId.value) {
+      child.classList.add(CURRENT_WRAPPER)
+    } else {
+      child.classList.remove(CURRENT_WRAPPER)
+    }
+  })
+}
+
 function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape' && isLightboxOpen.value) {
     e.stopPropagation()
@@ -809,17 +975,8 @@ onMounted(async () => {
     window.addEventListener('keydown', handleKeydown)
   }
   await nextTick()
-  if (galleryRef.value) {
-    const wrappers = galleryRef.value.querySelectorAll<HTMLElement>(`.${WRAPPER_SELECTOR}`)
-    wrappers.forEach((child, i) => {
-      child.style.transform = DEFAULT_TRANSFORM
-      if (i === selectedImageId.value) {
-        child.classList.add(CURRENT_WRAPPER)
-      } else {
-        child.classList.remove(CURRENT_WRAPPER)
-      }
-    })
-  }
+  initGalleryClasses()
+  loadEvidencias()
 })
 
 function onImageError(index: number) {
@@ -868,13 +1025,6 @@ function onModalClosed() {
 
 onBeforeRouteLeave(() => {
   closeDetailModal()
-})
-
-onBeforeUnmount(() => {
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('keydown', handleKeydown)
-  }
-  if (copyTimeout) clearTimeout(copyTimeout)
 })
 
 function copyCoordinates(item?: GalleryImageItem) {
@@ -998,6 +1148,177 @@ function triggerCopiedFeedback(id: number | string, origin?: HTMLElement) {
     }
   }, 2500)
 }
+
+// ── Upload Evidence Modal ──
+const isUploadModalOpen = ref(false)
+const isSubmitting = ref(false)
+const fileInputEl = ref<HTMLInputElement | null>(null)
+const attachedFile = ref<File | null>(null)
+const attachedPreview = ref<string | null>(null)
+const isAttachedVideo = ref(false)
+
+const newReportType = ref('inundacion')
+const newReportProvince = ref('distrito-nacional')
+const newReportLocation = ref('')
+const newReportDescription = ref('')
+
+// Geolocation
+const reportLat = ref(18.4861)
+const reportLng = ref(-69.9312)
+const isLocating = ref(false)
+
+const provinceOptions = computed(() => {
+  return Object.values(PROVINCES_DATA).map(p => ({
+    name: p.name,
+    slug: p.slug,
+    alerta: p.alerta
+  })).sort((a, b) => a.name.localeCompare(b.name))
+})
+
+// Auto-detect province + geocode when typing location in modal
+let geocodeTimer: ReturnType<typeof setTimeout> | null = null
+function handleLocationInput() {
+  if (newReportLocation.value.length > 3) {
+    const detectedSlug = detectProvinceFromText(newReportLocation.value)
+    if (detectedSlug && detectedSlug !== 'distrito-nacional') {
+      newReportProvince.value = detectedSlug
+    }
+  }
+
+  if (newReportLocation.value.trim().length >= 5) {
+    if (geocodeTimer) clearTimeout(geocodeTimer)
+    geocodeTimer = setTimeout(geocodeLocation, 900)
+  }
+}
+
+async function geocodeLocation() {
+  const q = newReportLocation.value.trim()
+  if (q.length < 5) return
+  isLocating.value = true
+  try {
+    const results = await $fetch<Array<{ lat: string; lon: string }>>(
+      'https://nominatim.openstreetmap.org/search',
+      {
+        query: { q: `${q}, República Dominicana`, format: 'json', limit: 1 }
+      }
+    )
+    if (results.length) {
+      reportLat.value = parseFloat(results[0].lat)
+      reportLng.value = parseFloat(results[0].lon)
+    }
+  } catch {
+    /* si el geocoding no está disponible, se mantiene el punto capturado */
+  } finally {
+    isLocating.value = false
+  }
+}
+
+function captureGPS() {
+  if (!navigator.geolocation) return
+  isLocating.value = true
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      reportLat.value = pos.coords.latitude
+      reportLng.value = pos.coords.longitude
+      isLocating.value = false
+    },
+    () => {
+      isLocating.value = false
+    },
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
+  )
+}
+
+function onFileSelected(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  if (file.size > 5 * 1024 * 1024 && !file.type.startsWith('image/')) {
+    toast.warning('El video excede el límite de 5MB. Intenta uno más corto.')
+    return
+  }
+  attachedFile.value = file
+  attachedPreview.value = URL.createObjectURL(file)
+  isAttachedVideo.value = file.type.startsWith('video/')
+}
+
+async function compressIfNeeded(file: File): Promise<File> {
+  if (!file.type.startsWith('image/') || file.size <= 5 * 1024 * 1024) return file
+  return imageCompression(file, { maxSizeMB: 5, useWebWorker: true })
+}
+
+function clearAttachment() {
+  if (attachedPreview.value) URL.revokeObjectURL(attachedPreview.value)
+  attachedFile.value = null
+  attachedPreview.value = null
+  isAttachedVideo.value = false
+  if (fileInputEl.value) fileInputEl.value.value = ''
+}
+
+function openUploadModal(event?: MouseEvent) {
+  isUploadModalOpen.value = true
+  captureGPS()
+}
+
+function closeUploadModal() {
+  isUploadModalOpen.value = false
+}
+
+async function submitNewEvidence() {
+  if (!newReportLocation.value.trim()) {
+    toast.warning('Por favor ingresa la ubicación o sector del incidente.')
+    return
+  }
+
+  isSubmitting.value = true
+
+  try {
+    let fotoUrl = ''
+    if (attachedFile.value) {
+      const file = await compressIfNeeded(attachedFile.value)
+      const uploaded = await api.uploadMedia(file)
+      fotoUrl = uploaded.url
+    }
+
+    const form = new FormData()
+    form.append('tipo', newReportType.value)
+    form.append('ubicacion', newReportLocation.value.trim())
+    form.append('descripcion', newReportDescription.value.trim())
+    form.append('latitud', String(reportLat.value))
+    form.append('longitud', String(reportLng.value))
+    form.append('provincia', PROVINCES_DATA[newReportProvince.value]?.name || 'Distrito Nacional')
+    if (fotoUrl) form.append('foto_url', fotoUrl)
+
+    const creado = await api.postReporte(form)
+    const newEvidenceItem = mapReporteToCard(creado)
+
+    images.value.unshift(newEvidenceItem)
+    userVotes.value.push(newEvidenceItem.id)
+
+    await nextTick()
+    selectedImageId.value = 0
+    initGalleryClasses()
+
+    toast.success(`¡Evidencia publicada y enriquecida con datos de ${creado.provincia}!`)
+
+    clearAttachment()
+    newReportLocation.value = ''
+    newReportDescription.value = ''
+    closeUploadModal()
+  } catch {
+    toast.error('No se pudo publicar el reporte. Revisa que el backend esté activo e intenta de nuevo.')
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('keydown', handleKeydown)
+  }
+  if (copyTimeout) clearTimeout(copyTimeout)
+  if (geocodeTimer) clearTimeout(geocodeTimer)
+  if (attachedPreview.value) URL.revokeObjectURL(attachedPreview.value)
+})
 </script>
 
 <style scoped>
