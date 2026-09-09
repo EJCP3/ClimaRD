@@ -35,27 +35,6 @@
             </span>
           </div>
 
-          <!-- Video Indicator Badge (Top Right) -->
-          <div
-            v-if="image.video && selectedImageId !== id"
-            class="gallery__video-badge hidden sm:block absolute top-2.5 right-2.5 z-10 pointer-events-none"
-          >
-            <span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-black/75 text-white shadow-xs">
-              <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
-              <span>VIDEO</span>
-            </span>
-          </div>
-
-          <!-- Top-Right Expand Cue on Hero Card -->
-          <div
-            v-if="selectedImageId === id"
-            class="gallery__expand-badge hidden sm:block"
-          >
-            <span class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/75 hover:bg-black/90 text-white transition-all shadow-xs backdrop-blur-xs">
-              <AppIcon :name="image.video ? 'video' : 'maximize-2'" class="w-3 h-3" />
-              <span>{{ image.video ? 'Ver Video y Reporte' : 'Ver Detalles' }}</span>
-            </span>
-          </div>
 
           <!-- Bottom Caption Overlay -->
           <div class="gallery__caption">
@@ -1121,14 +1100,6 @@ function triggerCopiedFeedback(id: number | string, origin?: HTMLElement) {
   pointer-events: none;
 }
 
-.gallery__expand-badge {
-  position: absolute;
-  top: 0.625rem;
-  right: 0.625rem;
-  z-index: 2;
-  pointer-events: none;
-}
-
 /* Bottom Caption */
 .gallery__caption {
   position: absolute;
@@ -1191,8 +1162,6 @@ function triggerCopiedFeedback(id: number | string, origin?: HTMLElement) {
 
   /* Limpiar imagen en móvil: ocultar todas las etiquetas y dejar únicamente el título */
   .gallery__top-badge,
-  .gallery__video-badge,
-  .gallery__expand-badge,
   .gallery__caption-loc {
     display: none !important;
   }

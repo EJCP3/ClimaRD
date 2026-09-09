@@ -8,48 +8,38 @@
       </p>
     </div>
 
-    <!-- Alert Level Legend (Cards with AppShape) -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-      <!-- Roja -->
-      <div class="p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-4 shadow-sm">
-        <AppShape name="burst" size="medium" class="shrink-0">
-          <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
+    <!-- Alert Level Legend (Cards with AppShape ordered from menor a mayor) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+      <!-- 1. Sin Alerta (Menor alerta -> Mínimo detalle: Círculo limpio y sereno) -->
+      <div class="p-4 sm:p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-3.5 shadow-sm">
+        <AppShape name="circle" size="medium" class="shrink-0">
+          <AppIcon name="sun" class="w-6 h-6 text-zinc-900" />
         </AppShape>
-        <div>
-          <div class="flex items-center space-x-2">
-            <h4 class="text-sm font-extrabold text-zinc-950">Alerta Roja</h4>
-            <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">Extremo</span>
-          </div>
-          <p class="text-[11px] text-zinc-500 mt-1 leading-snug">Evacuación preventiva en zonas de alta vulnerabilidad.</p>
-        </div>
+        <h4 class="text-sm font-extrabold text-zinc-950">Sin Alerta</h4>
       </div>
 
-      <!-- Amarilla -->
-      <div class="p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-4 shadow-sm">
+      <!-- 2. Alerta Verde (Alerta baja -> Detalle suave: 8 pétalos) -->
+      <div class="p-4 sm:p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-3.5 shadow-sm">
+        <AppShape name="flower-8" size="medium" class="shrink-0">
+          <AppIcon name="shield" class="w-6 h-6 text-zinc-900" />
+        </AppShape>
+        <h4 class="text-sm font-extrabold text-zinc-950">Alerta Verde</h4>
+      </div>
+
+      <!-- 3. Alerta Amarilla (Alerta media -> Detalle intermedio: 12 pétalos) -->
+      <div class="p-4 sm:p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-3.5 shadow-sm">
         <AppShape name="12-sided-cookie" size="medium" class="shrink-0">
           <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
         </AppShape>
-        <div>
-          <div class="flex items-center space-x-2">
-            <h4 class="text-sm font-extrabold text-zinc-950">Alerta Amarilla</h4>
-            <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Vigilancia</span>
-          </div>
-          <p class="text-[11px] text-zinc-500 mt-1 leading-snug">Preparación activa. Crecidas de ríos y cañadas.</p>
-        </div>
+        <h4 class="text-sm font-extrabold text-zinc-950">Alerta Amarilla</h4>
       </div>
 
-      <!-- Verde -->
-      <div class="p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-4 shadow-sm">
-        <AppShape name="flower" size="medium" class="shrink-0">
-          <AppIcon name="shield" class="w-6 h-6 text-zinc-900" />
+      <!-- 4. Alerta Roja (Mayor alerta -> Máximo detalle: 16 picos explosivos) -->
+      <div class="p-4 sm:p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-3.5 shadow-sm">
+        <AppShape name="burst" size="medium" class="shrink-0">
+          <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
         </AppShape>
-        <div>
-          <div class="flex items-center space-x-2">
-            <h4 class="text-sm font-extrabold text-zinc-950">Alerta Verde</h4>
-            <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Atención</span>
-          </div>
-          <p class="text-[11px] text-zinc-500 mt-1 leading-snug">Monitoreo continuo ante cambios meteorológicos.</p>
-        </div>
+        <h4 class="text-sm font-extrabold text-zinc-950">Alerta Roja</h4>
       </div>
     </div>
 

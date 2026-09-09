@@ -112,6 +112,30 @@
       </span>
     </div>
 
+    <!-- User Zone Focus Pill -->
+    <div
+      v-if="userProfile.hasCompletedOnboarding"
+      class="absolute z-20 flex items-center space-x-2 bg-white/95 backdrop-blur-xl px-3 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300"
+      :class="[
+        isBonita
+          ? 'top-16 left-4 sm:left-6'
+          : (tickerPosition === 'top' ? 'top-16 sm:top-20 left-4 sm:left-6' : 'top-4 left-4 sm:left-6')
+      ]"
+    >
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="text-xs font-bold text-zinc-900 truncate max-w-[140px] sm:max-w-[200px]">
+        {{ userProfile.zone }}, {{ userProfile.provinceName }}
+      </span>
+      <button
+        type="button"
+        @click="focusUserZone"
+        class="text-[10px] font-black uppercase text-zinc-600 hover:text-zinc-950 bg-zinc-100 hover:bg-zinc-200 px-2 py-0.5 rounded-full transition-colors cursor-pointer"
+        title="Reenfocar cámara en mi zona"
+      >
+        Enfocar
+      </button>
+    </div>
+
     <!-- Map Container -->
     <div
       ref="mapContainer"
@@ -299,9 +323,11 @@ import postalCodes from '~/assets/data/codigos-postales-rd.json'
 import drMaskData from '~/assets/data/dr-mask.json'
 import drBorderData from '~/assets/data/dr-border.json'
 import { useAppearance } from '~/composables/useAppearance'
+import { useUserProfile } from '~/composables/useUserProfile'
 import { toast } from 'super-beautiful-toast'
 
 const { navStyle, tickerPosition } = useAppearance()
+const { userProfile, initProfile } = useUserProfile()
 const isBonita = computed(() => navStyle.value === 'bonita')
 
 const mapContainer = ref<HTMLElement | null>(null)
@@ -616,6 +642,17 @@ function fitDominicanRepublic() {
   )
 }
 
+function focusUserZone() {
+  if (!mapInstance || !userProfile.value.coordinates) return
+  mapInstance.flyTo({
+    center: [userProfile.value.coordinates.lng, userProfile.value.coordinates.lat],
+    zoom: 14.2,
+    essential: true,
+    speed: 1.2
+  })
+  toast.info(`Enfocando en ${userProfile.value.zone || 'tu sector'}, ${userProfile.value.provinceName}`)
+}
+
 function getMaskColors() {
   if (currentLayer.value === 'dark') {
     return {
@@ -871,12 +908,19 @@ function renderMarkers(map: maplibregl.Map) {
 onMounted(() => {
   if (!mapContainer.value) return
 
+  initProfile()
+  const hasCustomLocation = userProfile.value.coordinates && userProfile.value.hasCompletedOnboarding
+  const startCenter: [number, number] = hasCustomLocation
+    ? [userProfile.value.coordinates.lng, userProfile.value.coordinates.lat]
+    : [-69.942, 18.485]
+  const startZoom = hasCustomLocation ? 14.0 : 12.0
+
   // Initialize MapLibre with strict Dominican Republic boundaries & mask
   const map = new maplibregl.Map({
     container: mapContainer.value,
     style: MAP_STYLES.light as any,
-    center: [-69.942, 18.485], // Santo Domingo
-    zoom: 12.0,
+    center: startCenter,
+    zoom: startZoom,
     minZoom: 7.2,              // No permite alejarse más allá del territorio dominicano
     maxZoom: 19,
     maxBounds: [

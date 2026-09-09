@@ -138,6 +138,12 @@
       <polyline points="12 5 19 12 12 19" />
     </template>
 
+    <!-- arrow-left -->
+    <template v-else-if="name === 'arrow-left'">
+      <line x1="19" x2="5" y1="12" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
+    </template>
+
     <!-- close -->
     <template v-else-if="name === 'close' || name === 'x'">
       <line x1="18" x2="6" y1="6" y2="18" />
@@ -271,9 +277,100 @@
       <path d="m9 18 6-6-6-6" />
     </template>
 
+    <!-- chevron-up -->
+    <template v-else-if="name === 'chevron-up'">
+      <path d="m18 15-6-6-6 6" />
+    </template>
+
+    <!-- chevron-down -->
+    <template v-else-if="name === 'chevron-down'">
+      <path d="m6 9 6 6 6-6" />
+    </template>
+
     <!-- maximize / focus -->
     <template v-else-if="name === 'maximize' || name === 'focus'">
       <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+    </template>
+
+    <!-- user / profile -->
+    <template v-else-if="name === 'user' || name === 'profile'">
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </template>
+
+    <!-- menu / drawer -->
+    <template v-else-if="name === 'menu' || name === 'drawer'">
+      <line x1="4" x2="20" y1="12" y2="12" />
+      <line x1="4" x2="20" y1="6" y2="6" />
+      <line x1="4" x2="20" y1="18" y2="18" />
+    </template>
+
+    <!-- zap / electricity / blackouts -->
+    <template v-else-if="name === 'zap' || name === 'flash' || name === 'power'">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </template>
+
+    <!-- sliders / options -->
+    <template v-else-if="name === 'sliders'">
+      <line x1="4" x2="4" y1="21" y2="14" />
+      <line x1="4" x2="4" y1="10" y2="3" />
+      <line x1="12" x2="12" y1="21" y2="12" />
+      <line x1="12" x2="12" y1="8" y2="3" />
+      <line x1="20" x2="20" y1="21" y2="16" />
+      <line x1="20" x2="20" y1="12" y2="3" />
+      <line x1="1" x2="7" y1="14" y2="14" />
+      <line x1="9" x2="15" y1="8" y2="8" />
+      <line x1="17" x2="23" y1="16" y2="16" />
+    </template>
+
+    <!-- edit -->
+    <template v-else-if="name === 'edit'">
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+      <path d="m15 5 4 4" />
+    </template>
+
+    <!-- trash -->
+    <template v-else-if="name === 'trash'">
+      <path d="M3 6h18" />
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+    </template>
+
+    <!-- rocket / suscripción -->
+    <template v-else-if="name === 'rocket'">
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+    </template>
+
+    <!-- grid / general -->
+    <template v-else-if="name === 'grid'">
+      <rect width="4" height="4" x="3" y="3" rx="1"/>
+      <rect width="4" height="4" x="10" y="3" rx="1"/>
+      <rect width="4" height="4" x="17" y="3" rx="1"/>
+      <rect width="4" height="4" x="3" y="10" rx="1"/>
+      <rect width="4" height="4" x="10" y="10" rx="1"/>
+      <rect width="4" height="4" x="17" y="10" rx="1"/>
+      <rect width="4" height="4" x="3" y="17" rx="1"/>
+      <rect width="4" height="4" x="10" y="17" rx="1"/>
+      <rect width="4" height="4" x="17" y="17" rx="1"/>
+    </template>
+
+    <!-- agent / bot -->
+    <template v-else-if="name === 'agent' || name === 'bot' || name === 'brain'">
+      <path d="M12 8V4H8"/>
+      <rect width="16" height="12" x="4" y="8" rx="2"/>
+      <path d="M2 14h2"/>
+      <path d="M20 14h2"/>
+      <path d="M15 13v2"/>
+      <path d="M9 13v2"/>
+    </template>
+
+    <!-- badge-check / verificado -->
+    <template v-else-if="name === 'badge-check' || name === 'verified'">
+      <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+      <path d="m9 12 2 2 4-4" />
     </template>
 
     <!-- default/fallback -->

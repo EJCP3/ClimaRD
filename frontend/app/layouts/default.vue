@@ -65,6 +65,16 @@
         </button>
 
         <button
+          id="nav-dropdown-btn-clasica"
+          type="button"
+          @click.prevent="openProfileModal('#nav-dropdown-btn-clasica')"
+          class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-full text-sm font-bold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer text-left"
+        >
+          <AppIcon name="user" class="w-5 h-5 shrink-0 text-zinc-600" />
+          <span class="flex-1">{{ userProfile.hasCompletedOnboarding ? `Mi Perfil (${userProfile.zone})` : 'Mi Perfil y Zona' }}</span>
+        </button>
+
+        <button
           id="appearance-sidebar-btn-clasica"
           type="button"
           @click.prevent="openAppearanceModal($event)"
@@ -127,6 +137,17 @@
         >
           <AppIcon name="alert-triangle" class="w-5 h-5 shrink-0" />
           <span class="text-[10px] mt-1 leading-tight tracking-tight">Reportar</span>
+        </button>
+
+        <button
+          id="nav-dropdown-btn-guapa"
+          type="button"
+          @click.prevent="handleOpenNavDropdown('#nav-dropdown-btn-guapa')"
+          class="flex flex-col items-center justify-center w-14 py-2 rounded-2xl transition-all cursor-pointer group select-none text-zinc-600 hover:text-zinc-950 hover:bg-zinc-50"
+          title="Opciones"
+        >
+          <AppIcon name="menu" class="w-5 h-5 shrink-0" />
+          <span class="text-[10px] mt-1 leading-tight tracking-tight">Opciones</span>
         </button>
 
         <button
@@ -246,31 +267,16 @@
 
         <span class="w-px h-4 bg-zinc-200/80 mx-1"></span>
 
-        <!-- Quick Reportar Button inside Nav -->
-        <AppButton
-          id="nav-report-btn-tasks"
-          class="nav-report-btn"
-          variant="filled"
-          shape="round"
-          size="small"
-          @click="handleReportNav('#nav-report-btn-tasks')"
-        >
-          <template #icon>
-            <AppIcon name="alert-triangle" class="w-3.5 h-3.5 mr-1" />
-          </template>
-          Reportar
-        </AppButton>
-
-        <!-- Quick Appearance Button inside Nav -->
+        <!-- Actions Dropdown Button (Perfil, Reportar, Apariencia) -->
         <button
-          id="appearance-tasks-trigger-btn"
+          id="nav-dropdown-btn-tasks"
           type="button"
-          @click.stop="openAppearanceModal($event)"
+          @click.stop="handleOpenNavDropdown('#nav-dropdown-btn-tasks')"
           class="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 flex items-center justify-center transition-all cursor-pointer group"
-          title="Personalizar Apariencia y Titular"
-          aria-label="Personalizar apariencia"
+          title="Opciones"
+          aria-label="Opciones"
         >
-          <AppIcon name="palette" class="w-3.5 h-3.5 text-zinc-900 group-hover:rotate-12 transition-transform" />
+          <AppIcon name="menu" class="w-3.5 h-3.5 text-zinc-900 group-hover:scale-110 transition-transform" />
         </button>
       </div>
 
@@ -320,27 +326,17 @@
         <!-- Vertical Divider -->
         <span class="w-px h-4 bg-zinc-200 mx-0.5"></span>
 
-        <!-- Quick Reportar Button (High-Contrast Solid Dark Pill) -->
+        <!-- Upward Dropdown / Select Button (Perfil, Reporta, Apariencia) -->
         <button
-          id="nav-report-btn-bonita"
+          id="nav-dropdown-btn-bonita"
           type="button"
-          class="nav-report-btn flex items-center space-x-1.5 bg-zinc-950 text-white hover:bg-zinc-800 active:scale-95 font-black text-xs px-3.5 py-1.5 rounded-full shadow-sm transition-all cursor-pointer"
-          @click="handleReportNav('#nav-report-btn-bonita')"
+          @click.stop="handleOpenNavDropdown('#nav-dropdown-btn-bonita')"
+          class="flex items-center space-x-1.5 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-white font-bold text-xs px-3.5 py-1.5 rounded-full shadow-sm transition-all cursor-pointer group"
+          title="Opciones"
+          aria-label="Opciones"
         >
-          <AppIcon name="alert-triangle" class="w-3.5 h-3.5 text-white" />
-          <span>Reportar</span>
-        </button>
-
-        <!-- Quick Appearance Button -->
-        <button
-          id="appearance-trigger-btn"
-          type="button"
-          @click.stop="openAppearanceModal($event)"
-          class="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950 border border-zinc-200/80 flex items-center justify-center transition-all cursor-pointer group"
-          title="Personalizar Apariencia y Titular"
-          aria-label="Personalizar外观"
-        >
-          <AppIcon name="palette" class="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-950 group-hover:rotate-12 transition-transform" />
+          <AppIcon name="menu" class="w-3.5 h-3.5 text-zinc-300 group-hover:text-white" />
+          <span class="text-xs font-black tracking-tight">{{ userProfile.hasCompletedOnboarding ? userProfile.zone : 'Acciones' }}</span>
         </button>
       </nav>
 
@@ -387,22 +383,14 @@
       </NuxtLink>
 
       <button
-        id="nav-report-btn-mobile-bonita"
+        id="nav-dropdown-btn-mobile-bonita"
         type="button"
-        class="nav-report-btn bg-zinc-950 text-white font-black text-[11px] px-2.5 py-1.5 rounded-full flex items-center space-x-1 shadow-sm active:scale-95 transition-all cursor-pointer"
-        @click="handleReportNav('#nav-report-btn-mobile-bonita')"
+        class="flex items-center space-x-1.5 py-1.5 px-3 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 active:scale-95 transition-all cursor-pointer shadow-sm"
+        @click.prevent="handleOpenNavDropdown('#nav-dropdown-btn-mobile-bonita')"
+        title="Opciones"
       >
-        <AppIcon name="alert-triangle" class="w-3.5 h-3.5 text-white" />
-        <span class="hidden sm:inline">Reportar</span>
-      </button>
-
-      <button
-        id="appearance-mobile-trigger-btn-bonita"
-        type="button"
-        class="w-7 h-7 rounded-full bg-zinc-100 text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200 flex items-center justify-center shrink-0 border border-zinc-200 cursor-pointer"
-        @click.prevent="openAppearanceModal($event)"
-      >
-        <AppIcon name="palette" class="w-3.5 h-3.5" />
+        <AppIcon name="menu" class="w-3.5 h-3.5 text-zinc-300" />
+        <span class="text-[10px] font-black">{{ userProfile.hasCompletedOnboarding ? userProfile.zone : 'Acciones' }}</span>
       </button>
     </div>
 
@@ -428,25 +416,14 @@
           <span class="text-[10px] mt-0.5 font-bold tracking-tight">{{ item.shortLabel }}</span>
         </button>
         <button
-          id="nav-report-btn-mobile"
+          id="nav-dropdown-btn-mobile"
           type="button"
-          class="nav-report-btn flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all cursor-pointer select-none text-zinc-600 hover:text-zinc-950"
-          :class="[
-            isReportModalOpen ? 'text-zinc-950 font-black' : ''
-          ]"
-          @click="handleReportNav('#nav-report-btn-mobile')"
+          class="flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all cursor-pointer select-none text-zinc-500 hover:text-zinc-800"
+          @click.prevent="handleOpenNavDropdown('#nav-dropdown-btn-mobile')"
+          title="Opciones"
         >
-          <AppIcon name="alert-triangle" class="w-5 h-5 shrink-0" />
-          <span class="text-[10px] mt-0.5 font-bold tracking-tight">Reportar</span>
-        </button>
-        <button
-          id="appearance-mobile-trigger-btn"
-          type="button"
-          class="flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all cursor-pointer select-none text-zinc-400 hover:text-zinc-700"
-          @click.prevent="openAppearanceModal($event)"
-        >
-          <AppIcon name="palette" class="w-5 h-5 shrink-0" />
-          <span class="text-[10px] mt-0.5 font-bold tracking-tight">Tema</span>
+          <AppIcon name="menu" class="w-5 h-5 shrink-0" />
+          <span class="text-[10px] mt-0.5 font-bold tracking-tight">Opciones</span>
         </button>
       </div>
     </div>
@@ -456,6 +433,12 @@
 
     <!-- Incident Report Modal using AppModal (Global, in-place, without navigating to /mapa) -->
     <IncidentReportModal />
+
+    <!-- User Profile & Zone Onboarding Modal -->
+    <UserProfileModal />
+
+    <!-- Upward WissPop DropdownPanel (Perfil, Reportar, Apariencia) -->
+    <NavActionsDropdown />
   </div>
 </template>
 
@@ -466,13 +449,22 @@ import AppShape from '~/components/AppShape.vue'
 import AppButton from '~/components/AppButton.vue'
 import AppearanceModal from '~/components/AppearanceModal.vue'
 import IncidentReportModal from '~/components/IncidentReportModal.vue'
+import UserProfileModal from '~/components/UserProfileModal.vue'
+import NavActionsDropdown from '~/components/NavActionsDropdown.vue'
 import BulletinTicker from '~/components/BulletinTicker.vue'
 import { useAppearance } from '~/composables/useAppearance'
 import { useIncidentReport } from '~/composables/useIncidentReport'
+import { useUserProfile } from '~/composables/useUserProfile'
 
 const route = useRoute()
 const isMapPage = computed(() => route.path === '/mapa')
 const { isReportModalOpen, openReportModal } = useIncidentReport()
+const {
+  userProfile,
+  initProfile,
+  openActionsDropdown,
+  openProfileModal
+} = useUserProfile()
 
 const {
   isAppearanceModalOpen,
@@ -500,7 +492,19 @@ const handleReportNav = (selector?: string) => {
   openReportModal(selector)
 }
 
+const handleOpenNavDropdown = (selector?: string) => {
+  openActionsDropdown(selector)
+}
+
 onMounted(() => {
   initAppearance()
+  initProfile()
+
+  // Auto-launch mini-onboarding gently if new user
+  if (!userProfile.value.hasCompletedOnboarding) {
+    setTimeout(() => {
+      openProfileModal('#nav-dropdown-btn-bonita')
+    }, 700)
+  }
 })
 </script>
