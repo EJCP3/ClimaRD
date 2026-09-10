@@ -60,6 +60,17 @@
               <AppIcon name="alert-triangle" class="w-4 h-4 shrink-0" />
               <span>Problemáticas</span>
             </button>
+
+            <!-- 4. Tema -->
+            <button
+              type="button"
+              @click="activeTab = 'tema'"
+              class="flex items-center space-x-2.5 px-3 py-2 rounded-2xl text-xs font-semibold transition-all cursor-pointer text-left shrink-0"
+              :class="activeTab === 'tema' ? 'bg-[#1B2620] text-white font-bold shadow-xs' : 'text-zinc-400 hover:text-white hover:bg-white/5'"
+            >
+              <AppIcon name="palette" class="w-4 h-4 shrink-0" />
+              <span>Tema</span>
+            </button>
           </div>
         </div>
 
@@ -67,59 +78,77 @@
         <div class="flex-1 p-5 md:p-6 flex flex-col justify-between overflow-y-auto max-h-[85vh]">
           <!-- TAB 1: CUENTA (Exactly like user image) -->
           <div v-if="activeTab === 'cuenta'" class="space-y-4">
-            <!-- Big Aurora Borealis Nebula Card (Dynamic based on Province Alert) -->
+            <!-- Big Card: Normal (glow + puntos) o Reactivo (orbe animada + grano + partículas) -->
             <div
-              class="relative rounded-[28px] p-6 sm:p-8 min-h-[390px] overflow-hidden shadow-2xl select-text transition-all duration-700"
-              :style="{ backgroundColor: alertCardTheme.baseBg }"
+              class="relative rounded-[28px] p-6 sm:p-8 min-h-[390px] overflow-hidden shadow-2xl select-text transition-colors duration-700 border border-white/10"
+              :style="cardTheme === 'reactivo'
+                ? { backgroundColor: reactiveTheme.baseBg, boxShadow: reactiveTheme.glow }
+                : { backgroundColor: alertCardTheme.baseBg }"
             >
-              <!-- Layer 1: Diagonal Core Aurora Ribbon -->
-              <div
-                class="absolute inset-0 pointer-events-none blur-[65px] sm:blur-[90px]"
-                :style="{ background: alertCardTheme.layer1, mixBlendMode: 'screen' }"
-                aria-hidden="true"
-              />
-              <!-- Layer 2: Intersecting Aurora Stream -->
-              <div
-                class="absolute inset-0 pointer-events-none blur-[55px] sm:blur-[80px] opacity-90"
-                :style="{ background: alertCardTheme.layer2, mixBlendMode: 'screen' }"
-                aria-hidden="true"
-              />
-              <!-- Layer 3: Radial Center Aurora Bloom -->
-              <div
-                class="absolute inset-0 pointer-events-none blur-[50px] sm:blur-[70px] opacity-90"
-                :style="{ background: alertCardTheme.layer3, mixBlendMode: 'screen' }"
-                aria-hidden="true"
-              />
-              <!-- Layer 4: Deep Ambient Core Glow -->
-              <div
-                class="absolute inset-0 pointer-events-none blur-[75px] sm:blur-[110px]"
-                :style="{ background: alertCardTheme.layer4, mixBlendMode: 'screen' }"
-                aria-hidden="true"
-              />
-              <!-- Layer 5: Multiply Vignette Shading -->
-              <div
-                class="absolute inset-0 pointer-events-none blur-[40px] sm:blur-[60px] opacity-90"
-                :style="{ background: alertCardTheme.layer5, mixBlendMode: 'multiply' }"
-                aria-hidden="true"
-              />
-              <!-- Layer 6: Cosmic Hue Edge Splash -->
-              <div
-                class="absolute inset-0 pointer-events-none blur-[60px] sm:blur-[85px] opacity-70"
-                :style="{ background: alertCardTheme.layer6, mixBlendMode: 'screen' }"
-                aria-hidden="true"
-              />
+              <!-- TEMA NORMAL -->
+              <template v-if="cardTheme !== 'reactivo'">
+                <!-- Layer 1: Glow central suave -->
+                <div
+                  class="absolute inset-0 pointer-events-none"
+                  :style="{ background: alertCardTheme.glow }"
+                  aria-hidden="true"
+                />
+                <!-- Layer 2: Viñeta para legibilidad (oscurece bordes) -->
+                <div
+                  class="absolute inset-0 pointer-events-none"
+                  :style="{ background: alertCardTheme.vignette }"
+                  aria-hidden="true"
+                />
 
-              <!-- Layer 7: Halftone / Dither Dot Screen (Estilo del fondo anterior adaptado a los colores de ahora) -->
-              <div
-                class="absolute inset-0 pointer-events-none z-[1]"
-                style="
-                  background-image: 
-                    radial-gradient(circle at 1.5px 1.5px, rgba(255, 255, 255, 0.48) 1.2px, transparent 1.3px),
-                    radial-gradient(circle at 4.5px 4.5px, rgba(0, 0, 0, 0.35) 1.2px, transparent 1.3px);
-                  background-size: 6px 6px;
-                "
-                aria-hidden="true"
-              />
+                <!-- Layer 3: Trama de puntos uniforme y sutil (como la referencia) -->
+                <div
+                  class="absolute inset-0 pointer-events-none z-[1] opacity-60"
+                  style="
+                    background-image: radial-gradient(circle, rgba(255, 235, 238, 0.38) 1.1px, transparent 1.4px);
+                    background-size: 9px 9px;
+                  "
+                  aria-hidden="true"
+                />
+              </template>
+
+              <!-- TEMA REACTIVO (patrón Aura: base normal + resplandor screen + grano) -->
+              <template v-else>
+                <!-- Aura Layer 1: base oscura teñida (normal) -->
+                <div
+                  class="absolute inset-0 pointer-events-none"
+                  :style="{ background: reactiveTheme.auraBase, mixBlendMode: 'normal' }"
+                  aria-hidden="true"
+                />
+                <!-- Orbe principal animada (pequeña y redonda) -->
+                <div
+                  class="absolute top-[6%] left-[52%] w-[210px] h-[210px] rounded-full pointer-events-none reactive-orb-1"
+                  :style="{ background: reactiveTheme.orb1 }"
+                  aria-hidden="true"
+                />
+                <!-- Orbe secundaria animada (pequeña y redonda) -->
+                <div
+                  class="absolute top-[60%] left-[12%] w-[150px] h-[150px] rounded-full pointer-events-none reactive-orb-2"
+                  :style="{ background: reactiveTheme.orb2 }"
+                  aria-hidden="true"
+                />
+                <!-- Aura Layer 2: resplandor teñido (screen, con blur) -->
+                <div
+                  class="absolute inset-0 pointer-events-none blur-[18px]"
+                  :style="{ background: reactiveTheme.auraGlow, mixBlendMode: 'screen' }"
+                  aria-hidden="true"
+                />
+                <!-- Textura de grano -->
+                <div
+                  class="absolute inset-0 pointer-events-none z-[1] opacity-60 reactive-grain"
+                  aria-hidden="true"
+                />
+                <!-- Viñeta para legibilidad -->
+                <div
+                  class="absolute inset-0 pointer-events-none"
+                  :style="{ background: reactiveTheme.vignette }"
+                  aria-hidden="true"
+                />
+              </template>
 
               <!-- Content wrapper - keep it above the absolute layers and halftone grid -->
               <div class="relative z-[2] flex flex-col justify-between h-full min-h-[330px]">
@@ -137,7 +166,7 @@
                 <div class="space-y-4 my-auto pt-2">
                   <!-- Correo -->
                   <div>
-                    <span class="block text-xs sm:text-sm font-black uppercase tracking-wider" :class="alertCardTheme.labelColor">
+                    <span class="block text-xs sm:text-sm font-black uppercase tracking-wider" :class="cardTheme === 'reactivo' ? reactiveTheme.labelColor : alertCardTheme.labelColor">
                       Correo
                     </span>
                     <h2 class="text-xl sm:text-2xl md:text-3xl font-black tracking-tight leading-snug break-all mt-0.5 text-white">
@@ -147,7 +176,7 @@
 
                   <!-- Nombre -->
                   <div>
-                    <span class="block text-xs sm:text-sm font-black uppercase tracking-wider" :class="alertCardTheme.labelColor">
+                    <span class="block text-xs sm:text-sm font-black uppercase tracking-wider" :class="cardTheme === 'reactivo' ? reactiveTheme.labelColor : alertCardTheme.labelColor">
                       Nombre
                     </span>
                     <h2 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-snug mt-0.5 text-white">
@@ -159,7 +188,7 @@
                 <!-- Zona rápida -->
                 <div class="pt-2 flex items-center justify-between">
                   <div>
-                    <span class="block text-[10px] font-black uppercase tracking-wider" :class="alertCardTheme.labelColor">
+                    <span class="block text-[10px] font-black uppercase tracking-wider" :class="cardTheme === 'reactivo' ? reactiveTheme.labelColor : alertCardTheme.labelColor">
                       Zona Monitoreada
                     </span>
                     <p class="text-xs sm:text-sm font-black mt-0.5 text-white">
@@ -287,7 +316,7 @@
                   <!-- WissPop Dropdown: Provincias -->
                   <WissPopMorph
                     :model-value="isProvinceDropdownOpen"
-                    :origin-ref="provinceInputRef"
+                    :origin-ref="provinceDropdownOrigin"
                     placement="bottom"
                     align="start"
                     :gap="6"
@@ -372,7 +401,7 @@
                   <!-- WissPop Dropdown: Sectores -->
                   <WissPopMorph
                     :model-value="!isSectorDisabled && isSectorDropdownOpen"
-                    :origin-ref="sectorInputRef"
+                    :origin-ref="sectorDropdownOrigin"
                     placement="bottom"
                     align="start"
                     :gap="6"
@@ -569,6 +598,63 @@
             </div>
           </div>
 
+          <!-- TAB 4: TEMA (Normal vs Reactivo por alerta) -->
+          <div v-else-if="activeTab === 'tema'" class="space-y-4">
+            <div class="p-5 rounded-[28px] bg-[#141C17] border border-white/10 space-y-4">
+              <div>
+                <h3 class="text-sm font-bold text-white">Tema de la tarjeta</h3>
+                <p class="text-[11px] text-zinc-400 mt-0.5">
+                  El reactivo usa los colores de la alerta vigente en {{ currentProvinceName }} ({{ currentProvinceAlert }}): orbe animada, grano y partículas.
+                </p>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <!-- Opción Normal -->
+                <button
+                  type="button"
+                  @click="setCardTheme('normal')"
+                  class="p-3 rounded-2xl border text-left transition-all cursor-pointer"
+                  :class="cardTheme === 'normal' ? 'bg-[#1e2c24] border-emerald-500/60' : 'bg-[#0B110E] border-white/5 hover:border-white/15'"
+                >
+                  <span
+                    class="block h-16 rounded-xl mb-2 border border-white/10"
+                    :style="{ backgroundColor: alertCardTheme.baseBg, backgroundImage: 'radial-gradient(circle, rgba(255,235,238,0.38) 1.1px, transparent 1.4px)', backgroundSize: '9px 9px' }"
+                  />
+                  <span class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-white">Normal</span>
+                    <span v-if="cardTheme === 'normal'" class="text-emerald-400 text-xs font-black">✓</span>
+                  </span>
+                  <span class="block text-[10px] text-zinc-500 mt-0.5">Clásica con puntos y glow suave</span>
+                </button>
+
+                <!-- Opción Reactivo -->
+                <button
+                  type="button"
+                  @click="setCardTheme('reactivo')"
+                  class="p-3 rounded-2xl border text-left transition-all cursor-pointer"
+                  :class="cardTheme === 'reactivo' ? 'bg-[#1e2c24] border-emerald-500/60' : 'bg-[#0B110E] border-white/5 hover:border-white/15'"
+                >
+                  <span
+                    class="block h-16 rounded-xl mb-2 border border-white/10 overflow-hidden relative"
+                    :style="{ backgroundColor: reactiveTheme.baseBg }"
+                  >
+                    <span class="absolute -top-4 -left-4 w-20 h-20 rounded-full blur-md" :style="{ background: reactiveTheme.orb1 }" />
+                    <span class="absolute -bottom-5 -right-4 w-16 h-16 rounded-full blur-md" :style="{ background: reactiveTheme.orb2 }" />
+                  </span>
+                  <span class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-white">Reactivo <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/10 text-zinc-300 ml-1">{{ currentProvinceAlert }}</span></span>
+                    <span v-if="cardTheme === 'reactivo'" class="text-emerald-400 text-xs font-black">✓</span>
+                  </span>
+                  <span class="block text-[10px] text-zinc-500 mt-0.5">Orbe animada, grano y partículas</span>
+                </button>
+              </div>
+
+              <p v-if="cardTheme === 'reactivo'" class="text-[10px] text-zinc-500 leading-snug">
+                Con el tema reactivo, el selector de color primario en Apariencia queda oculto: los colores los dicta la alerta.
+              </p>
+            </div>
+          </div>
+
         </div>
       </div>
     </WissPopMorph>
@@ -591,6 +677,7 @@ import {
 } from '~/composables/useUserProfile'
 import postalCodes from '~/assets/data/codigos-postales-rd.json'
 import { PROVINCES_DATA } from '~/composables/useWeatherEnrichment'
+import { useCardTheme } from '~/composables/useCardTheme'
 
 interface AutocompleteItem {
   place: string
@@ -612,7 +699,9 @@ const {
   findCoordinatesForZone
 } = useUserProfile()
 
-const activeTab = ref<'cuenta' | 'ubicacion' | 'problematicas'>('cuenta')
+const { cardTheme, initCardTheme, setCardTheme } = useCardTheme()
+
+const activeTab = ref<'cuenta' | 'ubicacion' | 'problematicas' | 'tema'>('cuenta')
 const isEditing = ref(false)
 
 const formName = ref('Euddy Javier')
@@ -655,6 +744,31 @@ const provinceWidthStyle = computed(() => {
 
 const sectorWidthStyle = computed(() => {
   return `${sectorWidth.value || 280}px`
+})
+
+// Orígenes solo-geometría para los dropdowns internos: pasar el elemento hacía
+// que WissPopMorph interpolara el bg y clonara el input (contiene SVGs) como
+// elemento viajero, lo que producía destellos de color durante la animación.
+// Con un Rect solo hay morph de posición/tamaño, sin cambios de color.
+function rectOriginOf(el: HTMLElement | null) {
+  if (!el || typeof window === 'undefined') return null
+  const r = el.getBoundingClientRect()
+  if (r.width === 0 && r.height === 0) return null
+  return {
+    top: Math.round(r.top),
+    left: Math.round(r.left),
+    width: Math.round(r.width),
+    height: Math.round(r.height),
+    radius: 12
+  }
+}
+
+const provinceDropdownOrigin = computed(() => {
+  return rectOriginOf(provinceInputRef.value) ?? provinceInputRef.value
+})
+
+const sectorDropdownOrigin = computed(() => {
+  return rectOriginOf(sectorInputRef.value) ?? sectorInputRef.value
 })
 
 interface ProvinceListItem extends ProvinceOption {
@@ -782,6 +896,11 @@ const currentProvinceAlert = computed(() => {
 })
 
 const alertCardTheme = computed(() => {
+  // Estética referencia: fondo oscuro apagado + resplandor central suave del mismo tono + viñeta.
+  // Sin blancos puros, sin screen/multiply, sin cintas diagonales que molestan a la vista.
+  const vignette =
+    'radial-gradient(ellipse 120% 105% at 50% 45%, transparent 52%, rgba(0,0,0,0.38) 82%, rgba(0,0,0,0.62) 100%), linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, transparent 28%, transparent 58%, rgba(0,0,0,0.45) 100%)'
+
   switch (currentProvinceAlert.value) {
     case 'ROJA':
       return {
@@ -790,15 +909,11 @@ const alertCardTheme = computed(() => {
         icon: 'alert-triangle',
         shapeBg: 'rgba(255, 255, 255, 0.95)',
         shapeFg: '#4c0519',
-        baseBg: '#140307',
+        baseBg: '#231016',
         borderColor: 'border-rose-500/35',
-        labelColor: 'text-rose-200/75',
-        layer1: 'linear-gradient(154deg, transparent 18%, rgba(85,10,25,0.08) 29%, rgba(255,45,85,0.45) 36%, rgb(255,255,255) 42%, rgba(244,63,94,0.36) 48%, rgba(225,29,72,0.28) 55%, rgba(255,100,30,0.35) 62%, rgba(120,15,35,0.10) 68%, transparent 82%)',
-        layer2: 'linear-gradient(128deg, transparent 28%, rgba(90,15,30,0.08) 38%, rgba(255,75,40,0.38) 43%, rgb(255,255,255) 48%, rgba(251,113,133,0.26) 52%, rgba(244,63,94,0.30) 57%, rgba(130,20,40,0.12) 62%, transparent 76%)',
-        layer3: 'radial-gradient(ellipse 78% 25% at 51% 53%, rgba(244,63,94,0.28) 0%, rgba(159,18,57,0.12) 45%, transparent 82%)',
-        layer4: 'radial-gradient(ellipse 48% 12% at 52% 50%, rgba(254,205,211,0.18) 0%, rgba(251,113,133,0.08) 45%, transparent 80%)',
-        layer5: 'linear-gradient(to top, rgba(15,2,5,0.92) 0%, rgba(20,3,7,0.60) 28%, rgba(25,4,9,0.22) 55%, transparent 78%)',
-        layer6: 'radial-gradient(ellipse 50% 32% at 72% 18%, rgba(168,85,247,0.16) 0%, rgba(107,33,168,0.06) 45%, transparent 82%)'
+        labelColor: 'text-[#e2b3bb]/80',
+        glow: 'radial-gradient(ellipse 88% 62% at 50% 42%, rgba(172, 96, 108, 0.62) 0%, rgba(120, 58, 70, 0.32) 38%, rgba(60, 26, 34, 0.12) 60%, transparent 74%)',
+        vignette
       }
     case 'AMARILLA':
       return {
@@ -807,15 +922,11 @@ const alertCardTheme = computed(() => {
         icon: 'alert-triangle',
         shapeBg: 'rgba(255, 255, 255, 0.95)',
         shapeFg: '#451a03',
-        baseBg: '#140d02',
+        baseBg: '#211710',
         borderColor: 'border-amber-500/35',
-        labelColor: 'text-amber-200/75',
-        layer1: 'linear-gradient(154deg, transparent 18%, rgba(95,65,10,0.08) 29%, rgba(255,185,0,0.45) 36%, rgb(255,255,255) 42%, rgba(250,204,21,0.36) 48%, rgba(245,158,11,0.26) 55%, rgba(251,146,60,0.35) 62%, rgba(120,70,10,0.10) 68%, transparent 82%)',
-        layer2: 'linear-gradient(128deg, transparent 28%, rgba(90,60,15,0.08) 38%, rgba(251,146,60,0.38) 43%, rgb(255,255,255) 48%, rgba(253,224,71,0.26) 52%, rgba(250,204,21,0.30) 57%, rgba(140,80,15,0.12) 62%, transparent 76%)',
-        layer3: 'radial-gradient(ellipse 78% 25% at 51% 53%, rgba(245,158,11,0.26) 0%, rgba(180,83,9,0.12) 45%, transparent 82%)',
-        layer4: 'radial-gradient(ellipse 48% 12% at 52% 50%, rgba(254,240,138,0.18) 0%, rgba(250,204,21,0.08) 45%, transparent 80%)',
-        layer5: 'linear-gradient(to top, rgba(12,8,2,0.92) 0%, rgba(18,11,3,0.60) 28%, rgba(24,14,4,0.22) 55%, transparent 78%)',
-        layer6: 'radial-gradient(ellipse 50% 32% at 72% 18%, rgba(239,68,68,0.14) 0%, rgba(185,28,28,0.05) 45%, transparent 82%)'
+        labelColor: 'text-[#e6c9a3]/80',
+        glow: 'radial-gradient(ellipse 88% 62% at 50% 42%, rgba(190, 150, 100, 0.58) 0%, rgba(135, 98, 58, 0.30) 38%, rgba(70, 50, 28, 0.12) 60%, transparent 74%)',
+        vignette
       }
     case 'VERDE':
       return {
@@ -824,15 +935,11 @@ const alertCardTheme = computed(() => {
         icon: 'shield',
         shapeBg: 'rgba(255, 255, 255, 0.95)',
         shapeFg: '#022c22',
-        baseBg: '#03140e',
+        baseBg: '#101a16',
         borderColor: 'border-emerald-500/35',
-        labelColor: 'text-emerald-200/75',
-        layer1: 'linear-gradient(154deg, transparent 18%, rgba(12,72,61,0.08) 29%, rgba(0,229,255,0.42) 36%, rgb(255,255,255) 42%, rgba(73,207,158,0.34) 48%, rgba(38,158,119,0.24) 55%, rgba(0,183,255,0.32) 62%, rgba(15,76,65,0.10) 68%, transparent 82%)',
-        layer2: 'linear-gradient(128deg, transparent 28%, rgba(15,82,96,0.08) 38%, rgba(0,183,255,0.36) 43%, rgb(255,255,255) 48%, rgba(68,197,185,0.24) 52%, rgba(0,229,255,0.26) 57%, rgba(25,105,112,0.12) 62%, transparent 76%)',
-        layer3: 'radial-gradient(ellipse 78% 25% at 51% 53%, rgba(65,183,155,0.26) 0%, rgba(30,102,91,0.12) 45%, transparent 82%)',
-        layer4: 'radial-gradient(ellipse 48% 12% at 52% 50%, rgba(190,255,226,0.16) 0%, rgba(91,195,163,0.08) 45%, transparent 80%)',
-        layer5: 'linear-gradient(to top, rgba(1,8,6,0.92) 0%, rgba(2,12,9,0.60) 28%, rgba(3,16,12,0.22) 55%, transparent 78%)',
-        layer6: 'radial-gradient(ellipse 50% 32% at 72% 18%, rgba(129,140,248,0.14) 0%, rgba(79,70,229,0.05) 45%, transparent 82%)'
+        labelColor: 'text-[#a9cdbd]/80',
+        glow: 'radial-gradient(ellipse 88% 62% at 50% 42%, rgba(110, 160, 140, 0.55) 0%, rgba(70, 110, 95, 0.28) 38%, rgba(35, 60, 52, 0.12) 60%, transparent 74%)',
+        vignette
       }
     default:
       return {
@@ -841,15 +948,69 @@ const alertCardTheme = computed(() => {
         icon: 'sun',
         shapeBg: 'rgba(255, 255, 255, 0.95)',
         shapeFg: '#082f49',
-        baseBg: '#040b17',
+        baseBg: '#11161e',
         borderColor: 'border-sky-500/35',
-        labelColor: 'text-sky-200/75',
-        layer1: 'linear-gradient(154deg, transparent 18%, rgba(15,45,95,0.08) 29%, rgba(56,189,248,0.42) 36%, rgb(255,255,255) 42%, rgba(96,165,250,0.34) 48%, rgba(59,130,246,0.24) 55%, rgba(129,140,248,0.32) 62%, rgba(20,50,110,0.10) 68%, transparent 82%)',
-        layer2: 'linear-gradient(128deg, transparent 28%, rgba(20,60,120,0.08) 38%, rgba(96,165,250,0.36) 43%, rgb(255,255,255) 48%, rgba(147,197,253,0.24) 52%, rgba(56,189,248,0.26) 57%, rgba(30,64,130,0.12) 62%, transparent 76%)',
-        layer3: 'radial-gradient(ellipse 78% 25% at 51% 53%, rgba(59,130,246,0.26) 0%, rgba(30,58,138,0.12) 45%, transparent 82%)',
-        layer4: 'radial-gradient(ellipse 48% 12% at 52% 50%, rgba(186,230,253,0.16) 0%, rgba(96,165,250,0.08) 45%, transparent 80%)',
-        layer5: 'linear-gradient(to top, rgba(1,5,15,0.92) 0%, rgba(2,7,20,0.60) 28%, rgba(3,10,25,0.22) 55%, transparent 78%)',
-        layer6: 'radial-gradient(ellipse 50% 32% at 72% 18%, rgba(192,132,252,0.14) 0%, rgba(126,34,206,0.05) 45%, transparent 82%)'
+        labelColor: 'text-[#aec3d8]/80',
+        glow: 'radial-gradient(ellipse 88% 62% at 50% 42%, rgba(120, 145, 170, 0.55) 0%, rgba(75, 95, 120, 0.28) 38%, rgba(38, 50, 66, 0.12) 60%, transparent 74%)',
+        vignette
+      }
+  }
+})
+
+// Tema reactivo: orbe animada + grano + partículas con los colores de la
+// alerta vigente en la provincia. Comparte viñeta con el tema normal.
+const REACTIVE_VIGNETTE =
+  'radial-gradient(ellipse 120% 105% at 50% 45%, transparent 52%, rgba(0,0,0,0.38) 82%, rgba(0,0,0,0.62) 100%), linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, transparent 28%, transparent 58%, rgba(0,0,0,0.45) 100%)'
+
+const reactiveTheme = computed(() => {
+  switch (currentProvinceAlert.value) {
+    case 'ROJA':
+      return {
+        alerta: 'ROJA',
+        baseBg: '#1c0a0e',
+        auraBase: 'linear-gradient(135deg, #0d0305 0%, #1a070b 42%, #221016 72%, #0a0204 100%)',
+        auraGlow: 'radial-gradient(ellipse 45% 55% at 54% 44%, rgba(244,63,94,0.22) 0%, transparent 65%)',
+        orb1: 'radial-gradient(circle at 35% 35%, rgba(244,63,94,0.85) 0%, rgba(159,18,57,0.35) 55%, transparent 72%)',
+        orb2: 'radial-gradient(circle at 60% 60%, rgba(251,146,60,0.5) 0%, transparent 70%)',
+        glow: '0 0 90px rgba(244,63,94,0.28), 0 24px 64px rgba(0,0,0,0.7)',
+        labelColor: 'text-[#f3c1c8]/80',
+        vignette: REACTIVE_VIGNETTE
+      }
+    case 'AMARILLA':
+      return {
+        alerta: 'AMARILLA',
+        baseBg: '#171106',
+        auraBase: 'linear-gradient(135deg, #0d0a03 0%, #1a1406 42%, #221a0c 72%, #0a0702 100%)',
+        auraGlow: 'radial-gradient(ellipse 45% 55% at 54% 44%, rgba(245,158,11,0.22) 0%, transparent 65%)',
+        orb1: 'radial-gradient(circle at 35% 35%, rgba(245,158,11,0.8) 0%, rgba(180,83,9,0.35) 55%, transparent 72%)',
+        orb2: 'radial-gradient(circle at 60% 60%, rgba(253,224,71,0.4) 0%, transparent 70%)',
+        glow: '0 0 90px rgba(245,158,11,0.26), 0 24px 64px rgba(0,0,0,0.7)',
+        labelColor: 'text-[#ecd3a8]/80',
+        vignette: REACTIVE_VIGNETTE
+      }
+    case 'VERDE':
+      return {
+        alerta: 'VERDE',
+        baseBg: '#07120d',
+        auraBase: 'linear-gradient(135deg, #030803 0%, #08120d 42%, #0d1a13 72%, #040805 100%)',
+        auraGlow: 'radial-gradient(ellipse 45% 55% at 54% 44%, rgba(34,197,94,0.22) 0%, transparent 65%)',
+        orb1: 'radial-gradient(circle at 35% 30%, rgba(34,197,94,0.75) 0%, rgba(16,185,129,0.35) 55%, transparent 72%)',
+        orb2: 'radial-gradient(circle at 60% 65%, rgba(45,212,191,0.45) 0%, transparent 70%)',
+        glow: '0 0 90px rgba(16,185,129,0.28), 0 24px 64px rgba(0,0,0,0.7)',
+        labelColor: 'text-[#b8dfcb]/80',
+        vignette: REACTIVE_VIGNETTE
+      }
+    default:
+      return {
+        alerta: 'NORMAL',
+        baseBg: '#0a1017',
+        auraBase: 'linear-gradient(135deg, #030507 0%, #0a1016 42%, #101820 72%, #05080c 100%)',
+        auraGlow: 'radial-gradient(ellipse 45% 55% at 54% 44%, rgba(56,189,248,0.22) 0%, transparent 65%)',
+        orb1: 'radial-gradient(circle at 35% 35%, rgba(56,189,248,0.75) 0%, rgba(30,64,175,0.35) 55%, transparent 72%)',
+        orb2: 'radial-gradient(circle at 60% 60%, rgba(129,140,248,0.45) 0%, transparent 70%)',
+        glow: '0 0 90px rgba(56,189,248,0.26), 0 24px 64px rgba(0,0,0,0.7)',
+        labelColor: 'text-[#b8cbe0]/80',
+        vignette: REACTIVE_VIGNETTE
       }
   }
 })
@@ -1067,6 +1228,7 @@ watch(isProfileModalOpen, (open) => {
 
 onMounted(() => {
   initProfile()
+  initCardTheme()
   syncForm()
   if (typeof document !== 'undefined') {
     document.addEventListener('click', handleClickOutside)
@@ -1090,7 +1252,13 @@ const resolvedOrigin = computed(() => {
     return null
   }
   if (typeof trigger === 'string' && typeof document !== 'undefined') {
-    return document.querySelector(trigger)
+    const el = document.querySelector(trigger)
+    // El selector puede no existir según el nav activo (ej. auto-onboarding
+    // apunta a la píldora bonita): fallback centrado en vez de null.
+    if (!el && typeof window !== 'undefined') {
+      return { top: window.innerHeight / 2 - 20, left: window.innerWidth / 2 - 20, width: 40, height: 40, radius: 20 }
+    }
+    return el
   }
   return unref(trigger)
 })
@@ -1135,3 +1303,42 @@ function resetProfileData() {
   syncForm()
 }
 </script>
+
+<style scoped>
+/* Tema reactivo: orbes a la deriva + partículas flotantes + grano */
+.reactive-orb-1 {
+  filter: blur(48px);
+  opacity: 0.95;
+  mix-blend-mode: screen;
+  animation: reactive-drift-1 12s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.reactive-orb-2 {
+  filter: blur(44px);
+  opacity: 0.7;
+  mix-blend-mode: screen;
+  animation: reactive-drift-2 17s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes reactive-drift-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-34px, 26px) scale(1.06); }
+  100% { transform: translate(28px, -22px) scale(0.96); }
+}
+@keyframes reactive-drift-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -24px) scale(1.05); }
+  100% { transform: translate(-26px, 20px) scale(0.95); }
+}
+.reactive-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reactive-orb-1,
+  .reactive-orb-2 {
+    animation: none !important;
+  }
+}
+</style>
