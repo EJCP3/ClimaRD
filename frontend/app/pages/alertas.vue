@@ -12,32 +12,32 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
       <!-- 1. Sin Alerta (Menor alerta -> Mínimo detalle: Círculo limpio y sereno) -->
       <div class="p-4 sm:p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-3.5 shadow-sm">
-        <AppShape name="circle" size="medium" class="shrink-0">
-          <AppIcon name="sun" class="w-6 h-6 text-zinc-900" />
+        <AppShape name="circle" size="medium" class="shrink-0 shape-alert-sin">
+          <AppIcon name="sun" class="w-6 h-6" />
         </AppShape>
         <h4 class="text-sm font-extrabold text-zinc-950">Sin Alerta</h4>
       </div>
 
       <!-- 2. Alerta Verde (Alerta baja -> Detalle suave: 8 pétalos) -->
       <div class="p-4 sm:p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-3.5 shadow-sm">
-        <AppShape name="flower-8" size="medium" class="shrink-0">
-          <AppIcon name="shield" class="w-6 h-6 text-zinc-900" />
+        <AppShape name="flower-8" size="medium" class="shrink-0 shape-alert-verde">
+          <AppIcon name="shield" class="w-6 h-6" />
         </AppShape>
         <h4 class="text-sm font-extrabold text-zinc-950">Alerta Verde</h4>
       </div>
 
       <!-- 3. Alerta Amarilla (Alerta media -> Detalle intermedio: 12 pétalos) -->
       <div class="p-4 sm:p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-3.5 shadow-sm">
-        <AppShape name="12-sided-cookie" size="medium" class="shrink-0">
-          <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
+        <AppShape name="12-sided-cookie" size="medium" class="shrink-0 shape-alert-amarilla">
+          <AppIcon name="alert-triangle" class="w-6 h-6" />
         </AppShape>
         <h4 class="text-sm font-extrabold text-zinc-950">Alerta Amarilla</h4>
       </div>
 
       <!-- 4. Alerta Roja (Mayor alerta -> Máximo detalle: 16 picos explosivos) -->
       <div class="p-4 sm:p-5 bg-white border border-zinc-200/80 rounded-[24px] flex items-center space-x-3.5 shadow-sm">
-        <AppShape name="burst" size="medium" class="shrink-0">
-          <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
+        <AppShape name="burst" size="medium" class="shrink-0 shape-alert-roja">
+          <AppIcon name="alert-triangle" class="w-6 h-6" />
         </AppShape>
         <h4 class="text-sm font-extrabold text-zinc-950">Alerta Roja</h4>
       </div>
@@ -52,18 +52,14 @@
     <div class="space-y-4 pt-2">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2.5">
-          <AppShape name="12-sided-cookie" size="small">
-            <AppIcon name="calendar" class="w-4 h-4 text-zinc-900" />
+          <AppShape name="12-sided-cookie" size="small" class="shape-alert-sin">
+            <AppIcon name="calendar" class="w-4 h-4" />
           </AppShape>
           <div>
             <h3 class="font-black text-xl text-zinc-950 tracking-tight">Últimos Boletines Oficiales</h3>
             <p class="text-xs text-zinc-500">Actualizaciones técnicas y avisos especiales vigentes emitidos por el COE e INDOMET</p>
           </div>
         </div>
-        <span class="text-xs font-bold text-zinc-600 hidden sm:inline-flex items-center space-x-1.5 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200/60">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Boletines Actualizados</span>
-        </span>
       </div>
 
       <!-- Bulletins Feed in Responsive Multi-Column Grid -->
@@ -113,8 +109,8 @@
             <div class="relative w-full p-6 text-left">
               <!-- Header -->
               <div class="flex items-center space-x-2.5 mb-4 pr-8">
-                <AppShape name="12-sided-cookie" size="small">
-                  <AppIcon name="calendar" class="w-4 h-4 text-zinc-900" />
+                <AppShape name="12-sided-cookie" size="small" class="shape-alert-sin">
+                  <AppIcon name="calendar" class="w-4 h-4" />
                 </AppShape>
                 <div>
                   <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600">

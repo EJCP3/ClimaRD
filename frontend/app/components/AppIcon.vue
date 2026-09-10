@@ -54,6 +54,15 @@
       <circle cx="12" cy="10" r="3" />
     </template>
 
+    <!-- crosshair / locate-me -->
+    <template v-else-if="name === 'crosshair' || name === 'locate'">
+      <circle cx="12" cy="12" r="7" />
+      <line x1="22" x2="18" y1="12" y2="12" />
+      <line x1="6" x2="2" y1="12" y2="12" />
+      <line x1="12" x2="12" y1="6" y2="2" />
+      <line x1="12" x2="12" y1="22" y2="18" />
+    </template>
+
     <!-- cloud-rain -->
     <template v-else-if="name === 'cloud-rain'">
       <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />

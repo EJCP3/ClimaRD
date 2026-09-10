@@ -47,11 +47,6 @@
           </div>
         </div>
 
-        <!-- Aviso cuando el tema reactivo manda en colores -->
-        <p v-if="cardTheme === 'reactivo'" class="text-[11px] text-zinc-500 leading-snug bg-zinc-100 border border-zinc-200/60 rounded-2xl px-3 py-2.5">
-          Tema reactivo activo: el color primario está pausado y lo dicta la alerta de tu provincia. Cámbialo desde Perfil → Tema.
-        </p>
-
         <!-- 2. Navigation Preset Section -->
         <div class="pt-1">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-2">

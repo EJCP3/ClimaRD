@@ -1,10 +1,10 @@
 <template>
-  <div class="bg-white rounded-[32px] border border-zinc-200/80 shadow-sm overflow-hidden flex flex-col">
+  <div class="coe-map-card bg-white rounded-[32px] border border-zinc-200/80 shadow-sm overflow-hidden flex flex-col">
     <!-- Map Card Header -->
-    <div class="p-5 md:p-6 pb-3 border-b border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-50/50">
+    <div class="coe-map-header p-5 md:p-6 pb-3 border-b border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-50/50">
       <div class="flex items-start space-x-3">
-        <AppShape name="flower" color="surface" size="small" class="shrink-0 mt-0.5">
-          <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
+        <AppShape name="flower" color="surface" size="small" class="shrink-0 mt-0.5 shape-alert-sin">
+          <AppIcon name="cloud-rain" class="w-4 h-4" />
         </AppShape>
         <div>
           <div class="flex items-center space-x-2">
@@ -59,7 +59,7 @@
     </div>
 
     <!-- View 1: Graphical SVG Map (DominicanGo Cartographic Design) -->
-    <div v-show="activeView === 'mapa'" class="relative p-3 md:p-6 bg-slate-50/40 flex-1 flex flex-col justify-between">
+    <div v-show="activeView === 'mapa'" class="coe-map-body relative p-3 md:p-6 bg-slate-50/40 flex-1 flex flex-col justify-between">
       <!-- Top Map Controls & Quick Filter Chips -->
       <div class="flex flex-wrap items-center justify-between gap-2 mb-3 z-10">
         <!-- Interactive Alert Filter Chips -->
@@ -334,13 +334,14 @@
       </div>
 
       <!-- Selected Province Inspector Drawer -->
-      <div v-if="selectedProvince" class="mt-4 p-4 rounded-2xl bg-white border border-zinc-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
+      <div v-if="selectedProvince" class="coe-inspector mt-4 p-4 rounded-2xl bg-white border border-zinc-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
         <div class="space-y-1">
           <div class="flex items-center space-x-2.5">
             <AppShape
               :name="getProvinceShape(selectedProvince.alerta)"
               size="small"
               class="shrink-0"
+              :class="getShapeAlertClass(selectedProvince.alerta)"
               :style="getShapeColorStyle(selectedProvince.alerta)"
             >
               <AppIcon :name="getProvinceIcon(selectedProvince.alerta)" class="w-3.5 h-3.5" />
@@ -380,7 +381,7 @@
 
       <!-- Export Actions -->
       <div class="mt-4 flex justify-end">
-        <div class="flex items-center space-x-1 bg-white p-1.5 rounded-full border border-zinc-200/80 text-xs shadow-sm">
+        <div class="coe-exportbar flex items-center space-x-1 bg-white p-1.5 rounded-full border border-zinc-200/80 text-xs shadow-sm">
           <button
             @click="downloadMap"
             type="button"
@@ -417,7 +418,7 @@
           :key="`grid-${prov.code}`"
           :id="`grid-${prov.code}`"
           @click.stop="selectProvince(prov, $event)"
-          class="py-2.5 px-3.5 rounded-2xl border transition-all cursor-pointer hover:shadow-md flex items-center justify-between gap-2.5 group select-none"
+          class="coe-grid-card py-2.5 px-3.5 rounded-2xl border transition-all cursor-pointer hover:shadow-md flex items-center justify-between gap-2.5 group select-none"
           :class="[
             getGridCardClass(prov.alerta),
             isProvinceDimmed(prov.alerta) ? 'opacity-30' : 'opacity-100'
@@ -434,6 +435,7 @@
             :name="getProvinceShape(prov.alerta)"
             size="small"
             class="shrink-0 transition-transform duration-300 group-hover:scale-110"
+            :class="getShapeAlertClass(prov.alerta)"
             :style="getShapeColorStyle(prov.alerta)"
           >
             <AppIcon :name="getProvinceIcon(prov.alerta)" class="w-3.5 h-3.5" />
@@ -457,6 +459,7 @@
             :name="getProvinceShape(selectedProvince.alerta)"
             size="small"
             class="shrink-0"
+            :class="getShapeAlertClass(selectedProvince.alerta)"
             :style="getShapeColorStyle(selectedProvince.alerta)"
           >
             <AppIcon :name="getProvinceIcon(selectedProvince.alerta)" class="w-3.5 h-3.5" />
@@ -858,28 +861,45 @@ function getShapeColorStyle(alerta: string): Record<string, string> {
   switch (alerta) {
     case 'ROJA':
       return {
+        '--shape-bg': '#FFE4E6',
+        '--shape-fg': '#E11D48',
         '--_shape-bg': '#FFE4E6',
         '--_shape-fg': '#E11D48',
         '--_shape-size': '2rem'
       }
     case 'AMARILLA':
       return {
+        '--shape-bg': '#FEF3C7',
+        '--shape-fg': '#D97706',
         '--_shape-bg': '#FEF3C7',
         '--_shape-fg': '#D97706',
         '--_shape-size': '2rem'
       }
     case 'VERDE':
       return {
+        '--shape-bg': '#D1FAE5',
+        '--shape-fg': '#059669',
         '--_shape-bg': '#D1FAE5',
         '--_shape-fg': '#059669',
         '--_shape-size': '2rem'
       }
     default:
       return {
+        '--shape-bg': '#F1F5F9',
+        '--shape-fg': '#64748B',
         '--_shape-bg': '#F1F5F9',
         '--_shape-fg': '#64748B',
         '--_shape-size': '2rem'
       }
+  }
+}
+
+function getShapeAlertClass(alerta: string): string {
+  switch (alerta) {
+    case 'ROJA': return 'shape-alert-roja'
+    case 'AMARILLA': return 'shape-alert-amarilla'
+    case 'VERDE': return 'shape-alert-verde'
+    default: return 'shape-alert-sin'
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="inline-flex items-center justify-center shrink-0 transition-transform select-none overflow-hidden"
+    class="app-shape inline-flex items-center justify-center shrink-0 transition-transform select-none overflow-hidden"
     :class="[sizeClass, shapeClass]"
     :style="shapeStyle"
   >
@@ -23,6 +23,20 @@ const props = withDefaults(
     color: 'surface'
   }
 )
+
+// Paleta semántica por alerta. Se aplica solo si el padre NO fijó
+// --shape-bg/--shape-fg por :style o clase (el inline/clase gana al var).
+const COLOR_MAP: Record<string, { bg: string; fg: string }> = {
+  roja: { bg: '#FFE4E6', fg: '#E11D48' },
+  red: { bg: '#FFE4E6', fg: '#E11D48' },
+  amarilla: { bg: '#FEF3C7', fg: '#D97706' },
+  yellow: { bg: '#FEF3C7', fg: '#D97706' },
+  verde: { bg: '#D1FAE5', fg: '#059669' },
+  green: { bg: '#D1FAE5', fg: '#059669' },
+  sin: { bg: '#F1F5F9', fg: '#64748B' },
+  normal: { bg: '#F1F5F9', fg: '#64748B' },
+  surface: { bg: '', fg: '' }
+}
 
 const sizeClass = computed(() => {
   switch (props.size) {
@@ -53,9 +67,15 @@ const shapeClass = computed(() => {
 })
 
 const shapeStyle = computed(() => {
+  const palette = COLOR_MAP[props.color?.toLowerCase?.() ?? 'surface']
   const baseStyle: Record<string, string> = {
-    backgroundColor: 'var(--shape-bg, var(--primary-container, #EAEAEB))',
-    color: 'var(--shape-fg, var(--on-primary-container, #18181B))'
+    // --shape-bg es la API oficial; --_shape-bg se acepta como alias
+    // legacy (MiniMapaCOE/MapaOperativo la usaban con guion bajo).
+    // Si se pasa color="roja|amarilla|..." se usa como fallback final.
+    backgroundColor:
+      'var(--shape-bg, var(--_shape-bg, ' + (palette?.bg || 'var(--primary-container, #EAEAEB)') + '))',
+    color:
+      'var(--shape-fg, var(--_shape-fg, ' + (palette?.fg || 'var(--on-primary-container, #18181B)') + '))'
   }
 
   // Exact Material 3 Expressive organic clip-paths

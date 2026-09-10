@@ -1,14 +1,36 @@
 <template>
   <div
     class="flex flex-col bg-[#F6F6F8] text-zinc-900 font-sans antialiased selection:bg-zinc-200"
-    :class="isMapPage ? 'h-screen overflow-hidden' : 'min-h-screen'"
+    :class="[isMapPage ? 'h-screen overflow-hidden' : 'min-h-screen', cardTheme === 'reactivo' ? 'modo-reactivo' : '']"
+    :style="cardTheme === 'reactivo' ? { backgroundColor: reactiveTheme.baseBg } : {}"
   >
+    <!-- Fondo reactivo del main (tema reactivo: aura + orbes + grano por alerta) -->
+    <div
+      v-if="cardTheme === 'reactivo'"
+      class="fixed inset-0 z-0 overflow-hidden pointer-events-none"
+      aria-hidden="true"
+    >
+      <div class="absolute inset-0" :style="{ background: reactiveTheme.auraBase }" />
+      <div
+        class="absolute left-[13%] top-[2%] w-[104vmin] h-[104vmin] rounded-full reactive-orb-1 reactive-orb-main-1"
+        :style="{ background: reactiveTheme.orb1 }"
+      />
+      <div
+        class="absolute right-[13%] bottom-[14%] w-[80vmin] h-[80vmin] rounded-full reactive-orb-2 reactive-orb-main-2"
+        :style="{ background: reactiveTheme.orb2 }"
+      />
+      <div class="absolute inset-0" :style="{ background: reactiveTheme.auraGlow }" />
+      <div class="absolute inset-0 reactive-grain opacity-100" />
+      <div class="absolute inset-0 reactive-grain opacity-70" />
+      <div class="absolute inset-0" :style="{ background: reactiveTheme.vignette }" />
+    </div>
+
     <!-- Top Full-Width Bulletin Ticker (Spans 100% width of the screen, above navigation) -->
     <BulletinTicker v-if="tickerPosition === 'top'" class="[view-transition-name:bulletin-ticker] !z-[1050]" />
 
     <!-- Application Body: Navigation + Content Area -->
     <div
-      class="flex-1 flex flex-col md:flex-row min-w-0 relative"
+      class="flex-1 flex flex-col md:flex-row min-w-0 relative z-[1]"
       :class="isMapPage ? 'h-full overflow-hidden' : ''"
     >
       <!-- 1. Clásica: Drawer lateral estándar completo (M3 Navigation Drawer) -->
@@ -494,7 +516,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted, watch } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
 import AppShape from '~/components/AppShape.vue'
 import AppButton from '~/components/AppButton.vue'
@@ -505,7 +527,7 @@ import NavActionsDropdown from '~/components/NavActionsDropdown.vue'
 import BulletinTicker from '~/components/BulletinTicker.vue'
 import { useAppearance } from '~/composables/useAppearance'
 import { useUserProfile } from '~/composables/useUserProfile'
-import { useCardTheme } from '~/composables/useCardTheme'
+import { useCardTheme, useReactiveTheme } from '~/composables/useCardTheme'
 
 const route = useRoute()
 const isMapPage = computed(() => route.path === '/mapa')
@@ -525,6 +547,19 @@ const {
 } = useAppearance()
 
 const { initCardTheme } = useCardTheme()
+const { cardTheme } = useCardTheme()
+const { reactiveTheme } = useReactiveTheme()
+
+// El modo reactivo es el modo oscuro global. Los modales/dropdowns van con
+// Teleport a <body> (fuera del root con .modo-reactivo), así que se replica
+// la clase en <body> para que los overrides oscuros también los cubran.
+function syncBodyDarkClass() {
+  if (typeof document === 'undefined') return
+  document.body.classList.toggle('modo-reactivo', cardTheme.value === 'reactivo')
+  document.documentElement.classList.toggle('modo-reactivo', cardTheme.value === 'reactivo')
+}
+
+watch(cardTheme, syncBodyDarkClass)
 const isTasksDrawerOpen = ref(false)
 const navActionsRef = ref<{ requestClose?: () => void } | null>(null)
 const isLetrasOpen = ref(false)
@@ -675,6 +710,7 @@ onMounted(() => {
   initAppearance()
   initProfile()
   initCardTheme()
+  syncBodyDarkClass()
 
   // Auto-launch mini-onboarding gently if new user
   if (!userProfile.value.hasCompletedOnboarding) {

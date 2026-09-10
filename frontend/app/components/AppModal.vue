@@ -35,7 +35,7 @@
           v-if="showCloseButton"
           type="button"
           @click="close"
-          class="btn btn-sm btn-circle btn-ghost absolute right-0 top-0 text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 cursor-pointer z-20"
+          class="btn btn-sm btn-circle btn-ghost absolute right-0 top-0 text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/10 cursor-pointer z-20"
           aria-label="Cerrar"
         >
           ✕
@@ -54,7 +54,7 @@
         <!-- Footer slot -->
         <div
           v-if="$slots.footer"
-          class="modal-action mt-4 pt-3 border-t border-zinc-100 flex items-center justify-end space-x-2"
+          class="modal-action mt-4 pt-3 border-t border-zinc-100 dark:border-white/10 flex items-center justify-end space-x-2"
         >
           <slot name="footer" :close="close" />
         </div>
@@ -112,7 +112,7 @@ const props = withDefaults(
     closeEase: undefined,
     overlay: true,
     overlayBlur: false,
-    overlayDark: true,
+    overlayDark: false,
     swipeToClose: false,
     closeOnEscape: true,
     lockScroll: false,
@@ -154,17 +154,16 @@ const maxWidthClass = computed(() => {
 })
 
 const computedOverlayClass = computed(() => {
-  return [
-    props.overlayDark ? 'bg-black/45' : '',
-    props.overlayBlur ? 'backdrop-blur-sm' : '',
-    props.overlayClass || ''
-  ].filter(Boolean).join(' ')
+  // Sin velo negro ni blur: overlay transparente que solo captura el clic
+  // fuera para cerrar, sin oscurecer ni desenfocar el fondo.
+  return [props.overlayClass || 'bg-transparent'].filter(Boolean).join(' ')
 })
 
 const computedModalClass = computed(() => {
   return [
     'wisspop-app-modal',
     'bg-white text-zinc-900 rounded-[28px] border border-zinc-200/90 shadow-2xl p-6',
+    'dark:bg-[#141a17] dark:text-zinc-100 dark:border-white/10',
     'w-[92vw] sm:w-full',
     maxWidthClass.value,
     props.modalClass || ''

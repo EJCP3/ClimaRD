@@ -199,4 +199,405 @@
   }
 }
 
+/* Tema reactivo: orbes a la deriva + grano (tarjeta de perfil y fondo del main) */
+.reactive-orb-1 {
+  filter: blur(18px) saturate(1.1) brightness(1.0);
+  opacity: 1;
+  mix-blend-mode: screen;
+  animation: reactive-drift-1 7s linear infinite alternate;
+  will-change: transform;
+  pointer-events: none;
+}
+.reactive-orb-2 {
+  filter: blur(16px) saturate(1.05) brightness(1.0);
+  opacity: 1;
+  mix-blend-mode: screen;
+  animation: reactive-drift-2 9s linear infinite alternate;
+  will-change: transform;
+  pointer-events: none;
+}
+@keyframes reactive-drift-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-140px, 90px) scale(1.08); }
+  50% { transform: translate(90px, -80px) scale(0.95); }
+  75% { transform: translate(120px, 70px) scale(1.05); }
+  100% { transform: translate(-90px, -100px) scale(0.97); }
+}
+@keyframes reactive-drift-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(120px, -90px) scale(1.06); }
+  50% { transform: translate(-100px, 70px) scale(0.94); }
+  75% { transform: translate(-110px, -80px) scale(1.04); }
+  100% { transform: translate(80px, 95px) scale(0.96); }
+}
+/* Deriva amplia para las orbes del fondo del main */
+.reactive-orb-main-1 {
+  animation: reactive-drift-main-1 11s linear infinite alternate;
+}
+.reactive-orb-main-2 {
+  animation: reactive-drift-main-2 13s linear infinite alternate;
+}
+@keyframes reactive-drift-main-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-9vmin, 7vmin) scale(1.05); }
+  50% { transform: translate(6vmin, -6vmin) scale(0.97); }
+  75% { transform: translate(8vmin, 5vmin) scale(1.03); }
+  100% { transform: translate(-6vmin, -7vmin) scale(0.98); }
+}
+@keyframes reactive-drift-main-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(8vmin, -7vmin) scale(1.04); }
+  50% { transform: translate(-7vmin, 5vmin) scale(0.96); }
+  75% { transform: translate(-8vmin, -6vmin) scale(1.02); }
+  100% { transform: translate(6vmin, 7vmin) scale(0.98); }
+}
+.reactive-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reactive-orb-1,
+  .reactive-orb-2 {
+    animation: none !important;
+  }
+}
+
+/* Modo reactivo = modo oscuro global. Overrides por atributo para no tocar
+   cada componente: las clases Tailwind claras pasan a cristal oscuro y los
+   textos zinc oscuros a claros.
+   La clase vive en el root y TAMBIÉN en <body>/<html> (ver default.vue):
+   los modales y dropdowns van con Teleport a <body>, fuera del root. */
+body.modo-reactivo,
+html.modo-reactivo {
+  color-scheme: dark;
+}
+body.modo-reactivo {
+  background-color: #0b0f0d;
+  color: #f4f4f5;
+}
+/* Superficies de modales teletransportados (AppModal, detalle, upload) */
+body.modo-reactivo .wisspop-app-modal,
+body.modo-reactivo [class*="rounded-3xl"].bg-white,
+html.modo-reactivo .wisspop-app-modal {
+  background-color: #141a17 !important;
+  color: #f4f4f5 !important;
+  border-color: rgb(255 255 255 / 0.1) !important;
+}
+/* Inputs/selects/textarea dentro de modales y dropdowns */
+body.modo-reactivo select,
+body.modo-reactivo input,
+body.modo-reactivo textarea,
+html.modo-reactivo select {
+  background-color: rgb(255 255 255 / 0.06) !important;
+  border-color: rgb(255 255 255 / 0.12) !important;
+  color: #f4f4f5 !important;
+}
+body.modo-reactivo select option,
+html.modo-reactivo select option {
+  background-color: #141a17 !important;
+  color: #f4f4f5 !important;
+}
+body.modo-reactivo select:focus,
+body.modo-reactivo input:focus,
+body.modo-reactivo textarea:focus {
+  --tw-ring-color: rgb(255 255 255 / 0.4) !important;
+  border-color: rgb(255 255 255 / 0.25) !important;
+}
+body.modo-reactivo input::placeholder,
+body.modo-reactivo textarea::placeholder {
+  color: #71717a !important;
+}
+/* Dropdowns WissPop y panel de acciones: cristal oscuro + texto claro */
+body.modo-reactivo .wisspop-province-dropdown,
+body.modo-reactivo .wisspop-sector-dropdown,
+body.modo-reactivo .wisspop-report-type-dropdown,
+body.modo-reactivo .wisspop-report-province-dropdown,
+body.modo-reactivo .wisspop-report-sector-dropdown,
+body.modo-reactivo [class*="rounded-[24px]"].bg-white {
+  background-color: #10140f !important;
+  color: #f4f4f5 !important;
+  border-color: rgb(255 255 255 / 0.1) !important;
+}
+/* ── Dropdowns del Paso 2 (Confirmar Reporte): panel siempre opaco,
+   pegado al trigger y por encima del modal. Sin esto el .wisspop-box
+   (sin fondo propio) se ve translúcido y el z-index con sintaxis v3
+   (!z-*) no compila en Tailwind v4. ── */
+.wisspop-report-type-dropdown,
+.wisspop-report-province-dropdown,
+.wisspop-report-sector-dropdown {
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  z-index: 9999 !important;
+}
+@media (prefers-color-scheme: dark) {
+  .wisspop-report-type-dropdown,
+  .wisspop-report-province-dropdown,
+  .wisspop-report-sector-dropdown {
+    background-color: #0b120e !important;
+    border-color: rgb(255 255 255 / 0.1) !important;
+    color: #f4f4f5 !important;
+  }
+}
+html.dark .wisspop-report-type-dropdown,
+html.dark .wisspop-report-province-dropdown,
+html.dark .wisspop-report-sector-dropdown,
+body.dark .wisspop-report-type-dropdown,
+body.dark .wisspop-report-province-dropdown,
+body.dark .wisspop-report-sector-dropdown {
+  background-color: #0b120e !important;
+  border-color: rgb(255 255 255 / 0.1) !important;
+  color: #f4f4f5 !important;
+}
+/* Overlays: nunca velo negro ni blur (solo captura de clic) */
+body.modo-reactivo [class*="backdrop-blur"],
+html.modo-reactivo [class*="backdrop-blur"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.modo-reactivo {
+  color-scheme: dark;
+  color: #f4f4f5;
+  --tw-ring-offset-color: rgba(0, 0, 0, 0.55);
+}
+/* Superficies claras -> cristal oscuro */
+.modo-reactivo [class*="bg-white"]:not([class*="bg-white/"]) {
+  background-color: rgb(255 255 255 / 0.07) !important;
+}
+.modo-reactivo [class*="bg-white/95"] {
+  background-color: rgb(10 13 17 / 0.88) !important;
+}
+.modo-reactivo [class*="bg-zinc-100"] {
+  background-color: rgb(255 255 255 / 0.09) !important;
+}
+.modo-reactivo [class*="bg-zinc-50"] {
+  background-color: rgb(255 255 255 / 0.05) !important;
+}
+.modo-reactivo [class*="bg-zinc-200/"] {
+  background-color: rgb(255 255 255 / 0.1) !important;
+}
+.modo-reactivo [class*="bg-[#F6F6F8]"] {
+  background-color: transparent !important;
+}
+/* Hovers claros */
+.modo-reactivo [class*="hover:bg-zinc-100"]:hover {
+  background-color: rgb(255 255 255 / 0.12) !important;
+}
+.modo-reactivo [class*="hover:bg-zinc-200"]:hover {
+  background-color: rgb(255 255 255 / 0.14) !important;
+}
+.modo-reactivo [class*="hover:bg-zinc-50"]:hover {
+  background-color: rgb(255 255 255 / 0.08) !important;
+}
+.modo-reactivo [class*="hover:text-zinc-950"]:hover {
+  color: #ffffff !important;
+}
+.modo-reactivo [class*="hover:text-zinc-800"]:hover {
+  color: #e4e4e7 !important;
+}
+.modo-reactivo [class*="hover:text-zinc-700"]:hover {
+  color: #e4e4e7 !important;
+}
+.modo-reactivo [class*="hover:border-zinc-300"]:hover,
+.modo-reactivo [class*="hover:border-zinc-400"]:hover {
+  border-color: rgb(255 255 255 / 0.25) !important;
+}
+/* Textos zinc oscuros -> claros */
+.modo-reactivo [class*="text-zinc-950"] {
+  color: #fafafa !important;
+}
+.modo-reactivo [class*="text-zinc-900"] {
+  color: #f4f4f5 !important;
+}
+.modo-reactivo [class*="text-zinc-800"] {
+  color: #e4e4e7 !important;
+}
+.modo-reactivo [class*="text-zinc-700"] {
+  color: #d4d4d8 !important;
+}
+.modo-reactivo [class*="text-zinc-600"] {
+  color: #a1a1aa !important;
+}
+.modo-reactivo [class*="text-[#0D1411]"] {
+  color: #ffffff !important;
+}
+/* Bordes zinc -> línea clara sutil */
+.modo-reactivo [class*="border-zinc-"] {
+  border-color: rgb(255 255 255 / 0.12) !important;
+}
+.modo-reactivo [class*="divide-zinc-"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgb(255 255 255 / 0.1) !important;
+}
+/* Chips pastel de alerta -> versión translúcida oscura */
+.modo-reactivo [class*="bg-rose-50"],
+.modo-reactivo [class*="bg-rose-100"] {
+  background-color: rgb(244 63 94 / 0.16) !important;
+}
+.modo-reactivo [class*="bg-amber-50"],
+.modo-reactivo [class*="bg-amber-100"] {
+  background-color: rgb(245 158 11 / 0.16) !important;
+}
+.modo-reactivo [class*="bg-emerald-50"],
+.modo-reactivo [class*="bg-emerald-100"] {
+  background-color: rgb(16 185 129 / 0.16) !important;
+}
+.modo-reactivo [class*="bg-sky-100"] {
+  background-color: rgb(56 189 248 / 0.16) !important;
+}
+.modo-reactivo [class*="text-rose-800"],
+.modo-reactivo [class*="text-rose-900"] {
+  color: #fda4af !important;
+}
+.modo-reactivo [class*="text-amber-800"],
+.modo-reactivo [class*="text-amber-900"] {
+  color: #fcd34d !important;
+}
+.modo-reactivo [class*="text-emerald-800"],
+.modo-reactivo [class*="text-emerald-900"] {
+  color: #a7f3d0 !important;
+}
+.modo-reactivo [class*="text-sky-800"] {
+  color: #bae6fd !important;
+}
+.modo-reactivo [class*="border-rose-200"],
+.modo-reactivo [class*="border-amber-200"],
+.modo-reactivo [class*="border-emerald-200"] {
+  border-color: rgb(255 255 255 / 0.14) !important;
+}
+/* Anillo de foco claro en inputs */
+.modo-reactivo [class*="focus:ring-zinc-950"]:focus {
+  --tw-ring-color: rgb(255 255 255 / 0.4) !important;
+}
+
+/* ── Modales OPACOS en modo oscuro (legibilidad, AL FINAL para ganar
+   especificidad a la regla cristal `.modo-reactivo [class*="bg-white"]`) ── */
+body.modo-reactivo .wisspop-app-modal[class*="bg-white"]:not([class*="bg-white/"]),
+html.modo-reactivo .wisspop-app-modal[class*="bg-white"]:not([class*="bg-white/"]),
+body.modo-reactivo div[class*="rounded-3xl"][class*="bg-white"]:not([class*="bg-white/"]),
+html.modo-reactivo div[class*="rounded-3xl"][class*="bg-white"]:not([class*="bg-white/"]) {
+  background-color: #161d19 !important;
+  background-image: none !important;
+  color: #f4f4f5 !important;
+  border-color: rgb(255 255 255 / 0.12) !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65) !important;
+  opacity: 1 !important;
+}
+/* Campos dentro del modal oscuro: pastilla legible sobre fondo opaco */
+body.modo-reactivo .wisspop-app-modal[class*="bg-white"] select:not([class*="bg-white/"]),
+body.modo-reactivo .wisspop-app-modal[class*="bg-white"] input:not([class*="bg-white/"]),
+body.modo-reactivo .wisspop-app-modal[class*="bg-white"] textarea:not([class*="bg-white/"]),
+body.modo-reactivo div[class*="rounded-3xl"][class*="bg-white"] select:not([class*="bg-white/"]),
+body.modo-reactivo div[class*="rounded-3xl"][class*="bg-white"] input:not([class*="bg-white/"]),
+body.modo-reactivo div[class*="rounded-3xl"][class*="bg-white"] textarea:not([class*="bg-white/"]) {
+  background-color: rgb(255 255 255 / 0.07) !important;
+  border-color: rgb(255 255 255 / 0.14) !important;
+  color: #fafafa !important;
+  opacity: 1 !important;
+}
+
+/* ── Textos medios y de nivel 950: legibles en oscuro ── */
+.modo-reactivo [class*="text-zinc-500"],
+body.modo-reactivo [class*="text-zinc-500"] {
+  color: #a1a1aa !important;
+}
+.modo-reactivo [class*="text-zinc-400"],
+body.modo-reactivo [class*="text-zinc-400"] {
+  color: #b6b6bc !important;
+}
+.modo-reactivo [class*="text-rose-950"],
+body.modo-reactivo [class*="text-rose-950"] {
+  color: #fecdd3 !important;
+}
+.modo-reactivo [class*="text-amber-950"],
+body.modo-reactivo [class*="text-amber-950"] {
+  color: #fde68a !important;
+}
+.modo-reactivo [class*="text-emerald-950"],
+body.modo-reactivo [class*="text-emerald-950"] {
+  color: #a7f3d0 !important;
+}
+
+/* ── Página de Alertas en modo oscuro: cromos opacos, mapa intacto ── */
+body.modo-reactivo .coe-map-card {
+  background-color: #161d19 !important;
+  background-image: none !important;
+  color: #f4f4f5 !important;
+  border-color: rgb(255 255 255 / 0.12) !important;
+  opacity: 1 !important;
+}
+body.modo-reactivo .coe-map-header {
+  background-color: rgb(255 255 255 / 0.04) !important;
+  background-image: none !important;
+  border-color: rgb(255 255 255 / 0.08) !important;
+}
+body.modo-reactivo .coe-map-body {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+body.modo-reactivo .coe-inspector {
+  background-color: #1b221e !important;
+  background-image: none !important;
+  color: #f4f4f5 !important;
+  border-color: rgb(255 255 255 / 0.12) !important;
+  opacity: 1 !important;
+}
+body.modo-reactivo .coe-exportbar {
+  background-color: rgb(255 255 255 / 0.07) !important;
+  background-image: none !important;
+  border-color: rgb(255 255 255 / 0.12) !important;
+}
+body.modo-reactivo .coe-grid-card {
+  color: #f4f4f5 !important;
+  opacity: 1 !important;
+}
+
+/* ── Iconos dentro de flores/formas: el fondo de la forma siempre es pastel
+   claro (también en oscuro), así que el icono debe permanecer oscuro ── */
+body.modo-reactivo .app-shape svg[class*="text-zinc-"],
+html.modo-reactivo .app-shape svg[class*="text-zinc-"],
+.modo-reactivo .app-shape svg[class*="text-zinc-"] {
+  color: #18181b !important;
+}
+
+/* ── AppShape por nivel de alerta: pastel en claro, translúcido en oscuro ──
+   Uso: <AppShape class="shape-alert-roja|amarilla|verde|sin">
+   El icono interior hereda --shape-fg vía currentColor (no fijar text-zinc-*). */
+.shape-alert-sin {
+  --shape-bg: #f1f5f9;
+  --shape-fg: #64748b;
+}
+.shape-alert-verde {
+  --shape-bg: #d1fae5;
+  --shape-fg: #059669;
+}
+.shape-alert-amarilla {
+  --shape-bg: #fef3c7;
+  --shape-fg: #d97706;
+}
+.shape-alert-roja {
+  --shape-bg: #ffe4e6;
+  --shape-fg: #e11d48;
+}
+.modo-reactivo .shape-alert-sin,
+body.modo-reactivo .shape-alert-sin {
+  --shape-bg: rgb(148 163 184 / 0.22) !important;
+  --shape-fg: #cbd5e1 !important;
+}
+.modo-reactivo .shape-alert-verde,
+body.modo-reactivo .shape-alert-verde {
+  --shape-bg: rgb(16 185 129 / 0.22) !important;
+  --shape-fg: #6ee7b7 !important;
+}
+.modo-reactivo .shape-alert-amarilla,
+body.modo-reactivo .shape-alert-amarilla {
+  --shape-bg: rgb(245 158 11 / 0.22) !important;
+  --shape-fg: #fcd34d !important;
+}
+.modo-reactivo .shape-alert-roja,
+body.modo-reactivo .shape-alert-roja {
+  --shape-bg: rgb(244 63 94 / 0.24) !important;
+  --shape-fg: #fda4af !important;
+}
+
 

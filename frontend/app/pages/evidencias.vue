@@ -1,29 +1,5 @@
 <template>
   <div class="p-4 md:p-8 max-w-5xl mx-auto space-y-6">
-    <!-- Header Section -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <h2 class="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight">Muro de Evidencias Urbanas</h2>
-        <p class="text-xs sm:text-sm text-zinc-500 mt-1">
-          Reportes ciudadanos verificados en tiempo real ante eventos meteorológicos, inundaciones y vías anegadas.
-        </p>
-      </div>
-
-      <!-- Trigger for Upload Modal -->
-      <AppButton
-        id="btn-subir-evidencia"
-        variant="filled"
-        shape="round"
-        class="self-start sm:self-auto cursor-pointer"
-        @click="openUploadModal($event)"
-      >
-        <template #icon>
-          <AppIcon name="plus" class="w-4 h-4 mr-1.5" />
-        </template>
-        Subir Nueva Evidencia
-      </AppButton>
-    </div>
-
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center gap-2.5 py-16 text-zinc-500">
       <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -171,8 +147,8 @@
         placement="center"
         content-animation="fade"
         flying-text-class="foto-viajera"
-        modal-class="bg-white text-zinc-950 rounded-3xl border border-zinc-200/90 shadow-2xl p-4 sm:p-5 md:p-6 w-[95vw] sm:w-[680px] md:w-[760px] max-w-3xl max-h-[92vh] overflow-y-auto select-none custom-scrollbar"
-        overlay-class="bg-black/50 cursor-pointer"
+        modal-class="bg-white text-zinc-950 rounded-3xl border border-zinc-200/90 shadow-2xl p-4 sm:p-5 md:p-6 w-[95vw] sm:w-[680px] md:w-[760px] max-w-3xl max-h-[92vh] overflow-y-auto select-none custom-scrollbar dark:bg-[#141a17] dark:text-zinc-100 dark:border-white/10"
+        overlay-class="bg-transparent cursor-pointer"
         :overlay="true"
         :duration="0.52"
         :close-duration="0.42"
@@ -542,11 +518,10 @@
         >
           <div
             v-if="isUploadModalOpen"
-            class="fixed inset-0 z-[99998] flex items-center justify-center p-3 sm:p-5"
-            style="background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);"
+            class="fixed inset-0 z-[99998] flex items-center justify-center p-3 sm:p-5 bg-transparent"
             @click.self="closeUploadModal"
           >
-            <div class="w-full max-w-xl max-h-[92vh] overflow-y-auto custom-scrollbar bg-white text-zinc-950 rounded-3xl border border-zinc-200/90 shadow-2xl p-4 sm:p-6 select-none">
+            <div class="w-full max-w-xl max-h-[92vh] overflow-y-auto custom-scrollbar bg-white text-zinc-950 rounded-3xl border border-zinc-200/90 shadow-2xl p-4 sm:p-6 select-none dark:bg-[#141a17] dark:text-zinc-100 dark:border-white/10">
               <!-- Header -->
               <div class="flex items-center justify-between pb-4 border-b border-zinc-100">
                 <div class="flex items-center space-x-2.5">
@@ -582,6 +557,7 @@
                     <option value="inundacion">Inundación Callejera / Desborde de Cañada</option>
                     <option value="arbol">Árbol Caído / Cables de Alta Tensión</option>
                     <option value="bloqueo">Vía Bloqueada / Vehículos Varados</option>
+                    <option value="derrumbe">Derrumbe / Grieta Estructural</option>
                   </select>
                 </div>
 
@@ -772,7 +748,8 @@ const isLoading = ref(false)
 const CATEGORY_META: Record<string, { title: string; icon: string; shape: string }> = {
   inundacion: { title: 'Inundación Callejera', icon: 'water', shape: 'flower' },
   arbol: { title: 'Árbol Caído', icon: 'tree', shape: '12-sided-cookie' },
-  bloqueo: { title: 'Vía Bloqueada', icon: 'car', shape: 'soft-burst' }
+  bloqueo: { title: 'Vía Bloqueada', icon: 'car', shape: 'soft-burst' },
+  derrumbe: { title: 'Derrumbe / Grieta', icon: 'alert-triangle', shape: 'arch' }
 }
 
 // Poster de respaldo cuando el reporte es un video (la miniatura de la galería es una imagen)

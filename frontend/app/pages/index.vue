@@ -1,36 +1,8 @@
 <template>
   <div class="p-4 md:p-8 max-w-5xl mx-auto space-y-8">
-    <!-- Zone Customization Banner -->
-    <div
-      v-if="userProfile.hasCompletedOnboarding"
-      class="flex flex-wrap items-center justify-between gap-2.5 p-3.5 bg-white rounded-2xl border border-zinc-200/80 shadow-xs"
-    >
-      <div class="flex items-center space-x-2.5 flex-wrap gap-y-1">
-        <span class="relative flex h-2.5 w-2.5">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-        </span>
-        <span class="text-xs font-bold text-zinc-900">
-          {{ userProfile.name ? `Hola, ${userProfile.name} • ` : '' }}Monitoreando <strong>{{ userProfile.zone }}</strong>, {{ enrichedWeather.provinceName }}
-        </span>
-        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase text-white" :class="enrichedWeather.alertBadgeClass">
-          {{ enrichedWeather.alerta === 'NORMAL' ? 'Sin Alerta' : 'Alerta ' + enrichedWeather.alerta }}
-        </span>
-      </div>
-
-      <button
-        type="button"
-        @click="openProfileModal()"
-        class="inline-flex items-center space-x-1.5 text-xs font-bold text-zinc-700 hover:text-zinc-950 bg-zinc-100 hover:bg-zinc-200 px-3.5 py-1.5 rounded-full border border-zinc-200/80 transition-all cursor-pointer"
-      >
-        <AppIcon name="edit" class="w-3.5 h-3.5 text-zinc-700" />
-        <span>Cambiar mi zona</span>
-      </button>
-    </div>
-
     <!-- First Visit CTA Callout if Not Configured -->
     <div
-      v-else
+      v-if="!userProfile.hasCompletedOnboarding"
       class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-gradient-to-r from-zinc-900 to-zinc-950 text-white rounded-[24px] shadow-sm"
     >
       <div class="flex items-center space-x-3">

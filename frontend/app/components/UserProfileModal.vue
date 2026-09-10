@@ -6,9 +6,9 @@
       placement="center"
       align="center"
       :overlay="true"
-      :overlay-dark="true"
+      :overlay-dark="false"
       :overlay-blur="false"
-      overlay-class="bg-black/65"
+      overlay-class="bg-transparent"
       modal-class="wisspop-profile-modal bg-[#0D1411] text-white rounded-[32px] border border-white/10 shadow-[0_24px_64px_rgba(0,0,0,0.7)] overflow-hidden w-[95vw] sm:w-full max-w-2xl select-none"
       :close-on-escape="true"
       @update:model-value="onModelUpdate"
@@ -119,15 +119,15 @@
                   :style="{ background: reactiveTheme.auraBase, mixBlendMode: 'normal' }"
                   aria-hidden="true"
                 />
-                <!-- Orbe principal animada (pequeña y redonda) -->
+                <!-- Orbe principal animada (esfera definida, mismo tono) -->
                 <div
-                  class="absolute top-[6%] left-[52%] w-[210px] h-[210px] rounded-full pointer-events-none reactive-orb-1"
+                  class="absolute top-[2%] right-[6%] w-[350px] h-[350px] rounded-full pointer-events-none reactive-orb-1"
                   :style="{ background: reactiveTheme.orb1 }"
                   aria-hidden="true"
                 />
-                <!-- Orbe secundaria animada (pequeña y redonda) -->
+                <!-- Orbe secundaria animada (esfera definida, leve variación) -->
                 <div
-                  class="absolute top-[60%] left-[12%] w-[150px] h-[150px] rounded-full pointer-events-none reactive-orb-2"
+                  class="absolute bottom-[4%] left-[5%] w-[250px] h-[250px] rounded-full pointer-events-none reactive-orb-2"
                   :style="{ background: reactiveTheme.orb2 }"
                   aria-hidden="true"
                 />
@@ -139,7 +139,7 @@
                 />
                 <!-- Textura de grano -->
                 <div
-                  class="absolute inset-0 pointer-events-none z-[1] opacity-60 reactive-grain"
+                  class="absolute inset-0 pointer-events-none z-[1] opacity-100 reactive-grain"
                   aria-hidden="true"
                 />
                 <!-- Viñeta para legibilidad -->
@@ -604,7 +604,7 @@
               <div>
                 <h3 class="text-sm font-bold text-white">Tema de la tarjeta</h3>
                 <p class="text-[11px] text-zinc-400 mt-0.5">
-                  El reactivo usa los colores de la alerta vigente en {{ currentProvinceName }} ({{ currentProvinceAlert }}): orbe animada, grano y partículas.
+                  El reactivo es el modo oscuro de la web: usa los colores de la alerta vigente en {{ currentProvinceName }} ({{ currentProvinceAlert }}) en la tarjeta y en toda la página.
                 </p>
               </div>
 
@@ -677,7 +677,7 @@ import {
 } from '~/composables/useUserProfile'
 import postalCodes from '~/assets/data/codigos-postales-rd.json'
 import { PROVINCES_DATA } from '~/composables/useWeatherEnrichment'
-import { useCardTheme } from '~/composables/useCardTheme'
+import { useCardTheme, getReactivePalette } from '~/composables/useCardTheme'
 
 interface AutocompleteItem {
   place: string
@@ -957,63 +957,9 @@ const alertCardTheme = computed(() => {
   }
 })
 
-// Tema reactivo: orbe animada + grano + partículas con los colores de la
-// alerta vigente en la provincia. Comparte viñeta con el tema normal.
-const REACTIVE_VIGNETTE =
-  'radial-gradient(ellipse 120% 105% at 50% 45%, transparent 52%, rgba(0,0,0,0.38) 82%, rgba(0,0,0,0.62) 100%), linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, transparent 28%, transparent 58%, rgba(0,0,0,0.45) 100%)'
-
-const reactiveTheme = computed(() => {
-  switch (currentProvinceAlert.value) {
-    case 'ROJA':
-      return {
-        alerta: 'ROJA',
-        baseBg: '#1c0a0e',
-        auraBase: 'linear-gradient(135deg, #0d0305 0%, #1a070b 42%, #221016 72%, #0a0204 100%)',
-        auraGlow: 'radial-gradient(ellipse 45% 55% at 54% 44%, rgba(244,63,94,0.22) 0%, transparent 65%)',
-        orb1: 'radial-gradient(circle at 35% 35%, rgba(244,63,94,0.85) 0%, rgba(159,18,57,0.35) 55%, transparent 72%)',
-        orb2: 'radial-gradient(circle at 60% 60%, rgba(251,146,60,0.5) 0%, transparent 70%)',
-        glow: '0 0 90px rgba(244,63,94,0.28), 0 24px 64px rgba(0,0,0,0.7)',
-        labelColor: 'text-[#f3c1c8]/80',
-        vignette: REACTIVE_VIGNETTE
-      }
-    case 'AMARILLA':
-      return {
-        alerta: 'AMARILLA',
-        baseBg: '#171106',
-        auraBase: 'linear-gradient(135deg, #0d0a03 0%, #1a1406 42%, #221a0c 72%, #0a0702 100%)',
-        auraGlow: 'radial-gradient(ellipse 45% 55% at 54% 44%, rgba(245,158,11,0.22) 0%, transparent 65%)',
-        orb1: 'radial-gradient(circle at 35% 35%, rgba(245,158,11,0.8) 0%, rgba(180,83,9,0.35) 55%, transparent 72%)',
-        orb2: 'radial-gradient(circle at 60% 60%, rgba(253,224,71,0.4) 0%, transparent 70%)',
-        glow: '0 0 90px rgba(245,158,11,0.26), 0 24px 64px rgba(0,0,0,0.7)',
-        labelColor: 'text-[#ecd3a8]/80',
-        vignette: REACTIVE_VIGNETTE
-      }
-    case 'VERDE':
-      return {
-        alerta: 'VERDE',
-        baseBg: '#07120d',
-        auraBase: 'linear-gradient(135deg, #030803 0%, #08120d 42%, #0d1a13 72%, #040805 100%)',
-        auraGlow: 'radial-gradient(ellipse 45% 55% at 54% 44%, rgba(34,197,94,0.22) 0%, transparent 65%)',
-        orb1: 'radial-gradient(circle at 35% 30%, rgba(34,197,94,0.75) 0%, rgba(16,185,129,0.35) 55%, transparent 72%)',
-        orb2: 'radial-gradient(circle at 60% 65%, rgba(45,212,191,0.45) 0%, transparent 70%)',
-        glow: '0 0 90px rgba(16,185,129,0.28), 0 24px 64px rgba(0,0,0,0.7)',
-        labelColor: 'text-[#b8dfcb]/80',
-        vignette: REACTIVE_VIGNETTE
-      }
-    default:
-      return {
-        alerta: 'NORMAL',
-        baseBg: '#0a1017',
-        auraBase: 'linear-gradient(135deg, #030507 0%, #0a1016 42%, #101820 72%, #05080c 100%)',
-        auraGlow: 'radial-gradient(ellipse 45% 55% at 54% 44%, rgba(56,189,248,0.22) 0%, transparent 65%)',
-        orb1: 'radial-gradient(circle at 35% 35%, rgba(56,189,248,0.75) 0%, rgba(30,64,175,0.35) 55%, transparent 72%)',
-        orb2: 'radial-gradient(circle at 60% 60%, rgba(129,140,248,0.45) 0%, transparent 70%)',
-        glow: '0 0 90px rgba(56,189,248,0.26), 0 24px 64px rgba(0,0,0,0.7)',
-        labelColor: 'text-[#b8cbe0]/80',
-        vignette: REACTIVE_VIGNETTE
-      }
-  }
-})
+// Tema reactivo de la tarjeta: vista previa en vivo con la alerta del
+// formulario (provincia que se está eligiendo).
+const reactiveTheme = computed(() => getReactivePalette(currentProvinceAlert.value))
 
 const provincePlaces = computed<PostalPlace[]>(() => {
   return getPostalPlacesForProvince(formProvinceSlug.value)
@@ -1305,19 +1251,19 @@ function resetProfileData() {
 </script>
 
 <style scoped>
-/* Tema reactivo: orbes a la deriva + partículas flotantes + grano */
+/* Tema reactivo: orbes a la deriva + grano */
 .reactive-orb-1 {
-  filter: blur(48px);
-  opacity: 0.95;
+  filter: blur(18px) saturate(1.1) brightness(1.0);
+  opacity: 1;
   mix-blend-mode: screen;
-  animation: reactive-drift-1 12s ease-in-out infinite alternate;
+  animation: reactive-drift-1 7s ease-in-out infinite alternate;
   will-change: transform;
 }
 .reactive-orb-2 {
-  filter: blur(44px);
-  opacity: 0.7;
+  filter: blur(16px) saturate(1.05) brightness(1.0);
+  opacity: 1;
   mix-blend-mode: screen;
-  animation: reactive-drift-2 17s ease-in-out infinite alternate;
+  animation: reactive-drift-2 9s ease-in-out infinite alternate;
   will-change: transform;
 }
 @keyframes reactive-drift-1 {
@@ -1331,8 +1277,8 @@ function resetProfileData() {
   100% { transform: translate(-26px, 20px) scale(0.95); }
 }
 .reactive-grain {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  background-size: 160px 160px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
   mix-blend-mode: overlay;
 }
 @media (prefers-reduced-motion: reduce) {
