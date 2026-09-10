@@ -8,10 +8,79 @@
       :options="toastHostOptions"
     />
   </ClientOnly>
+  <!-- Glimm Canvas for Transitions -->
+  <canvas id="glimm-canvas" class="fixed inset-0 w-screen h-screen z-[9999] pointer-events-none" />
 </template>
 
 <script setup lang="ts">
 import { ToastHost, toast } from 'super-beautiful-toast'
+import { useRouter, START_LOCATION } from 'vue-router'
+import { useGlimmSweep, getProvinceAlert } from '~/composables/useGlimmSweep'
+
+const router = useRouter()
+
+if (import.meta.client) {
+  let isNavigatingWithGlimm = false
+  let isMidpointResolving = false
+
+  router.beforeEach(async (to, from) => {
+    // Si la llamada a router.push proviene del midpoint del sweep, permitimos el swap de ruta
+    if (isMidpointResolving) {
+      return true
+    }
+
+    // Evitar navegación repetida si ya hay un sweep en curso o es la misma URL
+    if (isNavigatingWithGlimm || to.fullPath === from.fullPath) {
+      return false
+    }
+
+    // Ignorar en la carga inicial / refresh de la página
+    if (from === START_LOCATION || (!from.name && from.matched.length === 0)) {
+      return true
+    }
+
+    const isEnteringProvince = to.path.startsWith('/provincia/')
+    const isExitingProvince = from.path.startsWith('/provincia/')
+
+    // Solo aplicamos glimm para entrar o salir de una provincia
+    if (!isEnteringProvince && !isExitingProvince) {
+      return true
+    }
+
+    // Determinar la alerta: si entra a provincia, usamos la alerta de destino; si sale, la de origen
+    const slug = isEnteringProvince
+      ? (to.params.slug as string || to.path.split('/')[2])
+      : (from.params.slug as string || from.path.split('/')[2])
+    const alerta = getProvinceAlert(slug)
+
+    isNavigatingWithGlimm = true
+    const { sweep } = useGlimmSweep()
+
+    sweep(
+      alerta,
+      async () => {
+        isMidpointResolving = true
+        try {
+          await router.push(to.fullPath)
+          await nextTick()
+          // Doble rAF (técnica exacta de Paseito): deja que el layout de la nueva página
+          // termine de pintarse antes de que la franja descubra el contenido.
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+        } catch (e) {
+          console.error('[glimm] navigation error:', e)
+        } finally {
+          isMidpointResolving = false
+        }
+      },
+      () => {
+        isNavigatingWithGlimm = false
+      }
+    )
+
+    // Cancelamos la navegación sincrónica inmediata; la navegación real ocurrirá en onMidpoint
+    return false
+  })
+}
 
 // Physics & animation tuning for super-beautiful-toast
 const toastHostOptions = {
@@ -76,68 +145,12 @@ if (import.meta.client) {
   --sbt-edge-offset: 20px;
 }
 
-/* View Transitions API (Native Browser Transitions) */
-::view-transition-old(app-page-content) {
-  animation: 180ms cubic-bezier(0.4, 0, 1, 1) both vtPageFadeOut;
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.2s ease;
 }
-
-::view-transition-new(app-page-content) {
-  animation: 240ms cubic-bezier(0, 0, 0.2, 1) both vtPageFadeIn;
-}
-
-::view-transition-old(root) {
-  animation: 140ms ease both vtFadeOut;
-}
-
-::view-transition-new(root) {
-  animation: 180ms ease both vtFadeIn;
-}
-
-@keyframes vtPageFadeOut {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-}
-
-@keyframes vtPageFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes vtFadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes vtFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
-  }
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
 }
 </style>

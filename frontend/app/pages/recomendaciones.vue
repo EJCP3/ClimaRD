@@ -25,6 +25,12 @@
                 <AppIcon name="siren" class="w-7 h-7 text-zinc-900" />
               </AppShape>
               <div class="flex items-center space-x-2">
+                <button @click="copyText('911')" class="p-1.5 hover:bg-zinc-100 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors" title="Copiar número">
+                  <MorphIcon :icon="copiedText === '911' ? Check : Copy" class="w-4 h-4" />
+                </button>
+                <button @click="shareText('Emergencias 9-1-1', 'Línea de emergencias 9-1-1 (República Dominicana)')" class="p-1.5 hover:bg-zinc-100 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors" title="Compartir">
+                  <MorphIcon :icon="sharedText === 'Línea de emergencias 9-1-1 (República Dominicana)' ? Check : Share" class="w-4 h-4" />
+                </button>
                 <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-[10px] font-black uppercase tracking-wider">
                   Prioridad Nacional
                 </span>
@@ -70,9 +76,17 @@
               <AppShape name="12-sided-cookie" size="medium" class="shrink-0 group-hover:scale-105 transition-transform">
                 <AppIcon name="alert-triangle" class="w-6 h-6 text-zinc-900" />
               </AppShape>
-              <span class="px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase border border-zinc-200/60">
-                Mando Operativo
-              </span>
+              <div class="flex items-center space-x-2">
+                <button @click="copyText('8094720909')" class="p-1.5 hover:bg-zinc-100 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors" title="Copiar número">
+                  <MorphIcon :icon="copiedText === '8094720909' ? Check : Copy" class="w-4 h-4" />
+                </button>
+                <button @click="shareText('COE Central', 'Contacto COE Central: (809) 472-0909')" class="p-1.5 hover:bg-zinc-100 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors" title="Compartir">
+                  <MorphIcon :icon="sharedText === 'Contacto COE Central: (809) 472-0909' ? Check : Share" class="w-4 h-4" />
+                </button>
+                <span class="px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-extrabold uppercase border border-zinc-200/60">
+                  Mando Operativo
+                </span>
+              </div>
             </div>
 
             <div class="space-y-1">
@@ -106,9 +120,17 @@
               <AppShape name="flower" size="medium" class="shrink-0 group-hover:scale-105 transition-transform">
                 <AppIcon name="life-buoy" class="w-6 h-6 text-zinc-900" />
               </AppShape>
-              <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-bold uppercase border border-zinc-200/60">
-                Albergues
-              </span>
+              <div class="flex items-center space-x-2">
+                <button @click="copyText('8094728614')" class="p-1.5 hover:bg-zinc-100 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors" title="Copiar número">
+                  <MorphIcon :icon="copiedText === '8094728614' ? Check : Copy" class="w-4 h-4" />
+                </button>
+                <button @click="shareText('Defensa Civil', 'Contacto Defensa Civil: (809) 472-8614')" class="p-1.5 hover:bg-zinc-100 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors" title="Compartir">
+                  <MorphIcon :icon="sharedText === 'Contacto Defensa Civil: (809) 472-8614' ? Check : Share" class="w-4 h-4" />
+                </button>
+                <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-bold uppercase border border-zinc-200/60">
+                  Albergues
+                </span>
+              </div>
             </div>
             <div>
               <h4 class="text-lg font-black text-zinc-950">Defensa Civil</h4>
@@ -140,9 +162,17 @@
               <AppShape name="sunny" size="medium" class="shrink-0 group-hover:scale-105 transition-transform">
                 <AppIcon name="flame" class="w-6 h-6 text-zinc-900" />
               </AppShape>
-              <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-bold uppercase border border-zinc-200/60">
-                Urbano
-              </span>
+              <div class="flex items-center space-x-2">
+                <button @click="copyText('8096822000')" class="p-1.5 hover:bg-zinc-100 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors" title="Copiar número">
+                  <MorphIcon :icon="copiedText === '8096822000' ? Check : Copy" class="w-4 h-4" />
+                </button>
+                <button @click="shareText('Bomberos D.N.', 'Contacto Bomberos D.N.: (809) 682-2000')" class="p-1.5 hover:bg-zinc-100 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors" title="Compartir">
+                  <MorphIcon :icon="sharedText === 'Contacto Bomberos D.N.: (809) 682-2000' ? Check : Share" class="w-4 h-4" />
+                </button>
+                <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-bold uppercase border border-zinc-200/60">
+                  Urbano
+                </span>
+              </div>
             </div>
             <div>
               <h4 class="text-lg font-black text-zinc-950">Bomberos D.N.</h4>
@@ -174,9 +204,17 @@
               <AppShape name="arch" size="medium" class="shrink-0 group-hover:scale-105 transition-transform">
                 <AppIcon name="car" class="w-6 h-6 text-zinc-900" />
               </AppShape>
-              <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-bold uppercase border border-zinc-200/60">
-                Autopistas
-              </span>
+              <div class="flex items-center space-x-2">
+                <button @click="copyText('8095674920')" class="p-1.5 hover:bg-zinc-100 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors" title="Copiar número">
+                  <MorphIcon :icon="copiedText === '8095674920' ? Check : Copy" class="w-4 h-4" />
+                </button>
+                <button @click="shareText('Asistencia Vial MOPC', 'Contacto Asistencia Vial MOPC: (809) 567-4920')" class="p-1.5 hover:bg-zinc-100 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors" title="Compartir">
+                  <MorphIcon :icon="sharedText === 'Contacto Asistencia Vial MOPC: (809) 567-4920' ? Check : Share" class="w-4 h-4" />
+                </button>
+                <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] font-bold uppercase border border-zinc-200/60">
+                  Autopistas
+                </span>
+              </div>
             </div>
             <div>
               <h4 class="text-lg font-black text-zinc-950">Asistencia Vial MOPC</h4>
@@ -321,5 +359,39 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { MorphIcon } from 'morphicons/vue'
+import { Copy, Share, Check } from 'lucide'
+
 // All emergency contacts and protocols follow COE & INDOMET official standards.
+
+const copiedText = ref<string | null>(null)
+const sharedText = ref<string | null>(null)
+
+const copyText = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    copiedText.value = text
+    setTimeout(() => { if (copiedText.value === text) copiedText.value = null }, 2000)
+  } catch (err) {
+    console.error('Failed to copy', err)
+  }
+}
+
+const shareText = async (title: string, text: string) => {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title,
+        text,
+      })
+      sharedText.value = text
+      setTimeout(() => { if (sharedText.value === text) sharedText.value = null }, 2000)
+    } catch (err) {
+      console.error('Failed to share', err)
+    }
+  } else {
+    copyText(text)
+  }
+}
 </script>

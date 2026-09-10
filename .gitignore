@@ -5,6 +5,8 @@ node_modules/
 .nitro/
 dist/
 *.log
+.pnpm-store/
+
 
 # Python / FastAPI
 __pycache__/
@@ -25,6 +27,9 @@ htmlcov/
 .env.test.local
 .env.production.local
 !.env.example
+
+# Evidencias subidas por los usuarios (backend)
+backend/uploads/
 
 # IDEs & System
 .vscode/
