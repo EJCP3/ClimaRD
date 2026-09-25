@@ -168,6 +168,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { WissPopFlip } from 'wisspop/vue'
 import AppIcon from '~/components/AppIcon.vue'
 import MiniMapaCOE from '~/components/mapa/MiniMapaCOE.vue'
 
