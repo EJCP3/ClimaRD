@@ -37,7 +37,7 @@ app = FastAPI(
 # CORS configuration for Nuxt 4 frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://climard.do"],
+    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "https://climard.do"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

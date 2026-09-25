@@ -22,6 +22,10 @@
       :aria-labelledby="ariaLabelledby"
       :close-button="false"
       :modal-class="computedModalClass"
+      :flying-text-class="flyingTextClass"
+      :label="resolvedLabel"
+      :flying-mode="flyingMode"
+      :label-offset-x="labelOffsetX"
       @update:model-value="onModelValueUpdate"
       @close="onClose"
     >
@@ -31,7 +35,7 @@
           v-if="showCloseButton"
           type="button"
           @click="close"
-          class="btn btn-sm btn-circle btn-ghost absolute right-0 top-0 text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 cursor-pointer z-20"
+          class="btn btn-sm btn-circle btn-ghost absolute right-0 top-0 text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/10 cursor-pointer z-20"
           aria-label="Cerrar"
         >
           ✕
@@ -50,7 +54,7 @@
         <!-- Footer slot -->
         <div
           v-if="$slots.footer"
-          class="modal-action mt-4 pt-3 border-t border-zinc-100 flex items-center justify-end space-x-2"
+          class="modal-action mt-4 pt-3 border-t border-zinc-100 dark:border-white/10 flex items-center justify-end space-x-2"
         >
           <slot name="footer" :close="close" />
         </div>
@@ -87,6 +91,10 @@ const props = withDefaults(
     contentBlur?: boolean
     ariaLabel?: string
     ariaLabelledby?: string
+    flyingTextClass?: string | null
+    label?: string | any
+    flyingMode?: string | null
+    labelOffsetX?: number
   }>(),
   {
     modelValue: undefined,
@@ -104,13 +112,17 @@ const props = withDefaults(
     closeEase: undefined,
     overlay: true,
     overlayBlur: false,
-    overlayDark: true,
+    overlayDark: false,
     swipeToClose: false,
     closeOnEscape: true,
     lockScroll: false,
     contentBlur: false,
     ariaLabel: undefined,
-    ariaLabelledby: undefined
+    ariaLabelledby: undefined,
+    flyingTextClass: null,
+    label: null,
+    flyingMode: null,
+    labelOffsetX: 24
   }
 )
 
@@ -123,6 +135,11 @@ const emit = defineEmits<{
 const morphRef = ref<any>(null)
 const internalOpen = ref(false)
 const customOrigin = ref<any>(null)
+const customLabel = ref<string | any>(null)
+
+const resolvedLabel = computed(() => {
+  return customLabel.value !== null && customLabel.value !== undefined ? customLabel.value : props.label
+})
 
 const isOpen = computed(() => {
   if (props.modelValue !== undefined) return props.modelValue
@@ -137,17 +154,16 @@ const maxWidthClass = computed(() => {
 })
 
 const computedOverlayClass = computed(() => {
-  return [
-    'bg-black/45',
-    props.overlayBlur ? 'backdrop-blur-sm' : '',
-    props.overlayClass || ''
-  ].filter(Boolean).join(' ')
+  // Sin velo negro ni blur: overlay transparente que solo captura el clic
+  // fuera para cerrar, sin oscurecer ni desenfocar el fondo.
+  return [props.overlayClass || 'bg-transparent'].filter(Boolean).join(' ')
 })
 
 const computedModalClass = computed(() => {
   return [
     'wisspop-app-modal',
     'bg-white text-zinc-900 rounded-[28px] border border-zinc-200/90 shadow-2xl p-6',
+    'dark:bg-[#141a17] dark:text-zinc-100 dark:border-white/10',
     'w-[92vw] sm:w-full',
     maxWidthClass.value,
     props.modalClass || ''
@@ -181,6 +197,9 @@ function resolveOrigin(rawInput: any) {
   // 1. MouseEvent or DOM Event
   if (typeof Event !== 'undefined' && raw instanceof Event) {
     const target = (raw.currentTarget || raw.target) as HTMLElement | SVGElement | null
+    if (typeof HTMLElement !== 'undefined' && target instanceof HTMLElement) {
+      return target
+    }
     if (target && typeof target.getBoundingClientRect === 'function') {
       const rect = target.getBoundingClientRect()
       return {
@@ -258,9 +277,12 @@ const resolvedOrigin = computed(() => {
   return resolveOrigin(originToUse)
 })
 
-const open = (origin?: any) => {
-  if (origin) {
+const open = (origin?: any, label?: any) => {
+  if (origin !== undefined) {
     customOrigin.value = origin
+  }
+  if (label !== undefined) {
+    customLabel.value = label
   }
   internalOpen.value = true
   emit('update:modelValue', true)
@@ -277,6 +299,7 @@ const close = () => {
 const onModelValueUpdate = (val: boolean) => {
   if (!val) {
     customOrigin.value = null
+    customLabel.value = null
     internalOpen.value = false
     emit('update:modelValue', false)
     emit('update:open', false)
@@ -285,6 +308,7 @@ const onModelValueUpdate = (val: boolean) => {
 
 const onClose = () => {
   customOrigin.value = null
+  customLabel.value = null
   internalOpen.value = false
   emit('update:modelValue', false)
   emit('update:open', false)

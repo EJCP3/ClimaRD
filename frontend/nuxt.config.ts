@@ -9,18 +9,27 @@ export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt'
   ],
+  // wisspop importa `gsap/Flip` con named export ESM. Si Nitro lo deja como
+  // dependencia externa, Node puede resolverlo al build CJS (dist/Flip.js)
+  // y Vercel responde 500: "Named export 'Flip' not found".
+  // Al transpilar/inlinear ambas dependencias, el import queda empaquetado
+  // y no existe resolución en runtime.
+  build: {
+    transpile: ['gsap', 'wisspop']
+  },
   vite: {
     plugins: [
       tailwindcss()
-    ]
+    ],
+    ssr: {
+      noExternal: ['gsap', 'wisspop']
+    }
   },
   css: [
     '~/assets/css/main.css',
     'maplibre-gl/dist/maplibre-gl.css'
   ],
-  experimental: {
-    viewTransition: true
-  },
+
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'

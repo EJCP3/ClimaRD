@@ -20,8 +20,8 @@
 
       <!-- Body Content (Default Slot) -->
       <div class="space-y-4 py-2 text-zinc-900 select-none">
-        <!-- 1. Color Swatches (2 rows of 5 matching reference design) -->
-        <div>
+        <!-- 1. Color Swatches (oculto con tema reactivo: los colores los dicta la alerta) -->
+        <div v-if="cardTheme !== 'reactivo'">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-2">
             Color Primario
           </label>
@@ -148,6 +148,7 @@ import {
   type TickerAnimation,
   type TickerSpeed
 } from '~/composables/useAppearance'
+import { useCardTheme } from '~/composables/useCardTheme'
 
 const {
   primaryColor,
@@ -166,10 +167,15 @@ const {
   closeAppearanceModal,
 } = useAppearance()
 
+const { cardTheme } = useCardTheme()
+
 const navModes: { id: NavStyle; label: string }[] = [
   { id: 'clasica', label: 'Clásica' },
   { id: 'bonita', label: 'Bonita' },
   { id: 'guapa', label: 'Guapa' },
+  { id: 'pildoras', label: 'Píldoras' },
+  { id: 'letras', label: 'Letras' },
+  { id: 'letras-izq', label: 'Letras izq.' },
 ]
 
 const tickerPositions: { id: TickerPosition; label: string }[] = [

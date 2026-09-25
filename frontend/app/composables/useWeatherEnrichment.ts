@@ -1,4 +1,4 @@
-﻿export interface EnrichedWeatherData {
+export interface EnrichedWeatherData {
   provinceSlug: string
   provinceName: string
   alerta: 'ROJA' | 'AMARILLA' | 'VERDE' | 'NORMAL'
@@ -447,7 +447,7 @@ export function getEnrichedEvidenceData(location: string, timeInput?: string, fo
   let alertBadgeClass = 'bg-zinc-700 text-white'
   let alertBgColor = '#71717A'
   let alertTextColor = '#FFFFFF'
-  let alertShape = '12-sided-cookie'
+  let alertShape = 'circle'
   let alertIcon = 'sun'
 
   if (base.alerta === 'ROJA') {
@@ -460,13 +460,13 @@ export function getEnrichedEvidenceData(location: string, timeInput?: string, fo
     alertBadgeClass = 'bg-[#F59E0B] text-zinc-950 font-black border border-amber-400/50'
     alertBgColor = '#F59E0B'
     alertTextColor = '#18181B'
-    alertShape = 'soft-burst'
+    alertShape = '12-sided-cookie'
     alertIcon = 'alert-triangle'
   } else if (base.alerta === 'VERDE') {
     alertBadgeClass = 'bg-[#10B981] text-white border border-emerald-500/50'
     alertBgColor = '#10B981'
     alertTextColor = '#FFFFFF'
-    alertShape = 'flower'
+    alertShape = 'flower-8'
     alertIcon = 'shield'
   }
 
