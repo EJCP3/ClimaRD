@@ -369,7 +369,7 @@
                     </label>
                     <span
                       v-if="isSectorDisabled"
-                      class="text-[9px] font-semibold text-zinc-500 bg-white/5 px-2 py-0.5 rounded"
+                      class="text-[10px] font-semibold text-zinc-500 bg-white/5 px-2 py-0.5 rounded"
                     >
                       Selecciona provincia primero
                     </span>
@@ -509,7 +509,7 @@
                   <AppIcon :name="issue.icon" class="w-4 h-4 shrink-0" :class="formIssues.includes(issue.id) ? 'text-emerald-400' : 'text-zinc-500'" />
                   <div class="flex-1 min-w-0">
                     <span class="block text-xs font-bold truncate leading-tight">{{ issue.title }}</span>
-                    <span class="block text-[9px] text-zinc-500 truncate mt-0.5">{{ issue.subtitle }}</span>
+                    <span class="block text-[10px] text-zinc-500 truncate mt-0.5">{{ issue.subtitle }}</span>
                   </div>
                   <span v-if="formIssues.includes(issue.id)" class="text-emerald-400 text-xs font-black">✓</span>
                 </button>
@@ -642,7 +642,7 @@
                     <span class="absolute -bottom-5 -right-4 w-16 h-16 rounded-full blur-md" :style="{ background: reactiveTheme.orb2 }" />
                   </span>
                   <span class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-white">Reactivo <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/10 text-zinc-300 ml-1">{{ currentProvinceAlert }}</span></span>
+                    <span class="text-xs font-bold text-white">Reactivo <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-white/10 text-zinc-300 ml-1">{{ currentProvinceAlert }}</span></span>
                     <span v-if="cardTheme === 'reactivo'" class="text-emerald-400 text-xs font-black">✓</span>
                   </span>
                   <span class="block text-[10px] text-zinc-500 mt-0.5">Orbe animada, grano y partículas</span>

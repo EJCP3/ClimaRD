@@ -333,27 +333,27 @@ export interface UserProfile {
 }
 
 const DEFAULT_PROFILE: UserProfile = {
-  name: 'Euddy Javier',
-  emailOrPhone: 'euddy.javier@gmail.com',
+  name: '',
+  emailOrPhone: '',
   provinceSlug: 'distrito-nacional',
   provinceName: 'Distrito Nacional',
-  zone: 'Piantini',
-  zipcode: '10149',
+  zone: '',
+  zipcode: '',
   coordinates: {
-    lat: 18.466,
-    lng: -69.934
+    lat: 18.4861,
+    lng: -69.9312
   },
-  frequentIssues: ['inundaciones', 'apagones'],
+  frequentIssues: [],
   hasCompletedOnboarding: false
 }
 
 export function useUserProfile() {
   const userProfile = useState<UserProfile>('climard_user_profile', () => ({ ...DEFAULT_PROFILE }))
   const isProfileModalOpen = useState<boolean>('climard_profile_modal_open', () => false)
-  const profileTriggerSelector = useState<any>('climard_profile_trigger_selector', () => null)
+  const profileTriggerSelector = useState<HTMLElement | SVGElement | string | null>('climard_profile_trigger_selector', () => null)
 
   const isActionsDropdownOpen = useState<boolean>('climard_actions_dropdown_open', () => false)
-  const dropdownTriggerSelector = useState<any>('climard_dropdown_trigger_selector', () => null)
+  const dropdownTriggerSelector = useState<HTMLElement | SVGElement | string | null>('climard_dropdown_trigger_selector', () => null)
   const isProfileInitialized = useState<boolean>('climard_profile_initialized', () => false)
 
   const findPostalItemForZone = (provinceSlug: string, zoneText: string): PostalPlace | undefined => {
@@ -478,7 +478,7 @@ export function useUserProfile() {
     toast.info('Perfil restablecido')
   }
 
-  const openProfileModal = (trigger?: any) => {
+  const openProfileModal = (trigger?: HTMLElement | SVGElement | string | null) => {
     if (trigger) {
       profileTriggerSelector.value = trigger
     }
@@ -489,7 +489,7 @@ export function useUserProfile() {
     isProfileModalOpen.value = false
   }
 
-  const openActionsDropdown = (trigger?: any) => {
+  const openActionsDropdown = (trigger?: HTMLElement | SVGElement | string | null) => {
     if (trigger) {
       dropdownTriggerSelector.value = trigger
     }

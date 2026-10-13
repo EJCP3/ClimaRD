@@ -8,8 +8,9 @@
       :options="toastHostOptions"
     />
   </ClientOnly>
-  <!-- Glimm Canvas for Transitions -->
-  <canvas id="glimm-canvas" class="fixed inset-0 w-screen h-screen z-[9999] pointer-events-none" />
+  <!-- Glimm Canvas: solo se monta en rutas de provincia (único lugar con sweep).
+       Respeta prefers-reduced-motion: el sweep se omite en el guard de abajo. -->
+  <canvas v-if="needsGlimm" id="glimm-canvas" class="fixed inset-0 w-screen h-screen z-[9999] pointer-events-none" aria-hidden="true" />
 </template>
 
 <script setup lang="ts">
@@ -18,6 +19,15 @@ import { useRouter, START_LOCATION } from 'vue-router'
 import { useGlimmSweep, getProvinceAlert } from '~/composables/useGlimmSweep'
 
 const router = useRouter()
+const route = useRoute()
+// El canvas WebGL solo existe en entrada/salida de /provincia/* (evita costo GPU global).
+const needsGlimm = computed(() => route.path.startsWith('/provincia'))
+
+function prefersReducedMotion(): boolean {
+  return import.meta.client && typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false
+}
 
 if (import.meta.client) {
   let isNavigatingWithGlimm = false
@@ -44,6 +54,11 @@ if (import.meta.client) {
 
     // Solo aplicamos glimm para entrar o salir de una provincia
     if (!isEnteringProvince && !isExitingProvince) {
+      return true
+    }
+
+    // WCAG 2.3.3: si el usuario pide movimiento reducido, navegar sin sweep.
+    if (prefersReducedMotion()) {
       return true
     }
 
@@ -145,12 +160,4 @@ if (import.meta.client) {
   --sbt-edge-offset: 20px;
 }
 
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 0.2s ease;
-}
-.page-enter-from,
-.page-leave-to {
-  opacity: 0;
-}
 </style>

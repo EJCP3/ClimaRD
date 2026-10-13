@@ -17,7 +17,7 @@
               <span class="text-xs font-bold text-zinc-400">
                 Opciones
               </span>
-              <span v-if="userProfile.hasCompletedOnboarding" class="text-[9px] font-bold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-full">
+              <span v-if="userProfile.hasCompletedOnboarding" class="text-[10px] font-bold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-full">
                 {{ userProfile.zone }}
               </span>
             </div>

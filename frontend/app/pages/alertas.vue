@@ -48,6 +48,14 @@
       <MiniMapaCOE />
     </div>
 
+    <!-- Push opt-in geolocalizado (Fase 3) -->
+    <PushOptIn
+      :province-slug="userProfile.provinceSlug || 'distrito-nacional'"
+      :province-name="userProfile.provinceName || 'tu zona'"
+      :lat="userProfile.coordinates?.lat"
+      :lng="userProfile.coordinates?.lng"
+    />
+
     <!-- Section: Últimos Boletines Oficiales (Placed below the full-width map) -->
     <div class="space-y-4 pt-2">
       <div class="flex items-center justify-between">
@@ -171,6 +179,20 @@ import { ref } from 'vue'
 import { WissPopFlip } from 'wisspop/vue'
 import AppIcon from '~/components/AppIcon.vue'
 import MiniMapaCOE from '~/components/mapa/MiniMapaCOE.vue'
+import PushOptIn from '~/components/PushOptIn.vue'
+import { getMockBoletines } from '~/composables/useCoeData'
+import { useUserProfile } from '~/composables/useUserProfile'
+
+const { userProfile } = useUserProfile()
+
+useSeoMeta({
+  title: 'Alertas Provinciales COE/INDOMET | Clima RD',
+  description: 'Niveles oficiales de alerta meteorológica por provincia (COE/INDOMET) y últimos boletines vigentes en República Dominicana.',
+  ogTitle: 'Alertas Provinciales COE/INDOMET | Clima RD',
+  ogDescription: 'Mapa oficial de alertas por provincia y boletines vigentes del COE e INDOMET.',
+  ogLocale: 'es_DO',
+  twitterCard: 'summary_large_image',
+})
 
 interface Boletin {
   id: number
@@ -180,29 +202,8 @@ interface Boletin {
   resumen: string
 }
 
-const boletines: Boletin[] = [
-  {
-    id: 1,
-    fecha: 'Hoy, 05:00 PM',
-    estado: 'Vigente',
-    titulo: 'Vaguada continuará provocando aguaceros con tronadas en 14 provincias',
-    resumen: 'Se recomienda a los residentes en zonas bajas de Monseñor Nouel, Duarte y La Vega abstenerse de cruzar ríos, arroyos y cañadas desbordadas.'
-  },
-  {
-    id: 2,
-    fecha: 'Hoy, 11:30 AM',
-    estado: 'Vigente',
-    titulo: 'Aviso especial por saturación de suelos en la cuenca del Río Yuna',
-    resumen: 'Incremento de alertas en el Cibao Central ante acumulados de lluvia superiores a 75 mm registrados en las últimas 12 horas por persistencia de vaguada.'
-  },
-  {
-    id: 3,
-    fecha: 'Hoy, 08:00 AM',
-    estado: 'Vigilancia',
-    titulo: 'Alerta verde marítima para la costa Atlántica por oleaje anormal',
-    resumen: 'Oleaje de 6 a 8 pies cerca de la costa. Se instruye a los operadores de frágiles y pequeñas embarcaciones permanecer en puerto desde Cabo Engaño hasta Manzanillo.'
-  }
-]
+// Mock centralizado (ver useCoeData): la persona de backend lo sustituye por useFetch.
+const boletines: Boletin[] = getMockBoletines() as Boletin[]
 
 
 </script>

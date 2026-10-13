@@ -244,12 +244,12 @@
           </g>
 
           <!-- Maritime Coordinates -->
-          <text x="940" y="24" text-anchor="end" class="font-mono text-[9px] fill-[#8aaec0] select-none pointer-events-none opacity-80">
+          <text x="940" y="24" text-anchor="end" class="font-mono text-[10px] fill-[#8aaec0] select-none pointer-events-none opacity-80">
             18°44' N • 70°09' W | REPUBLICA DOMINICANA
           </text>
 
           <!-- 32 Province Polygons (Official dr-optimized GeoJSON with Islands & Coastline) -->
-          <g class="provinces-group" filter="url(#island-shadow)">
+          <g class="provinces-group" filter="url(#island-shadow)" role="group" aria-label="Provincias por nivel de alerta">
             <path
               v-for="prov in provincesList"
               :key="prov.code"
@@ -267,10 +267,13 @@
               stroke-linejoin="round"
               stroke-linecap="round"
               tabindex="0"
+              role="button"
+              :aria-label="`${prov.name}: ${prov.alerta === 'NORMAL' ? 'sin alerta' : 'alerta ' + prov.alerta}`"
               @mouseenter="onHover(prov, $event)"
               @mouseleave="onLeave"
               @click.stop="selectProvince(prov, $event)"
               @keydown.enter="selectProvince(prov, $event)"
+              @keydown.space.prevent="selectProvince(prov, $event)"
             />
           </g>
 
@@ -315,7 +318,7 @@
             <div class="flex items-center justify-between space-x-2">
               <p class="font-extrabold text-xs text-white">{{ hoveredProvince.name }}</p>
               <span
-                class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider text-white"
+                class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider text-white"
                 :class="getBadgeColorClass(hoveredProvince.alerta)"
               >
                 {{ hoveredProvince.alerta === 'NORMAL' ? 'SIN ALERTA' : hoveredProvince.alerta }}
@@ -550,21 +553,22 @@
 import { MorphIcon } from 'morphicons/vue'
 import { Share, Check } from 'lucide'
 import { ref, computed } from 'vue'
-import html2canvas from 'html2canvas'
 import AppIcon from '~/components/AppIcon.vue'
 import AppButton from '~/components/AppButton.vue'
 import AppShape from '~/components/AppShape.vue'
 import AppModal from '~/components/AppModal.vue'
 import rawProvincesPaths from '~/assets/data/provincias-dr-paths.json'
+import { PROVINCES_DATA } from '~/composables/useWeatherEnrichment'
 
 const activeView = ref<'mapa' | 'tabla'>('mapa')
 const mapColorMode = ref<'dominicango' | 'alertas'>('dominicango')
 const activeAlertFilter = ref<'ALL' | 'ROJA' | 'AMARILLA' | 'VERDE' | 'NORMAL'>('ALL')
-const hoveredProvince = ref<any>(null)
-const selectedProvince = ref<any>(null)
+interface MiniProvincia { code: string; name: string; alerta: string }
+const hoveredProvince = ref<MiniProvincia | null>(null)
+const selectedProvince = ref<MiniProvincia | null>(null)
 const tooltipPos = ref({ x: 0, y: 0 })
 const isProvinceModalOpen = ref(false)
-const selectedProvinceTrigger = ref<any>(null)
+const selectedProvinceTrigger = ref<HTMLElement | SVGElement | string | null>(null)
 const mapContainerRef = ref<HTMLElement | null>(null)
 
 async function captureMap() {
@@ -572,8 +576,10 @@ async function captureMap() {
   // Hide tooltip temporarily to avoid it appearing in capture if left active
   const prevHovered = hoveredProvince.value;
   hoveredProvince.value = null;
-  
+
   try {
+    // Lazy: html2canvas (~180KB) solo se descarga al pulsar Descargar/Compartir.
+    const { default: html2canvas } = await import('html2canvas')
     const canvas = await html2canvas(mapContainerRef.value, {
       useCORS: true,
       scale: 2,
@@ -613,8 +619,9 @@ async function shareMap() {
           text: 'Consulta el mapa de alertas meteorológicas.',
           files: [file]
         });
-      } catch (err) {
-        console.error('Error sharing:', err);
+      } catch (err: any) {
+        // AbortError = el usuario cerró el sheet: no es error.
+        if (err?.name !== 'AbortError') console.error('Error sharing:', err);
       }
     } else {
       // Fallback: download if share is not supported
@@ -628,45 +635,17 @@ function isProvinceDimmed(alerta: string): boolean {
   return activeAlertFilter.value !== alerta
 }
 
-// Exact 32 Provinces COE Alert mapping from official bulletin
+// Alertas COE por provincia: fuente única PROVINCES_DATA (mock central).
+// Se indexa por nombre normalizado para cruzar con el SVG de provincias.
 const coeAlertasMap: Record<string, string> = {
-  // 7 ALERTA ROJA
-  'ELIAS PINA': 'ROJA',
-  'SAN JUAN': 'ROJA',
-  'AZUA': 'ROJA',
-  'BAHORUCO': 'ROJA',
-  'BAORUCO': 'ROJA',
-  'INDEPENDENCIA': 'ROJA',
-  'BARAHONA': 'ROJA',
-  'PEDERNALES': 'ROJA',
-  // 8 ALERTA AMARILLA
-  'DAJABON': 'AMARILLA',
-  'MONSENOR NOUEL': 'AMARILLA',
-  'SANCHEZ RAMIREZ': 'AMARILLA',
-  'SAN JOSE DE OCOA': 'AMARILLA',
-  'PERAVIA': 'AMARILLA',
-  'SAN CRISTOBAL': 'AMARILLA',
-  'SANTO DOMINGO': 'AMARILLA',
-  'DISTRITO NACIONAL': 'AMARILLA',
-  // 7 ALERTA VERDE
-  'LA VEGA': 'VERDE',
-  'DUARTE': 'VERDE',
-  'MARIA TRINIDAD SANCHEZ': 'VERDE',
-  'MONTE PLATA': 'VERDE',
-  'HATO MAYOR': 'VERDE',
-  'SAN PEDRO DE MACORIS': 'VERDE',
-  'LA ALTAGRACIA': 'VERDE',
-  // 10 SIN ALERTA (NORMAL)
-  'MONTE CRISTI': 'NORMAL',
-  'SANTIAGO RODRIGUEZ': 'NORMAL',
-  'VALVERDE': 'NORMAL',
-  'SANTIAGO': 'NORMAL',
-  'PUERTO PLATA': 'NORMAL',
-  'ESPAILLAT': 'NORMAL',
-  'HERMANAS MIRABAL': 'NORMAL',
-  'SAMANA': 'NORMAL',
-  'EL SEIBO': 'NORMAL',
-  'LA ROMANA': 'NORMAL'
+  ...Object.fromEntries(
+    Object.values(PROVINCES_DATA).map(p => [
+      p.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim(),
+      p.alerta,
+    ])
+  ),
+  // Alias de grafía del SVG oficial
+  'BAHORUCO': PROVINCES_DATA['baoruco']?.alerta ?? 'ROJA',
 }
 
 function normalizeName(str: string): string {
@@ -684,7 +663,7 @@ const provincesList = computed(() => {
   })
 })
 
-function getProvinceFill(prov: any): string {
+function getProvinceFill(prov: { color?: string; alerta: string }): string {
   if (mapColorMode.value === 'dominicango') {
     return prov.color || '#80BABA'
   }
@@ -772,7 +751,7 @@ function getLabelPixelSize(code: string): string {
   return '6px'
 }
 
-function getLabelStyle(prov: any): Record<string, string> {
+function getLabelStyle(prov: { alerta: string }): Record<string, string> {
   const fontSize = getLabelPixelSize(prov.code)
   const isDominicanGoMode = mapColorMode.value === 'dominicango'
 
@@ -817,7 +796,7 @@ function getLabelStyle(prov: any): Record<string, string> {
   }
 }
 
-function onHover(prov: any, evt: MouseEvent) {
+function onHover(prov: MiniProvincia, evt: MouseEvent) {
   hoveredProvince.value = prov
   const svgEl = (evt.target as SVGElement).closest('svg')
   if (svgEl) {
@@ -833,7 +812,7 @@ function onLeave() {
   hoveredProvince.value = null
 }
 
-function selectProvince(prov: any, event?: MouseEvent) {
+function selectProvince(prov: MiniProvincia, event?: MouseEvent | KeyboardEvent) {
   if (event) {
     event.stopPropagation()
     selectedProvinceTrigger.value = event.currentTarget || event.target || `#prov-path-${prov.code}`

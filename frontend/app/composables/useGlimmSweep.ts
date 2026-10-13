@@ -1,4 +1,5 @@
 import { createShader, playSweep, accentChain, type ShaderController, type Palette } from 'glimm'
+import { PROVINCES_DATA } from '~/composables/useWeatherEnrichment'
 
 // Paletas por tipo de alerta según estándares COE
 export const alertPalettes: Record<string, Palette> = {
@@ -17,41 +18,12 @@ export const alertPalettes: Record<string, Palette> = {
   }
 }
 
-// Mapa oficial de alertas de provincias (COE / INDOMET)
-export const coeProvincesAlerts: Record<string, string> = {
-  'distrito-nacional': 'AMARILLA',
-  'azua': 'ROJA',
-  'baoruco': 'ROJA',
-  'barahona': 'ROJA',
-  'dajabon': 'AMARILLA',
-  'duarte': 'VERDE',
-  'elias-pina': 'ROJA',
-  'el-seibo': 'NORMAL',
-  'espaillat': 'NORMAL',
-  'independencia': 'ROJA',
-  'la-altagracia': 'VERDE',
-  'la-romana': 'NORMAL',
-  'la-vega': 'VERDE',
-  'maria-trinidad-sanchez': 'VERDE',
-  'monte-cristi': 'NORMAL',
-  'pedernales': 'ROJA',
-  'peravia': 'AMARILLA',
-  'puerto-plata': 'NORMAL',
-  'hermanas-mirabal': 'NORMAL',
-  'samana': 'NORMAL',
-  'san-cristobal': 'AMARILLA',
-  'san-juan': 'ROJA',
-  'san-pedro-de-macoris': 'VERDE',
-  'sanchez-ramirez': 'AMARILLA',
-  'santiago': 'NORMAL',
-  'santiago-rodriguez': 'NORMAL',
-  'valverde': 'NORMAL',
-  'monsenor-nouel': 'AMARILLA',
-  'monte-plata': 'VERDE',
-  'hato-mayor': 'VERDE',
-  'san-jose-de-ocoa': 'AMARILLA',
-  'santo-domingo': 'AMARILLA',
-}
+// Mapa de alertas por provincia.
+// Fuente única: PROVINCES_DATA (useWeatherEnrichment). Se mantiene este alias
+// deprecado solo por compatibilidad con código que ya lo importa.
+export const coeProvincesAlerts: Record<string, string> = Object.fromEntries(
+  Object.entries(PROVINCES_DATA).map(([slug, p]) => [slug, p.alerta])
+)
 
 export function getProvinceAlert(slug: string): string {
   return coeProvincesAlerts[slug] || 'NORMAL'

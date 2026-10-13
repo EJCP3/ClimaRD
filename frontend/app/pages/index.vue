@@ -286,6 +286,15 @@ const { userProfile, openProfileModal } = useUserProfile()
 const { openReportModal } = useIncidentReport()
 const { getEnrichedEvidenceData } = useWeatherEnrichment()
 
+useSeoMeta({
+  title: 'Clima RD | Monitoreo Climático y Alertas Ciudadanas',
+  description: 'Plataforma comunitaria del tiempo en RD: alertas oficiales INDOMET/COE, mapa de inundaciones y reportes ciudadanos por provincia.',
+  ogTitle: 'Clima RD | Monitoreo Climático y Alertas Ciudadanas',
+  ogDescription: 'Alertas oficiales INDOMET/COE y reporte ciudadano de inundaciones en República Dominicana.',
+  ogLocale: 'es_DO',
+  twitterCard: 'summary_large_image',
+})
+
 const enrichedWeather = computed(() => {
   const provSlug = userProfile.value.provinceSlug || 'distrito-nacional'
   const provName = userProfile.value.provinceName || 'Distrito Nacional'

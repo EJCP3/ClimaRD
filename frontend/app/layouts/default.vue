@@ -26,7 +26,7 @@
     </div>
 
     <!-- Top Full-Width Bulletin Ticker (Spans 100% width of the screen, above navigation) -->
-    <BulletinTicker v-if="tickerPosition === 'top'" class="[view-transition-name:bulletin-ticker] !z-[1050]" />
+    <BulletinTicker v-if="tickerPosition === 'top'" class="!z-[1050]" />
 
     <!-- Application Body: Navigation + Content Area -->
     <div
@@ -36,7 +36,7 @@
       <!-- 1. Clásica: Drawer lateral estándar completo (M3 Navigation Drawer) -->
       <aside
       v-if="navStyle === 'clasica'"
-      class="hidden md:flex flex-col w-72 border-r border-zinc-200/80 bg-white p-5 space-y-4 shrink-0 transition-all [view-transition-name:app-sidebar] sticky self-start z-20"
+      class="hidden md:flex flex-col w-72 border-r border-zinc-200/80 bg-white p-5 space-y-4 shrink-0 transition-all sticky self-start z-20"
       :class="tickerPosition === 'top' ? 'top-10 sm:top-11 h-[calc(100vh-2.5rem)] sm:h-[calc(100vh-2.75rem)]' : 'top-0 h-screen'"
     >
       <!-- App Brand -->
@@ -95,7 +95,7 @@
     <!-- 2. Guapa: Riel de navegación M3 compacto lateral (M3 Navigation Rail) -->
     <aside
       v-else-if="navStyle === 'guapa'"
-      class="hidden md:flex flex-col w-20 border-r border-zinc-200/80 bg-white py-4 items-center shrink-0 transition-all [view-transition-name:app-rail] sticky self-start z-20"
+      class="hidden md:flex flex-col w-20 border-r border-zinc-200/80 bg-white py-4 items-center shrink-0 transition-all sticky self-start z-20"
       :class="tickerPosition === 'top' ? 'top-10 sm:top-11 h-[calc(100vh-2.5rem)] sm:h-[calc(100vh-2.75rem)]' : 'top-0 h-screen'"
     >
       <div class="mb-3 shrink-0">
@@ -232,7 +232,7 @@
       <!-- Bonita Mode: Barra oscura compacta + botón verde (solo iconos) -->
       <div
         v-if="navStyle === 'bonita'"
-        class="hidden md:flex fixed z-40 items-center gap-2 transition-all duration-300 [view-transition-name:app-floating-nav]"
+        class="hidden md:flex fixed z-40 items-center gap-2 transition-all duration-300"
         :class="tickerPosition === 'bottom' ? 'bottom-[56px] left-1/2 -translate-x-1/2' : 'bottom-5 sm:bottom-6 left-1/2 -translate-x-1/2'"
       >
         <nav
@@ -368,7 +368,7 @@
 
       <!-- Page View Content -->
       <main
-        class="flex-1 [view-transition-name:app-page-content]"
+        class="flex-1"
         :class="[
           isMapPage
             ? 'h-full w-full p-0 overflow-hidden relative'
@@ -388,12 +388,12 @@
   </div>
 
   <!-- Animated Bulletin Ticker (Bottom Position - Full 100% Width) -->
-  <BulletinTicker v-if="tickerPosition === 'bottom'" class="[view-transition-name:bulletin-ticker] !z-[1050]" />
+  <BulletinTicker v-if="tickerPosition === 'bottom'" class="!z-[1050]" />
 
     <!-- Mobile Navigation: Barra oscura compacta bonita -->
     <div
       v-if="navStyle === 'bonita'"
-      class="md:hidden fixed z-40 left-1/2 -translate-x-1/2 flex items-center gap-2 [view-transition-name:app-mobile-nav]"
+      class="md:hidden fixed z-40 left-1/2 -translate-x-1/2 flex items-center gap-2"
       :class="tickerPosition === 'bottom' ? 'bottom-[52px]' : 'bottom-3'"
     >
       <nav
@@ -433,7 +433,7 @@
     <!-- Mobile Navigation: Píldoras oscuras con scroll horizontal -->
     <div
       v-else-if="navStyle === 'pildoras'"
-      class="md:hidden fixed z-40 left-3 right-3 [view-transition-name:app-mobile-nav]"
+      class="md:hidden fixed z-40 left-3 right-3"
       :class="tickerPosition === 'bottom' ? 'bottom-[52px]' : 'bottom-3'"
     >
       <nav
@@ -470,7 +470,7 @@
     <!-- Mobile Bottom Navigation Bar (Standard for other modes) -->
     <div
       v-else-if="navStyle !== 'letras' && navStyle !== 'letras-izq'"
-      class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-zinc-200/80 [view-transition-name:app-mobile-nav]"
+      class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-zinc-200/80"
     >
       <div class="flex items-center justify-around py-1.5 px-2">
         <button

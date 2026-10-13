@@ -166,6 +166,7 @@
               id="report-sector"
               v-model="reportLocation"
               type="text"
+              maxlength="120"
               placeholder="Sector, calle o vía — Ej. Av. Winston Churchill…"
               @focus="openSectorDropdown"
               @input="onSectorInput"
@@ -260,6 +261,7 @@
             id="report-description"
             v-model="reportDescription"
             rows="4"
+            maxlength="280"
             placeholder="Descripción — nivel de agua, vehículos afectados, postes…"
             class="w-full min-h-[150px] px-5 py-4 rounded-[20px] bg-[#F6F6F8] dark:bg-[#0B110E] border border-zinc-200/80 dark:border-white/10 text-[15px] font-medium leading-relaxed text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-[#8A938E] focus:outline-none focus:border-zinc-400 dark:focus:border-white/25 transition-colors resize-none"
           ></textarea>
@@ -374,7 +376,6 @@ import AppIcon from '~/components/AppIcon.vue'
 import AppShape from '~/components/AppShape.vue'
 import AppButton from '~/components/AppButton.vue'
 import { toast } from 'super-beautiful-toast'
-import imageCompression from 'browser-image-compression'
 import { useIncidentReport } from '~/composables/useIncidentReport'
 import { useApi } from '~/composables/useApi'
 import {
@@ -382,6 +383,7 @@ import {
   detectProvinceFromText
 } from '~/composables/useWeatherEnrichment'
 import { getPostalPlacesForProvince } from '~/composables/useUserProfile'
+import { canPublish, isLikelyDuplicate, recordPublish, saveLastReport, MAX_REPORTS_PER_HOUR } from '~/composables/useRateLimit'
 
 const { isReportModalOpen, reportTriggerSelector, closeReportModal } = useIncidentReport()
 const api = useApi()
@@ -819,6 +821,8 @@ function onFileSelected(event: Event) {
 
 async function compressIfNeeded(file: File): Promise<File> {
   if (!file.type.startsWith('image/') || file.size <= 5 * 1024 * 1024) return file
+  // Lazy: solo se descarga al adjuntar foto pesada.
+  const { default: imageCompression } = await import('browser-image-compression')
   return imageCompression(file, { maxSizeMB: 5, useWebWorker: true })
 }
 
@@ -835,6 +839,15 @@ async function submitReport(_event?: any) {
     toast.warning('Por favor ingresa la ubicación o sector del incidente.')
     return
   }
+  const quota = canPublish()
+  if (!quota.ok) {
+    toast.warning(`Límite de ${MAX_REPORTS_PER_HOUR} reportes por hora. Intenta en ~${quota.waitMinutes} min.`)
+    return
+  }
+  if (isLikelyDuplicate(reportType.value, reportLocation.value)) {
+    toast.warning('Ya publicaste este mismo reporte hace poco.')
+    return
+  }
   isSubmitting.value = true
   try {
     let fotoUrl = ''
@@ -845,14 +858,16 @@ async function submitReport(_event?: any) {
     }
     const form = new FormData()
     form.append('tipo', reportType.value)
-    form.append('ubicacion', reportLocation.value.trim())
-    form.append('descripcion', reportDescription.value.trim())
+    form.append('ubicacion', reportLocation.value.trim().slice(0, 120))
+    form.append('descripcion', reportDescription.value.trim().slice(0, 280))
     form.append('latitud', String(reportLat.value))
     form.append('longitud', String(reportLng.value))
-    form.append('provincia', PROVINCES_DATA[reportProvince.value]?.name || 'Distrito Nacional')
+    form.append('provincia', reportProvince.value in PROVINCES_DATA ? reportProvince.value : 'distrito-nacional')
     if (fotoUrl) form.append('foto_url', fotoUrl)
 
     const creado = await api.postReporte(form)
+    recordPublish()
+    saveLastReport(reportType.value, reportLocation.value)
     toast.success(`¡Evidencia publicada y enriquecida con datos de ${creado.provincia}!`)
     clearAttachment()
     reportLocation.value = ''

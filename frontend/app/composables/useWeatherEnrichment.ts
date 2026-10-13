@@ -1,3 +1,10 @@
+/**
+ * MOCK CENTRAL (solo frontend): estos valores son placeholdres deterministas
+ * hasta que el backend exponga INDOMET/COE. No hardcodear temperaturas/alertas
+ * en páginas: importar PROVINCES_DATA / getEnrichedEvidenceData desde aquí y
+ * los conteos desde useCoeData.getAlertCounts() para no divergir.
+ * Flag: runtimeConfig.public.useMock (NUXT_PUBLIC_USE_MOCK).
+ */
 export interface EnrichedWeatherData {
   provinceSlug: string
   provinceName: string

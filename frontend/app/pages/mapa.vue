@@ -20,6 +20,13 @@ import { onMounted, watch } from 'vue'
 import MapaOperativo from '~/components/mapa/MapaOperativo.client.vue'
 import { useIncidentReport } from '~/composables/useIncidentReport'
 
+useSeoMeta({
+  title: 'Mapa Operativo de Inundaciones | Clima RD',
+  description: 'Mapa interactivo WebGL de reportes ciudadanos de inundaciones e incidencias viales en República Dominicana.',
+  ogTitle: 'Mapa Operativo de Inundaciones | Clima RD',
+  twitterCard: 'summary_large_image',
+})
+
 const route = useRoute()
 const { openReportModal } = useIncidentReport()
 

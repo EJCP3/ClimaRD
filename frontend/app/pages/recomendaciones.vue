@@ -362,36 +362,34 @@
 import { ref } from 'vue'
 import { MorphIcon } from 'morphicons/vue'
 import { Copy, Share, Check } from 'lucide'
+import { useShare } from '~/composables/useShare'
+
+useSeoMeta({
+  title: 'Prevención y Asistencia Ciudadana | Clima RD',
+  description: 'Directorio nacional de emergencias (9-1-1, COE, Defensa Civil) y protocolos de seguridad ante inundaciones en RD.',
+  ogTitle: 'Prevención y Asistencia Ciudadana | Clima RD',
+  twitterCard: 'summary_large_image',
+})
 
 // All emergency contacts and protocols follow COE & INDOMET official standards.
 
 const copiedText = ref<string | null>(null)
 const sharedText = ref<string | null>(null)
+const { copyText: copyWithFallback, shareLink } = useShare()
 
 const copyText = async (text: string) => {
-  try {
-    await navigator.clipboard.writeText(text)
+  const ok = await copyWithFallback(text, 'Número copiado al portapapeles')
+  if (ok) {
     copiedText.value = text
     setTimeout(() => { if (copiedText.value === text) copiedText.value = null }, 2000)
-  } catch (err) {
-    console.error('Failed to copy', err)
   }
 }
 
 const shareText = async (title: string, text: string) => {
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title,
-        text,
-      })
-      sharedText.value = text
-      setTimeout(() => { if (sharedText.value === text) sharedText.value = null }, 2000)
-    } catch (err) {
-      console.error('Failed to share', err)
-    }
-  } else {
-    copyText(text)
+  const ok = await shareLink({ title, text })
+  if (ok) {
+    sharedText.value = text
+    setTimeout(() => { if (sharedText.value === text) sharedText.value = null }, 2000)
   }
 }
 </script>

@@ -20,6 +20,17 @@
               <span class="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/60 text-[10px] font-black text-emerald-700 uppercase tracking-wider"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span><span>En Vivo</span></span>
             </div>
             <p class="text-sm text-zinc-600 max-w-lg leading-relaxed">{{ advisoryText }}</p>
+            <div class="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                @click="shareCard"
+                class="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-full text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all cursor-pointer select-none active:scale-95 shadow-xs"
+                title="Generar imagen para difundir por WhatsApp"
+              >
+                <AppIcon name="share" class="w-3.5 h-3.5" />
+                <span>Tarjeta WhatsApp</span>
+              </button>
+            </div>
           </div>
           <div class="shrink-0"><AppShape :name="alertShape" color="surface" size="large"><AppIcon :name="alertIcon" class="w-7 h-7 text-zinc-900" /></AppShape></div>
         </div>
@@ -78,7 +89,7 @@
             >
               <div class="space-y-1.5">
                 <div class="flex items-center justify-between">
-                  <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider" :class="boletin.severityClass">
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider" :class="boletin.severityClass">
                     {{ boletin.severity }}
                   </span>
                   <div class="flex items-center space-x-1 text-zinc-400">
@@ -159,7 +170,7 @@
                   </span>
                   <span
                     v-if="inc.severity"
-                    class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full"
+                    class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full"
                     :class="getSeverityBadgeClass(inc.severity)"
                   >
                     {{ inc.severity }}
@@ -170,18 +181,18 @@
               <!-- Media Attachment (Image or Video) -->
               <div v-if="inc.image" class="relative rounded-xl overflow-hidden aspect-video bg-zinc-100 border border-zinc-200/80 shadow-xs">
                 <img :src="inc.image" :alt="inc.title" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
-                <span class="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[9px] font-bold text-white flex items-center space-x-1 pointer-events-none">
+                <span class="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-white flex items-center space-x-1 pointer-events-none">
                   <AppIcon name="camera" class="w-3 h-3" />
                   <span>Foto del reporte</span>
                 </span>
-                <span class="absolute top-1.5 right-1.5 px-2 py-0.5 rounded-full bg-black/55 backdrop-blur-md text-[9px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1 pointer-events-none">
+                <span class="absolute top-1.5 right-1.5 px-2 py-0.5 rounded-full bg-black/55 backdrop-blur-md text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1 pointer-events-none">
                   <AppIcon name="maximize-2" class="w-2.5 h-2.5" />
                   <span>Detalles</span>
                 </span>
               </div>
               <div v-else-if="inc.video" class="relative rounded-xl overflow-hidden aspect-video bg-black border border-zinc-200/80 shadow-xs">
                 <video :src="inc.video" controls playsinline preload="metadata" class="w-full h-full object-cover" @click.stop></video>
-                <span class="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[9px] font-bold text-white flex items-center space-x-1 pointer-events-none">
+                <span class="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-white flex items-center space-x-1 pointer-events-none">
                   <AppIcon name="video" class="w-3 h-3" />
                   <span>Video capturado</span>
                 </span>
@@ -263,7 +274,7 @@
                         {{ selectedIncident.category || 'Incidencia Reportada' }}
                       </span>
                       <span
-                        class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0"
+                        class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0"
                         :class="getSeverityBadgeClass(selectedIncident.severity)"
                       >
                         {{ selectedIncident.severity || 'Reportado' }}
@@ -369,7 +380,7 @@
                     <!-- Description Box -->
                     <div class="p-3 rounded-xl bg-zinc-50/90 border border-zinc-200/80 space-y-1.5">
                       <div class="flex items-center justify-between">
-                        <span class="inline-flex items-center space-x-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                        <span class="inline-flex items-center space-x-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
                           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                           <span>Reporte Ciudadano Verificado</span>
                         </span>
@@ -433,15 +444,15 @@
                       </div>
                       <div class="grid grid-cols-3 gap-2 text-center pt-1 border-t border-zinc-200/60">
                         <div class="bg-white rounded-lg p-1.5 border border-zinc-200/60">
-                          <span class="text-[9px] text-zinc-400 font-medium block">Temperatura</span>
+                          <span class="text-[10px] text-zinc-400 font-medium block">Temperatura</span>
                           <span class="text-xs font-black text-zinc-900 font-mono">{{ province?.temp || 30 }}°C</span>
                         </div>
                         <div class="bg-white rounded-lg p-1.5 border border-zinc-200/60">
-                          <span class="text-[9px] text-zinc-400 font-medium block">Lluvia</span>
+                          <span class="text-[10px] text-zinc-400 font-medium block">Lluvia</span>
                           <span class="text-xs font-black text-zinc-900 font-mono">{{ province?.rainChance || 60 }}%</span>
                         </div>
                         <div class="bg-white rounded-lg p-1.5 border border-zinc-200/60">
-                          <span class="text-[9px] text-zinc-400 font-medium block">Viento</span>
+                          <span class="text-[10px] text-zinc-400 font-medium block">Viento</span>
                           <span class="text-xs font-black text-zinc-900 font-mono">{{ province?.wind || 18 }} km/h</span>
                         </div>
                       </div>
@@ -460,12 +471,31 @@
                     :class="userVotes.includes(selectedIncident.id)
                       ? 'bg-zinc-950 text-white shadow-sm ring-2 ring-zinc-950/20'
                       : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200/80'"
-                    title="Validar reporte"
+                    title="Confirmar que sigue activo"
                   >
                     <AppIcon name="thumbs-up" class="w-3 h-3" />
                     <span class="tabular-nums font-black">{{ (selectedIncident.votos || 10) + (userVotes.includes(selectedIncident.id) ? 1 : 0) }}</span>
-                    <span class="text-[10px] font-medium opacity-80 hidden sm:inline">Verificados</span>
+                    <span class="text-[10px] font-medium opacity-80 hidden sm:inline">Sigue</span>
                   </button>
+                  <button
+                    type="button"
+                    @click="toggleResolved(selectedIncident.id)"
+                    class="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer select-none active:scale-95"
+                    :class="userResolved.includes(selectedIncident.id)
+                      ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-600/20'
+                      : 'bg-zinc-100 hover:bg-emerald-50 text-zinc-700 hover:text-emerald-800 border border-zinc-200/80'"
+                    title="Confirmar que ya se resolvió"
+                  >
+                    <AppIcon name="check" class="w-3 h-3" />
+                    <span class="tabular-nums font-black">{{ (selectedIncident.votosResuelto || 0) + (userResolved.includes(selectedIncident.id) ? 1 : 0) }}</span>
+                    <span class="text-[10px] font-medium opacity-80 hidden sm:inline">Resuelto</span>
+                  </button>
+                  <span
+                    class="px-2 py-0.5 rounded-full text-[10px] font-bold border"
+                    :class="freshnessMeta(getFreshnessFromHours(selectedIncident.ageHours)).badgeClass"
+                  >
+                    {{ freshnessMeta(getFreshnessFromHours(selectedIncident.ageHours)).label }}
+                  </span>
                 </div>
 
                 <div class="flex items-center space-x-2">
@@ -588,8 +618,16 @@ import AppButton from '~/components/AppButton.vue'
 import AppShape from '~/components/AppShape.vue'
 import { MorphIcon } from 'morphicons/vue'
 import { Copy, Share, Check } from 'lucide'
+import { PROVINCES_DATA } from '~/composables/useWeatherEnrichment'
+import { useApi } from '~/composables/useApi'
+import { useShare } from '~/composables/useShare'
+import { freshnessMeta, getFreshnessFromHours } from '~/composables/useReportStatus'
+import { shareAlertCard } from '~/composables/useShareCard'
 
-definePageMeta({ layout: 'default' })
+definePageMeta({
+  layout: 'default',
+  validate: (route) => typeof route.params.slug === 'string' && route.params.slug in PROVINCES_DATA,
+})
 
 const bulletinsTrack = ref<HTMLElement | null>(null)
 const incidentsTrack = ref<HTMLElement | null>(null)
@@ -602,43 +640,20 @@ const scrollTrack = (track: 'bulletins' | 'incidents', direction: 'left' | 'righ
 }
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
-interface ProvinceData { name: string; alerta: string; temp: number; humidity: number; wind: number; rainChance: number }
-const provinces: Record<string, ProvinceData> = {
-  'distrito-nacional': { name: 'Distrito Nacional', alerta: 'AMARILLA', temp: 32, humidity: 78, wind: 18, rainChance: 65 },
-  'azua': { name: 'Azua', alerta: 'ROJA', temp: 34, humidity: 85, wind: 28, rainChance: 90 },
-  'baoruco': { name: 'Baoruco', alerta: 'ROJA', temp: 31, humidity: 88, wind: 32, rainChance: 85 },
-  'barahona': { name: 'Barahona', alerta: 'ROJA', temp: 30, humidity: 90, wind: 35, rainChance: 92 },
-  'dajabon': { name: 'Dajabon', alerta: 'AMARILLA', temp: 29, humidity: 82, wind: 22, rainChance: 70 },
-  'duarte': { name: 'Duarte', alerta: 'VERDE', temp: 30, humidity: 75, wind: 15, rainChance: 45 },
-  'elias-pina': { name: 'Elias Pina', alerta: 'ROJA', temp: 28, humidity: 92, wind: 30, rainChance: 88 },
-  'el-seibo': { name: 'El Seibo', alerta: 'NORMAL', temp: 31, humidity: 68, wind: 14, rainChance: 25 },
-  'espaillat': { name: 'Espaillat', alerta: 'NORMAL', temp: 29, humidity: 70, wind: 16, rainChance: 30 },
-  'independencia': { name: 'Independencia', alerta: 'ROJA', temp: 33, humidity: 90, wind: 28, rainChance: 88 },
-  'la-altagracia': { name: 'La Altagracia', alerta: 'VERDE', temp: 31, humidity: 72, wind: 18, rainChance: 40 },
-  'la-romana': { name: 'La Romana', alerta: 'NORMAL', temp: 32, humidity: 65, wind: 12, rainChance: 20 },
-  'la-vega': { name: 'La Vega', alerta: 'VERDE', temp: 28, humidity: 78, wind: 14, rainChance: 50 },
-  'maria-trinidad-sanchez': { name: 'Maria Trinidad Sanchez', alerta: 'VERDE', temp: 30, humidity: 76, wind: 20, rainChance: 48 },
-  'monte-cristi': { name: 'Monte Cristi', alerta: 'NORMAL', temp: 33, humidity: 65, wind: 16, rainChance: 22 },
-  'pedernales': { name: 'Pedernales', alerta: 'ROJA', temp: 29, humidity: 95, wind: 35, rainChance: 95 },
-  'peravia': { name: 'Peravia', alerta: 'AMARILLA', temp: 31, humidity: 80, wind: 20, rainChance: 68 },
-  'puerto-plata': { name: 'Puerto Plata', alerta: 'NORMAL', temp: 30, humidity: 72, wind: 18, rainChance: 28 },
-  'hermanas-mirabal': { name: 'Hermanas Mirabal', alerta: 'NORMAL', temp: 28, humidity: 70, wind: 14, rainChance: 32 },
-  'samana': { name: 'Samana', alerta: 'NORMAL', temp: 30, humidity: 74, wind: 16, rainChance: 35 },
-  'san-cristobal': { name: 'San Cristobal', alerta: 'AMARILLA', temp: 31, humidity: 82, wind: 22, rainChance: 72 },
-  'san-juan': { name: 'San Juan', alerta: 'ROJA', temp: 29, humidity: 92, wind: 30, rainChance: 90 },
-  'san-pedro-de-macoris': { name: 'San Pedro de Macoris', alerta: 'VERDE', temp: 31, humidity: 74, wind: 16, rainChance: 42 },
-  'sanchez-ramirez': { name: 'Sanchez Ramirez', alerta: 'AMARILLA', temp: 29, humidity: 80, wind: 18, rainChance: 62 },
-  'santiago': { name: 'Santiago', alerta: 'NORMAL', temp: 30, humidity: 68, wind: 14, rainChance: 28 },
-  'santiago-rodriguez': { name: 'Santiago Rodriguez', alerta: 'NORMAL', temp: 29, humidity: 70, wind: 16, rainChance: 30 },
-  'valverde': { name: 'Valverde', alerta: 'NORMAL', temp: 31, humidity: 66, wind: 14, rainChance: 25 },
-  'monsenor-nouel': { name: 'Monsenor Nouel', alerta: 'AMARILLA', temp: 29, humidity: 80, wind: 18, rainChance: 64 },
-  'monte-plata': { name: 'Monte Plata', alerta: 'VERDE', temp: 30, humidity: 78, wind: 16, rainChance: 52 },
-  'hato-mayor': { name: 'Hato Mayor', alerta: 'VERDE', temp: 31, humidity: 74, wind: 15, rainChance: 46 },
-  'san-jose-de-ocoa': { name: 'San Jose de Ocoa', alerta: 'AMARILLA', temp: 26, humidity: 85, wind: 20, rainChance: 70 },
-  'santo-domingo': { name: 'Santo Domingo', alerta: 'AMARILLA', temp: 32, humidity: 78, wind: 18, rainChance: 66 },
-}
-const province = computed(() => provinces[slug.value] || null)
-useHead({ title: computed(() => province.value ? province.value.name + ' | Clima RD' : 'Provincia | Clima RD') })
+const api = useApi()
+const { shareLink, copyCoordinates: copyCoords } = useShare()
+// Fuente única: PROVINCES_DATA (mock central hasta que el backend exponga COE/INDOMET).
+const province = computed(() => PROVINCES_DATA[slug.value] ?? null)
+useSeoMeta({
+  title: () => (province.value ? `${province.value.name} | Clima RD` : 'Provincia | Clima RD'),
+  description: () =>
+    province.value
+      ? `Clima, alertas COE/INDOMET, boletines e incidencias reportadas en ${province.value.name}, República Dominicana.`
+      : 'Detalle climático por provincia en República Dominicana.',
+  ogTitle: () => (province.value ? `${province.value.name} | Clima RD` : 'Provincia | Clima RD'),
+  ogLocale: 'es_DO',
+  twitterCard: 'summary_large_image',
+})
 const alertBadgeClass = computed(() => { if (!province.value) return ''; switch (province.value.alerta) { case 'ROJA': return 'bg-[#E11D48]'; case 'AMARILLA': return 'bg-[#F59E0B] !text-zinc-950'; case 'VERDE': return 'bg-[#10B981]'; default: return 'bg-zinc-400' } })
 const alertShape = computed(() => { if (!province.value) return 'circle'; switch (province.value.alerta) { case 'ROJA': return 'burst'; case 'AMARILLA': return '12-sided-cookie'; case 'VERDE': return 'flower-8'; default: return 'circle' } })
 const alertIcon = computed(() => { if (!province.value) return 'cloud-rain'; switch (province.value.alerta) { case 'ROJA': return 'alert-triangle'; case 'AMARILLA': return 'alert-triangle'; case 'VERDE': return 'shield'; default: return 'sun' } })
@@ -653,6 +668,8 @@ interface IncidentItem {
   title: string
   location: string
   time: string
+  ageHours: number
+  votosResuelto: number
   image?: string
   video?: string
   category: string
@@ -675,6 +692,8 @@ const incidents = computed<IncidentItem[]>(() => {
       title: 'Inundación en vía principal',
       location: 'Sector centro, ' + n,
       time: 'Hace 25 min',
+      ageHours: 0.4,
+      votosResuelto: 0,
       image: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=600&q=80',
       category: 'Inundación Urbana',
       severity: 'ALTO',
@@ -691,6 +710,8 @@ const incidents = computed<IncidentItem[]>(() => {
       title: 'Árbol caído sobre calzada',
       location: 'Carretera principal, ' + n,
       time: 'Hace 1 hora',
+      ageHours: 1,
+      votosResuelto: 0,
       image: 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=600&q=80',
       category: 'Obstrucción de Vía',
       severity: 'MEDIO',
@@ -707,6 +728,8 @@ const incidents = computed<IncidentItem[]>(() => {
       title: 'Vehículos varados',
       location: 'Paso a desnivel, ' + n,
       time: 'Hace 2 horas',
+      ageHours: 2,
+      votosResuelto: 1,
       video: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
       category: 'Emergencia Vial',
       severity: 'EXTREMO',
@@ -722,7 +745,9 @@ const incidents = computed<IncidentItem[]>(() => {
       icon: 'alert-triangle',
       title: 'Monitoreo de filtraciones',
       location: 'Puente peatonal norte, ' + n,
-      time: 'Hace 3 horas',
+      time: 'Hace 30 horas',
+      ageHours: 30,
+      votosResuelto: 0,
       category: 'Infraestructura',
       severity: 'MODERADO',
       shape: 'arch',
@@ -743,6 +768,7 @@ const isIncidentModalOpen = ref(false)
 const isLightboxOpen = ref(false)
 const activeModalTab = ref<'reporte' | 'prevencion'>('reporte')
 const userVotes = ref<Array<string>>([])
+const userResolved = ref<Array<string>>([])
 const shareSuccessId = ref<string | null>(null)
 const isCopied = ref(false)
 let copyTimeout: any = null
@@ -788,29 +814,56 @@ function closeImageLightbox() {
   isLightboxOpen.value = false
 }
 
+function shareCard() {
+  if (!province.value) return
+  const p = province.value
+  shareAlertCard(
+    {
+      provinceName: p.name,
+      alerta: p.alerta,
+      conditionText: p.rainChance >= 60 ? 'Aguaceros con tronadas' : p.rainChance >= 30 ? 'Chubascos dispersos' : 'Tiempo estable',
+      tempLine: `${p.temp}°C · Humedad ${p.humidity}% · Viento ${p.wind} km/h`,
+      advisoryText: advisoryText.value,
+    },
+    `Clima RD: ${p.alerta === 'NORMAL' ? 'Sin alerta' : 'Alerta ' + p.alerta} en ${p.name}. ${advisoryText.value} ${window.location.href}`
+  )
+}
+
 function toggleVote(id: string) {
   if (userVotes.value.includes(id)) {
     userVotes.value = userVotes.value.filter(v => v !== id)
   } else {
+    // Optimistic UI: el backend confirma el voto (otra persona). Si falla, se revierte.
     userVotes.value.push(id)
     toast.success('¡Verificación registrada con éxito!')
+    api.voteReporte(id, 'activo').catch(() => {
+      userVotes.value = userVotes.value.filter(v => v !== id)
+      toast.error('No se pudo registrar el voto. Inténtalo de nuevo.')
+    })
   }
 }
 
-function shareReport(item: IncidentItem, _event?: MouseEvent) {
-  const shareText = `Clima RD - Incidencia: ${item.title} en ${item.location}.`
-  if (typeof navigator !== 'undefined' && navigator.share) {
-    navigator.share({
-      title: `Clima RD: ${item.title}`,
-      text: shareText,
-      url: window.location.href
-    }).then(() => {
-      triggerCopiedFeedback(item.id)
-    }).catch(() => {})
-  } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
-    navigator.clipboard.writeText(`${shareText} - ${window.location.href}`)
-    triggerCopiedFeedback(item.id)
+function toggleResolved(id: string) {  if (userResolved.value.includes(id)) {
+    userResolved.value = userResolved.value.filter(v => v !== id)
+  } else {
+    userResolved.value.push(id)
+    toast.success('¡Gracias! Marcaste este reporte como resuelto.')
+    api.voteReporte(id, 'resuelto').catch(() => {
+      userResolved.value = userResolved.value.filter(v => v !== id)
+      toast.error('No se pudo registrar. Inténtalo de nuevo.')
+    })
   }
+}
+
+function shareReport(item: IncidentItem, event?: MouseEvent) {
+  const origin = (event?.currentTarget as HTMLElement) || undefined
+  shareLink({
+    title: `Clima RD: ${item.title}`,
+    text: `Clima RD - Incidencia: ${item.title} en ${item.location}.`,
+    origin,
+  }).then((ok) => {
+    if (ok) triggerCopiedFeedback(item.id)
+  })
 }
 
 function triggerCopiedFeedback(id: string) {
@@ -825,16 +878,15 @@ function triggerCopiedFeedback(id: string) {
 
 function copyCoordinates(item?: IncidentItem) {
   if (!item || item.lat === undefined || item.lng === undefined) return
-  const text = `${item.lat.toFixed(5)}, ${item.lng.toFixed(5)}`
-  if (typeof navigator !== 'undefined' && navigator.clipboard) {
-    navigator.clipboard.writeText(text)
-    isCopied.value = true
-    toast.success('Coordenadas GPS copiadas al portapapeles')
-    clearTimeout(copyTimeout)
-    copyTimeout = setTimeout(() => {
-      isCopied.value = false
-    }, 2000)
-  }
+  copyCoords(item.lat, item.lng).then((ok) => {
+    if (ok) {
+      isCopied.value = true
+      clearTimeout(copyTimeout)
+      copyTimeout = setTimeout(() => {
+        isCopied.value = false
+      }, 2000)
+    }
+  })
 }
 
 function getModalShapeStyle(item?: IncidentItem | null) {

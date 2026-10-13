@@ -8,28 +8,85 @@
       <span class="text-sm font-semibold">Cargando evidencias...</span>
     </div>
 
+    <!-- Error State (distinto de vacío: permite reintentar) -->
+    <div v-else-if="loadError" class="py-16 text-center space-y-3" role="alert">
+      <AppIcon name="alert-triangle" class="w-8 h-8 mx-auto text-rose-400" />
+      <p class="text-sm font-bold text-zinc-700">No se pudieron cargar las evidencias</p>
+      <p class="text-xs text-zinc-500">{{ loadError }}</p>
+      <AppButton variant="tonal" shape="round" size="small" @click="loadEvidencias">
+        Reintentar
+      </AppButton>
+    </div>
+
     <!-- Empty State -->
-    <div v-else-if="!images.length" class="py-16 text-center space-y-2">
+    <div v-else-if="!visibleImages.length" class="py-16 text-center space-y-2">
       <AppIcon name="camera" class="w-8 h-8 mx-auto text-zinc-300" />
       <p class="text-sm font-bold text-zinc-700">Aún no hay evidencias publicadas</p>
       <p class="text-xs text-zinc-500">Sé el primero en reportar una situación: pulsa «Subir Nueva Evidencia».</p>
+    </div>
+
+    <!-- Filtro de vigencia -->
+    <div v-if="!isLoading && !loadError && images.length" class="flex flex-wrap items-center justify-between gap-2 px-1">
+      <p class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
+        {{ visibleImages.length }} de {{ images.length }} reportes
+      </p>
+      <div class="flex items-center gap-2 flex-wrap">
+        <button
+          type="button"
+          @click="nearbyOnly = !nearbyOnly"
+          :aria-pressed="nearbyOnly"
+          :disabled="!userLocation"
+          :title="userLocation ? 'Mostrar solo reportes cercanos a tu zona' : 'Configura tu zona en tu perfil para usar este filtro'"
+          class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all cursor-pointer select-none disabled:opacity-40 disabled:cursor-not-allowed"
+          :class="nearbyOnly ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400'"
+        >
+          <AppIcon name="map-pin" class="w-3.5 h-3.5" />
+          <span>Cerca de mí</span>
+        </button>
+        <div v-if="nearbyOnly && userLocation" class="flex items-center gap-1" role="group" aria-label="Radio de cercanía">
+          <button
+            v-for="km in NEARBY_PRESETS_KM"
+            :key="km"
+            type="button"
+            @click="nearbyKm = km"
+            :aria-pressed="nearbyKm === km"
+            class="px-2.5 py-1.5 rounded-full text-[11px] font-black font-mono border transition-all cursor-pointer"
+            :class="nearbyKm === km ? 'bg-zinc-950 text-white border-zinc-950' : 'bg-white text-zinc-600 border-zinc-200'"
+          >
+            {{ km }} km
+          </button>
+        </div>
+        <button
+          type="button"
+          @click="hideStale = !hideStale"
+          :aria-pressed="hideStale"
+          class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all cursor-pointer select-none"
+          :class="hideStale ? 'bg-zinc-950 text-white border-zinc-950' : 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400'"
+          title="Ocultar reportes resueltos o de más de 72 horas"
+        >
+          <AppIcon name="clock" class="w-3.5 h-3.5" />
+          <span>{{ hideStale ? 'Ocultando antiguos' : 'Ver todos' }}</span>
+        </button>
+      </div>
     </div>
 
     <!-- Vue FLIP Image Gallery (Adapted with Wisspop FLIP Modal) -->
     <div v-else class="gallery-container">
       <div ref="galleryRef" class="gallery">
         <div
-          v-for="(image, id) in images"
+          v-for="(image, id) in visibleImages"
           :key="image.id"
           class="gallery__image-wrapper group"
           :class="{ 'gallery__image-wrapper--selected': selectedImageId === id }"
           tabindex="0"
           role="button"
+          :aria-selected="selectedImageId === id"
           :aria-label="image.tipo + ' - ' + image.ubicacion"
           :title="selectedImageId === id ? 'Clic para abrir reporte completo' : 'Clic para seleccionar ' + image.tipo"
           @click="handleImageClick(id, $event)"
           @dblclick="openDetailModal(id)"
           @keydown.enter="handleImageClick(id, $event)"
+          @keydown.space.prevent="handleImageClick(id, $event)"
         >
           <img
             class="gallery__image"
@@ -37,13 +94,14 @@
             :alt="image.alt || image.tipo"
             :title="image.title"
             loading="lazy"
+            decoding="async"
             @error="onImageError(id)"
           />
 
           <!-- Top Alert Badge -->
           <div class="gallery__top-badge hidden sm:block">
             <span
-              class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider text-white shadow-xs"
+              class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider text-white shadow-xs"
               :class="image.badgeBg"
             >
               {{ image.alertaShort }}
@@ -83,10 +141,33 @@
             >
               {{ currentEvidence.alerta }}
             </span>
+            <span
+              v-if="isResolved(currentEvidence.votos, resolvedCount(currentEvidence))"
+              class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white"
+            >
+              Resuelto
+            </span>
+            <span
+              v-if="isFrequentSector(sectorReportCount(currentEvidence))"
+              class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 border border-sky-200/60"
+              :title="`${sectorReportCount(currentEvidence)} reportes en este sector`"
+            >
+              Zona recurrente · {{ sectorReportCount(currentEvidence) }}
+            </span>
+            <span
+              v-if="!isResolved(currentEvidence.votos, resolvedCount(currentEvidence))"
+              class="px-2 py-0.5 rounded-full text-[10px] font-bold border"
+              :class="freshnessMeta(getFreshness(currentEvidence.creadoEn)).badgeClass"
+            >
+              {{ freshnessMeta(getFreshness(currentEvidence.creadoEn)).label }}
+            </span>
           </div>
           <p class="text-xs text-zinc-500 truncate flex items-center space-x-1.5 mt-0.5">
             <AppIcon name="map-pin" class="w-3.5 h-3.5 text-zinc-400 shrink-0" />
             <span class="truncate">{{ currentEvidence.ubicacion }}</span>
+            <span v-if="distanceTo(currentEvidence) !== null" class="shrink-0 font-mono font-bold text-emerald-700">
+              · a {{ formatDistance(distanceTo(currentEvidence)!) }}
+            </span>
             <span>•</span>
             <AppIcon name="clock" class="w-3 h-3 text-zinc-400 shrink-0" />
             <span class="shrink-0">{{ currentEvidence.tiempo }}</span>
@@ -107,7 +188,7 @@
           <span>Ver Detalles</span>
         </button>
 
-        <!-- Citizen Validation -->
+        <!-- Citizen Validation: ¿sigue activo o ya se resolvió? -->
         <button
           type="button"
           @click="toggleVote(currentEvidence.id)"
@@ -115,11 +196,25 @@
           :class="userVotes.includes(currentEvidence.id)
             ? 'bg-zinc-950 text-white shadow-sm ring-2 ring-zinc-950/20'
             : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200/80'"
-          title="Validar reporte"
+          title="Confirmar que la situación sigue activa"
         >
           <AppIcon name="thumbs-up" class="w-3.5 h-3.5" />
           <span class="tabular-nums font-black">{{ currentEvidence.votos + (userVotes.includes(currentEvidence.id) ? 1 : 0) }}</span>
-          <span class="text-[11px] font-medium opacity-80">Verificados</span>
+          <span class="text-[11px] font-medium opacity-80">Sigue</span>
+        </button>
+
+        <button
+          type="button"
+          @click="toggleResolved(currentEvidence.id)"
+          class="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer select-none active:scale-95"
+          :class="userResolved.includes(currentEvidence.id)
+            ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-600/20'
+            : 'bg-zinc-100 hover:bg-emerald-50 text-zinc-700 hover:text-emerald-800 border border-zinc-200/80'"
+          title="Confirmar que la situación ya se resolvió"
+        >
+          <AppIcon name="check" class="w-3.5 h-3.5" />
+          <span class="tabular-nums font-black">{{ resolvedCount(currentEvidence) }}</span>
+          <span class="text-[11px] font-medium opacity-80">Resuelto</span>
         </button>
 
         <!-- Share Button -->
@@ -184,7 +279,7 @@
                       {{ currentEvidence.category || currentEvidence.tipo }}
                     </span>
                     <span
-                      class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0"
+                      class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0"
                       :class="getSeverityBadgeClass(currentEvidence.severity || currentEvidence.alertaShort)"
                     >
                       {{ currentEvidence.severity || currentEvidence.alerta }}
@@ -281,7 +376,7 @@
                   <!-- Description Box -->
                   <div class="p-3 rounded-xl bg-zinc-50/90 border border-zinc-200/80 space-y-1.5">
                     <div class="flex items-center justify-between">
-                      <span class="inline-flex items-center space-x-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                      <span class="inline-flex items-center space-x-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span>Reporte Ciudadano Verificado</span>
                       </span>
@@ -345,15 +440,15 @@
                     </div>
                     <div class="grid grid-cols-3 gap-2 text-center pt-1 border-t border-zinc-200/60">
                       <div class="bg-white rounded-lg p-1.5 border border-zinc-200/60">
-                        <span class="text-[9px] text-zinc-400 font-medium block">Temperatura</span>
+                        <span class="text-[10px] text-zinc-400 font-medium block">Temperatura</span>
                         <span class="text-xs font-black text-zinc-900 font-mono">{{ currentEvidence.weather ? currentEvidence.weather.temp + '°C' : '28°C' }}</span>
                       </div>
                       <div class="bg-white rounded-lg p-1.5 border border-zinc-200/60">
-                        <span class="text-[9px] text-zinc-400 font-medium block">Precipitación</span>
+                        <span class="text-[10px] text-zinc-400 font-medium block">Precipitación</span>
                         <span class="text-xs font-black text-zinc-900 font-mono">{{ currentEvidence.weather ? currentEvidence.weather.rainChance + '%' : '70%' }}</span>
                       </div>
                       <div class="bg-white rounded-lg p-1.5 border border-zinc-200/60">
-                        <span class="text-[9px] text-zinc-400 font-medium block">Viento</span>
+                        <span class="text-[10px] text-zinc-400 font-medium block">Viento</span>
                         <span class="text-xs font-black text-zinc-900 font-mono">{{ currentEvidence.weather ? currentEvidence.weather.wind + ' km/h' : '18 km/h' }}</span>
                       </div>
                     </div>
@@ -372,11 +467,25 @@
                   :class="userVotes.includes(currentEvidence.id)
                     ? 'bg-zinc-950 text-white shadow-sm ring-2 ring-zinc-950/20'
                     : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200/80'"
-                  title="Validar reporte"
+                  title="Confirmar que sigue activo"
                 >
                   <AppIcon name="thumbs-up" class="w-3 h-3" />
                   <span class="tabular-nums font-black">{{ currentEvidence.votos + (userVotes.includes(currentEvidence.id) ? 1 : 0) }}</span>
-                  <span class="text-[10px] font-medium opacity-80 hidden sm:inline">Verificados</span>
+                  <span class="text-[10px] font-medium opacity-80 hidden sm:inline">Sigue</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="toggleResolved(currentEvidence.id)"
+                  class="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer select-none active:scale-95"
+                  :class="userResolved.includes(currentEvidence.id)
+                    ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-600/20'
+                    : 'bg-zinc-100 hover:bg-emerald-50 text-zinc-700 hover:text-emerald-800 border border-zinc-200/80'"
+                  title="Confirmar que ya se resolvió"
+                >
+                  <AppIcon name="check" class="w-3 h-3" />
+                  <span class="tabular-nums font-black">{{ resolvedCount(currentEvidence) }}</span>
+                  <span class="text-[10px] font-medium opacity-80 hidden sm:inline">Resuelto</span>
                 </button>
 
                 <NuxtLink
@@ -387,6 +496,16 @@
                   <span>Ver provincia</span>
                   <AppIcon name="chevron-right" class="w-3.5 h-3.5" />
                 </NuxtLink>
+                <button
+                  v-if="!abuseReported.has(currentEvidence.id)"
+                  type="button"
+                  @click="handleReportAbuse(currentEvidence.id)"
+                  class="inline-flex items-center space-x-1 text-[11px] font-semibold text-zinc-400 hover:text-rose-700 transition-colors cursor-pointer"
+                  title="Reportar contenido falso o spam"
+                >
+                  <AppIcon name="trash" class="w-3.5 h-3.5" />
+                  <span>Reportar</span>
+                </button>
               </div>
 
               <div class="flex items-center space-x-2">
@@ -421,6 +540,9 @@
         >
           <div
             v-if="isLightboxOpen && currentEvidence"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Vista ampliada de la evidencia"
             class="fixed inset-0 flex flex-col justify-between bg-zinc-950/98 backdrop-blur-xl select-none"
             style="z-index: 99999 !important;"
             @click.self="closeImageLightbox"
@@ -549,8 +671,9 @@
               <div class="space-y-4 py-4 text-xs text-zinc-800">
                 <!-- 1. Tipo de Incidencia -->
                 <div class="space-y-1.5">
-                  <label class="font-bold text-zinc-900">Tipo de Incidencia:</label>
+                  <label for="ev-tipo" class="font-bold text-zinc-900">Tipo de Incidencia:</label>
                   <select
+                    id="ev-tipo"
                     v-model="newReportType"
                     class="w-full p-3 rounded-2xl bg-zinc-50 border border-zinc-200/90 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-950"
                   >
@@ -563,8 +686,9 @@
 
                 <!-- 2. Provincia -->
                 <div class="space-y-1.5">
-                  <label class="font-bold text-zinc-900">Provincia / Demarcación:</label>
+                  <label for="ev-provincia" class="font-bold text-zinc-900">Provincia / Demarcación:</label>
                   <select
+                    id="ev-provincia"
                     v-model="newReportProvince"
                     class="w-full p-3 rounded-2xl bg-zinc-50 border border-zinc-200/90 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-950"
                   >
@@ -576,10 +700,12 @@
 
                 <!-- 3. Ubicación específica + GPS -->
                 <div class="space-y-1.5">
-                  <label class="font-bold text-zinc-900">Sector, Calle o Vía en RD:</label>
+                  <label for="ev-ubicacion" class="font-bold text-zinc-900">Sector, Calle o Vía en RD:</label>
                   <input
+                    id="ev-ubicacion"
                     v-model="newReportLocation"
                     type="text"
+                    maxlength="120"
                     placeholder="Ej. Av. Winston Churchill casi 27 de Febrero"
                     class="w-full p-3 rounded-2xl bg-zinc-50 border border-zinc-200/90 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-950"
                     @input="handleLocationInput"
@@ -595,18 +721,23 @@
 
                 <!-- 4. Descripción detallada -->
                 <div class="space-y-1.5">
-                  <label class="font-bold text-zinc-900">Descripción detallada de la situación:</label>
+                  <label for="ev-descripcion" class="font-bold text-zinc-900">Descripción detallada de la situación:</label>
                   <textarea
+                    id="ev-descripcion"
                     v-model="newReportDescription"
                     rows="2"
+                    maxlength="280"
                     placeholder="Describe lo que está ocurriendo (nivel de agua, vehículos afectados, postes comprometidos)..."
                     class="w-full p-3 rounded-2xl bg-zinc-50 border border-zinc-200/90 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-950 resize-none"
                   ></textarea>
+                  <p class="text-right text-[10px] font-mono" :class="newReportDescription.length >= 280 ? 'text-rose-600' : 'text-zinc-400'">
+                    {{ newReportDescription.length }}/280
+                  </p>
                 </div>
 
                 <!-- 5. Foto / Video con preview y captura móvil -->
                 <div class="space-y-1.5">
-                  <label class="font-bold text-zinc-900">Evidencia multimedia (foto o video):</label>
+                  <span id="ev-media-label" class="font-bold text-zinc-900">Evidencia multimedia (foto o video):</span>
                   <input
                     ref="fileInputEl"
                     type="file"
@@ -692,7 +823,6 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { toast } from 'super-beautiful-toast'
-import imageCompression from 'browser-image-compression'
 import { WissPopMorph } from 'wisspop/vue'
 import AppIcon from '~/components/AppIcon.vue'
 import AppShape from '~/components/AppShape.vue'
@@ -700,6 +830,12 @@ import AppButton from '~/components/AppButton.vue'
 import { MorphIcon } from 'morphicons/vue'
 import { Copy, Share, Check } from 'lucide'
 import { useApi } from '~/composables/useApi'
+import { useShare } from '~/composables/useShare'
+import { getFreshness, freshnessMeta, isResolved, OBSOLETE_AFTER_HOURS } from '~/composables/useReportStatus'
+import { haversineKm, formatDistance, NEARBY_PRESETS_KM } from '~/composables/useNearby'
+import { countBySector, isFrequentSector, getAbuseReported, markAbuseReported } from '~/composables/useReportStats'
+import { canPublish, isLikelyDuplicate, recordPublish, saveLastReport, MAX_REPORTS_PER_HOUR } from '~/composables/useRateLimit'
+import { useUserProfile } from '~/composables/useUserProfile'
 import {
   getEnrichedEvidenceData,
   detectProvinceFromText,
@@ -709,8 +845,12 @@ import {
 
 definePageMeta({ layout: 'default' })
 
-useHead({
-  title: 'Evidencias Urbanas | Clima RD'
+useSeoMeta({
+  title: 'Evidencias Urbanas | Clima RD',
+  description: 'Muro ciudadano de evidencias: fotos y videos georreferenciados de inundaciones e incidencias viales en RD.',
+  ogTitle: 'Evidencias Urbanas | Clima RD',
+  ogDescription: 'Reportes ciudadanos verificados con foto, video y ubicación GPS.',
+  twitterCard: 'summary_large_image',
 })
 
 interface GalleryImageItem {
@@ -724,6 +864,7 @@ interface GalleryImageItem {
   ubicacion: string
   ubicacionShort: string
   tiempo: string
+  creadoEn: string
   descripcion: string
   alerta: string
   alertaShort: 'Roja' | 'Amarilla' | 'Verde' | 'Normal'
@@ -732,6 +873,7 @@ interface GalleryImageItem {
   icon: string
   shape?: string
   votos: number
+  votosResuelto: number
   lat: number
   lng: number
   video?: string
@@ -742,8 +884,10 @@ interface GalleryImageItem {
 
 // ── Datos reales desde el backend (Clima RD API) ──
 const api = useApi()
+const { copyCoordinates: copyCoords, shareLink } = useShare()
 const images = ref<GalleryImageItem[]>([])
 const isLoading = ref(false)
+const loadError = ref<string | null>(null)
 
 const CATEGORY_META: Record<string, { title: string; icon: string; shape: string }> = {
   inundacion: { title: 'Inundación Callejera', icon: 'water', shape: 'flower' },
@@ -776,7 +920,7 @@ function alertMeta(alerta?: string): { texto: string; corta: 'Roja' | 'Amarilla'
   return { texto: 'Normal', corta: 'Normal', badgeBg: 'bg-zinc-600', severity: 'BAJO' }
 }
 
-function mapReporteToCard(r: any): GalleryImageItem {
+function mapReporteToCard(r: { id: string | number; tipo: string; lugar: string | null; descripcion: string | null; latitud: number; longitud: number; foto_url: string | null; provincia: string; votos_activo: number; creado_en: string }): GalleryImageItem {
   const meta = CATEGORY_META[r.tipo] || CATEGORY_META.inundacion
   const mediaUrl = r.foto_url ? api.resolveMediaUrl(r.foto_url) : null
   const kind = mediaUrl ? mediaKind(mediaUrl) : 'image'
@@ -796,6 +940,7 @@ function mapReporteToCard(r: any): GalleryImageItem {
     ubicacion: `${lugar}, ${r.provincia}`,
     ubicacionShort: r.provincia,
     tiempo,
+    creadoEn: r.creado_en,
     descripcion: r.descripcion || 'Reporte ciudadano recibido en tiempo real y validado con la estación meteorológica local.',
     alerta: alerta.texto,
     alertaShort: alerta.corta,
@@ -804,6 +949,7 @@ function mapReporteToCard(r: any): GalleryImageItem {
     icon: meta.icon,
     shape: meta.shape,
     votos: r.votos_activo,
+    votosResuelto: r.votos_resuelto ?? 0,
     lat: r.latitud,
     lng: r.longitud,
     video: kind === 'video' ? mediaUrl : undefined,
@@ -815,13 +961,17 @@ function mapReporteToCard(r: any): GalleryImageItem {
 
 async function loadEvidencias() {
   isLoading.value = true
+  loadError.value = null
+  const controller = new AbortController()
   try {
-    const reportes = await api.getReportes()
+    const reportes = await api.getReportes({}, controller.signal)
     images.value = reportes.map(mapReporteToCard)
     await nextTick()
     initGalleryClasses()
-  } catch {
-    toast.error('No se pudo conectar con el servidor. Revisa que el backend esté activo.')
+  } catch (err: any) {
+    // createError del useApi trae statusMessage; se distingue error de vacío.
+    loadError.value = err?.statusMessage || 'No se pudo conectar con el servidor. Revisa que el backend esté activo.'
+    toast.error(loadError.value)
   } finally {
     isLoading.value = false
   }
@@ -830,9 +980,50 @@ async function loadEvidencias() {
 const galleryRef = ref<HTMLElement | null>(null)
 const selectedImageId = ref<number>(0)
 const userVotes = ref<Array<number | string>>([])
+const userResolved = ref<Array<number | string>>([])
 const shareSuccessId = ref<number | string | null>(null)
+const hideStale = ref(true)
+// Cercanía (Fase 2): filtro cliente con Haversine; el backend añadirá ?lat&lng&radio_km.
+const { userProfile } = useUserProfile()
+const nearbyOnly = ref(false)
+const nearbyKm = ref<number>(5)
+
+const userLocation = computed(() => {
+  const c = userProfile.value.coordinates
+  return c && (c.lat !== 0 || c.lng !== 0) ? c : null
+})
+
+function distanceTo(item: { lat: number; lng: number }): number | null {
+  if (!userLocation.value) return null
+  return haversineKm(userLocation.value, { lat: item.lat, lng: item.lng })
+}
+
+// Historial: recurrencia por sector + reportes de abuso (moderación v1).
+const sectorCounts = computed(() => countBySector(images.value))
+const abuseReported = ref<Set<string | number>>(new Set())
+
+onMounted(async () => {
+  abuseReported.value = getAbuseReported() as Set<string | number>
+})
+
+function sectorReportCount(item: { ubicacionShort?: string; ubicacion: string }): number {
+  const key = (item.ubicacionShort || item.ubicacion || '').trim()
+  return sectorCounts.value.get(key) ?? 0
+}
+
+async function handleReportAbuse(id: number | string) {
+  try {
+    await api.reportAbuse(String(id))
+  } catch {
+    // Backend aún sin endpoint: se guarda local y se agradece igual.
+  } finally {
+    markAbuseReported(String(id))
+    abuseReported.value = new Set(abuseReported.value).add(id)
+    toast.info('Gracias. Revisaremos este reporte.')
+  }
+}
 const isCopied = ref(false)
-let copyTimeout: any = null
+let copyTimeout: ReturnType<typeof setTimeout> | null = null
 
 // ── CodePen Vue FLIP Constants ──
 const WRAPPER_SELECTOR = 'gallery__image-wrapper'
@@ -858,7 +1049,28 @@ function closeImageLightbox() {
 }
 
 const currentEvidence = computed(() => {
-  return images.value[selectedImageId.value] || images.value[0]
+  return visibleImages.value[selectedImageId.value] || visibleImages.value[0]
+})
+
+/** Oculta resueltos y obsoletos (+72 h) salvo que el usuario desactive el filtro. */
+const visibleImages = computed(() => {
+  let list = images.value
+  if (hideStale.value) {
+    list = list.filter(img => {
+      const resolved = isResolved(img.votos + (userVotes.value.includes(img.id) ? 1 : 0), resolvedCount(img))
+      if (resolved) return false
+      return getFreshness(img.creadoEn) !== 'obsoleto'
+    })
+  }
+  if (nearbyOnly.value && userLocation.value) {
+    const origin = userLocation.value
+    list = list
+      .map(img => ({ img, d: haversineKm(origin, { lat: img.lat, lng: img.lng }) }))
+      .filter(({ d }) => d <= nearbyKm.value)
+      .sort((a, b) => a.d - b.d)
+      .map(({ img }) => img)
+  }
+  return list
 })
 
 function getActiveCardElement(): HTMLElement | null {
@@ -957,7 +1169,7 @@ onMounted(async () => {
 })
 
 function onImageError(index: number) {
-  const item = images.value[index]
+  const item = visibleImages.value[index]
   if (item && item.fallbackUrl && item.url !== item.fallbackUrl) {
     item.url = item.fallbackUrl
   }
@@ -969,7 +1181,7 @@ async function openDetailModal(targetId?: number) {
   activeModalTab.value = 'reporte'
   isLightboxOpen.value = false
 
-  if (typeof targetId === 'number' && targetId >= 0 && targetId < images.value.length && targetId !== selectedImageId.value) {
+  if (typeof targetId === 'number' && targetId >= 0 && targetId < visibleImages.value.length && targetId !== selectedImageId.value) {
     selectImage(targetId)
     await new Promise((resolve) => setTimeout(resolve, TRANSITION_DURATION + 50))
   }
@@ -1006,16 +1218,15 @@ onBeforeRouteLeave(() => {
 
 function copyCoordinates(item?: GalleryImageItem) {
   if (!item || item.lat === undefined || item.lng === undefined) return
-  const text = `${item.lat.toFixed(5)}, ${item.lng.toFixed(5)}`
-  if (typeof navigator !== 'undefined' && navigator.clipboard) {
-    navigator.clipboard.writeText(text)
-    isCopied.value = true
-    toast.success('Coordenadas GPS copiadas al portapapeles')
-    clearTimeout(copyTimeout)
-    copyTimeout = setTimeout(() => {
-      isCopied.value = false
-    }, 2000)
-  }
+  copyCoords(item.lat, item.lng).then((ok) => {
+    if (ok) {
+      isCopied.value = true
+      clearTimeout(copyTimeout)
+      copyTimeout = setTimeout(() => {
+        isCopied.value = false
+      }, 2000)
+    }
+  })
 }
 
 function getSeverityBadgeClass(sev?: string) {
@@ -1090,30 +1301,46 @@ function getIconContainerClass(alerta?: string) {
   return 'bg-zinc-50 border-zinc-200/70 text-zinc-700'
 }
 
+function resolvedCount(item: GalleryImageItem): number {
+  return item.votosResuelto + (userResolved.value.includes(item.id) ? 1 : 0)
+}
+
 function toggleVote(id: number | string) {
   if (userVotes.value.includes(id)) {
     userVotes.value = userVotes.value.filter(v => v !== id)
   } else {
+    // Optimistic UI: el backend confirma (otra persona). Si falla, se revierte.
     userVotes.value.push(id)
     toast.success('¡Verificación registrada con éxito!')
+    api.voteReporte(String(id), 'activo').catch(() => {
+      userVotes.value = userVotes.value.filter(v => v !== id)
+      toast.error('No se pudo registrar el voto. Inténtalo de nuevo.')
+    })
+  }
+}
+
+function toggleResolved(id: number | string) {
+  if (userResolved.value.includes(id)) {
+    userResolved.value = userResolved.value.filter(v => v !== id)
+  } else {
+    userResolved.value.push(id)
+    toast.success('¡Gracias! Marcaste este reporte como resuelto.')
+    api.voteReporte(String(id), 'resuelto').catch(() => {
+      userResolved.value = userResolved.value.filter(v => v !== id)
+      toast.error('No se pudo registrar. Inténtalo de nuevo.')
+    })
   }
 }
 
 function shareReport(item: GalleryImageItem, event?: MouseEvent) {
   const originEl = (event?.currentTarget as HTMLElement) || undefined
-  const shareText = `Clima RD: ${item.tipo} en ${item.ubicacion} (${item.alerta}).`
-  if (navigator.share) {
-    navigator.share({
-      title: `Clima RD: ${item.tipo}`,
-      text: shareText,
-      url: window.location.href
-    }).then(() => {
-      triggerCopiedFeedback(item.id, originEl)
-    }).catch(() => {})
-  } else {
-    navigator.clipboard.writeText(`${shareText} - ${window.location.href}`)
-    triggerCopiedFeedback(item.id, originEl)
-  }
+  shareLink({
+    title: `Clima RD: ${item.tipo}`,
+    text: `Clima RD: ${item.tipo} en ${item.ubicacion} (${item.alerta}).`,
+    origin: originEl,
+  }).then((ok) => {
+    if (ok) triggerCopiedFeedback(item.id, originEl)
+  })
 }
 
 function triggerCopiedFeedback(id: number | string, origin?: HTMLElement) {
@@ -1220,6 +1447,8 @@ function onFileSelected(event: Event) {
 
 async function compressIfNeeded(file: File): Promise<File> {
   if (!file.type.startsWith('image/') || file.size <= 5 * 1024 * 1024) return file
+  // Lazy: browser-image-compression (~70KB) solo se descarga al adjuntar foto pesada.
+  const { default: imageCompression } = await import('browser-image-compression')
   return imageCompression(file, { maxSizeMB: 5, useWebWorker: true })
 }
 
@@ -1246,6 +1475,17 @@ async function submitNewEvidence() {
     return
   }
 
+  // Anti-spam cliente (el backend aplica 429 real).
+  const quota = canPublish()
+  if (!quota.ok) {
+    toast.warning(`Límite de ${MAX_REPORTS_PER_HOUR} reportes por hora. Intenta en ~${quota.waitMinutes} min.`)
+    return
+  }
+  if (isLikelyDuplicate(newReportType.value, newReportLocation.value)) {
+    toast.warning('Ya publicaste este mismo reporte hace poco. ¿Sigue igual? Valídalo con “Sigue”.')
+    return
+  }
+
   isSubmitting.value = true
 
   try {
@@ -1258,15 +1498,20 @@ async function submitNewEvidence() {
 
     const form = new FormData()
     form.append('tipo', newReportType.value)
-    form.append('ubicacion', newReportLocation.value.trim())
-    form.append('descripcion', newReportDescription.value.trim())
+    form.append('ubicacion', newReportLocation.value.trim().slice(0, 120))
+    // Sanitizado básico: recorte + límite. El backend valida y escapa HTML.
+    form.append('descripcion', newReportDescription.value.trim().slice(0, 280))
     form.append('latitud', String(reportLat.value))
     form.append('longitud', String(reportLng.value))
-    form.append('provincia', PROVINCES_DATA[newReportProvince.value]?.name || 'Distrito Nacional')
+    // Se envía el slug validado (el backend resuelve el nombre oficial).
+    form.append('provincia', newReportProvince.value in PROVINCES_DATA ? newReportProvince.value : 'distrito-nacional')
     if (fotoUrl) form.append('foto_url', fotoUrl)
 
     const creado = await api.postReporte(form)
     const newEvidenceItem = mapReporteToCard(creado)
+
+    recordPublish()
+    saveLastReport(newReportType.value, newReportLocation.value)
 
     images.value.unshift(newEvidenceItem)
     userVotes.value.push(newEvidenceItem.id)
@@ -1304,11 +1549,14 @@ onBeforeUnmount(() => {
   width: 100%;
 }
 
+/* Grid denso: funciona con N evidencias (no solo 6). El hero ocupa 4x4,
+   el resto 2x2 y el auto-flow rellena huecos sin romper el layout. */
 .gallery {
   position: relative;
   width: 100%;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
+  grid-auto-flow: dense;
   gap: 0.75rem;
   box-sizing: border-box;
 }
@@ -1352,29 +1600,14 @@ onBeforeUnmount(() => {
   box-shadow: 0 6px 14px -3px rgba(0, 0, 0, 0.15);
 }
 
-/* Grid ordering of the 6 elements matching CodePen FLIP layout */
-.gallery__image-wrapper:nth-child(1) { order: 2; }
-.gallery__image-wrapper:nth-child(2) { order: 4; }
-.gallery__image-wrapper:nth-child(3) { order: 6; }
-.gallery__image-wrapper:nth-child(4) { order: 8; }
-.gallery__image-wrapper:nth-child(5) { order: 10; }
-.gallery__image-wrapper:nth-child(6) { order: 12; }
-
-/* Selected (Hero 4x4) item */
+/* Sin order hardcodeado: el seleccionado va primero en el flujo denso. */
 .gallery__image-wrapper.gallery__image-wrapper--selected {
   grid-row: span 4;
   grid-column: span 4;
+  order: -1;
   z-index: 10;
   box-shadow: 0 14px 28px -6px rgba(0, 0, 0, 0.22), 0 4px 10px -2px rgba(0, 0, 0, 0.1);
   ring: 2px solid rgba(24, 24, 27, 0.3);
-}
-
-.gallery__image-wrapper.gallery__image-wrapper--selected:nth-child(3) {
-  order: 3;
-}
-
-.gallery__image-wrapper.gallery__image-wrapper--selected:nth-child(6) {
-  order: 9;
 }
 
 /* Image inside wrapper */

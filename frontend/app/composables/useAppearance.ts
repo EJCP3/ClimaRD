@@ -29,7 +29,7 @@ export function useAppearance() {
   const primaryColor = useState<string>('appearance_primary_color', () => '#18181B')
   const navStyle = useState<NavStyle>('appearance_nav_style', () => 'bonita')
   const isAppearanceModalOpen = useState<boolean>('appearance_modal_open', () => false)
-  const appearanceTrigger = useState<any>('appearance_trigger_ref', () => null)
+  const appearanceTrigger = useState<HTMLElement | SVGElement | string | null>('appearance_trigger_ref', () => null)
   const tickerPosition = useState<TickerPosition>('appearance_ticker_position', () => 'top')
   const tickerAnimation = useState<TickerAnimation>('appearance_ticker_animation', () => 'marquee')
   const tickerSpeed = useState<TickerSpeed>('appearance_ticker_speed', () => 'slow')
@@ -134,7 +134,7 @@ export function useAppearance() {
     }
   }
 
-  const openAppearanceModal = (trigger?: any) => {
+  const openAppearanceModal = (trigger?: HTMLElement | SVGElement | string | null) => {
     if (trigger) {
       appearanceTrigger.value = trigger
     }
