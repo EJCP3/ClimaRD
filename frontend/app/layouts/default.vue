@@ -570,6 +570,7 @@ const navItems = [
   { path: '/mapa', label: 'Mapa Operativo', shortLabel: 'Mapa', icon: 'map' },
   { path: '/alertas', label: 'Alertas COE', shortLabel: 'Alertas', icon: 'bell' },
   { path: '/evidencias', label: 'Evidencias', shortLabel: 'Muro', icon: 'camera' },
+  { path: '/analitica', label: 'Analítica', shortLabel: 'Datos', icon: 'dashboard' },
   { path: '/recomendaciones', label: 'Prevención / 911', shortLabel: 'Ayuda', icon: 'shield' },
 ]
 

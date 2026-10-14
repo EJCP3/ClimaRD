@@ -93,6 +93,25 @@
         <span :class="isBonita ? 'hidden md:inline' : 'inline'">{{ radarLoading ? 'Cargando…' : 'Lluvia' }}</span>
       </button>
 
+      <!-- Controles de animación del radar (hora del frame + play/pausa) -->
+      <template v-if="radarOn && radarFrames.length > 1">
+        <button
+          type="button"
+          @click="toggleRadarPlaying"
+          :aria-pressed="radarPlaying"
+          :aria-label="radarPlaying ? 'Pausar animación del radar' : 'Reanudar animación del radar'"
+          class="w-7 h-7 rounded-full text-white flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+          style="background-color: #0284C7"
+          title="Pausar / reanudar lluvia"
+        >
+          <span v-if="radarPlaying" aria-hidden="true" class="text-[10px]">⏸</span>
+          <span v-else aria-hidden="true" class="text-[10px]">▶</span>
+        </button>
+        <span class="text-[11px] font-mono font-bold text-sky-700 tabular-nums hidden xl:inline" :title="`Frame del radar: ${radarFrameIdx + 1} de ${radarFrames.length}`">
+          {{ radarFrameTime }}
+        </span>
+      </template>
+
       <span class="w-px h-3.5 bg-zinc-200 mx-0.5"></span>
 
       <!-- Reset / Fit DR View Button -->
@@ -146,6 +165,16 @@
         </span>
         <AppIcon name="chevron-down" class="w-3.5 h-3.5 text-zinc-500 transition-transform" :class="showRoads ? 'rotate-180' : ''" />
       </button>
+      <div v-if="showRoads" class="px-3 pb-1">
+        <NuxtLink
+          to="/ruta-segura"
+          class="flex items-center justify-center space-x-1.5 w-full py-2 rounded-xl text-[11px] font-black uppercase tracking-wider text-white transition-all hover:opacity-90"
+          style="background-color: #0284C7"
+        >
+          <span>Planificar ruta segura</span>
+          <AppIcon name="arrow-right" class="w-3.5 h-3.5" />
+        </NuxtLink>
+      </div>
       <ul v-if="showRoads" class="max-h-48 overflow-y-auto divide-y divide-zinc-100 px-1.5 pb-1.5">
         <li v-for="road in affectedRoads" :key="road.sector">
           <button
@@ -921,49 +950,87 @@ function flyToRoad(road: AffectedRoad) {
 }
 
 // Radar de lluvia RainViewer (tiles públicos gratuitos, sin clave).
+// Anima los últimos 6 frames (~1 h) como pide la Fase 3 del doc.
+const RADAR_FRAME_COUNT = 6
+const RADAR_FRAME_MS = 900
 const radarOn = ref(false)
 const radarLoading = ref(false)
-const radarTiles = ref<string[]>([])
+const radarFrames = ref<Array<{ time: number; tiles: string[] }>>([])
+const radarFrameIdx = ref(0)
+const radarPlaying = ref(true)
+let radarTimer: ReturnType<typeof setInterval> | null = null
+
+const radarFrameTime = computed(() => {
+  const f = radarFrames.value[radarFrameIdx.value]
+  if (!f) return ''
+  return new Date(f.time * 1000).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' })
+})
+
+function stopRadarAnimation() {
+  if (radarTimer) clearInterval(radarTimer)
+  radarTimer = null
+}
+
+function showRadarFrame(map: maplibregl.Map, idx: number) {
+  const frame = radarFrames.value[idx]
+  if (!frame) return
+  radarFrameIdx.value = idx
+  if (map.getLayer('climard-radar-layer')) map.removeLayer('climard-radar-layer')
+  if (map.getSource('climard-radar')) map.removeSource('climard-radar')
+  map.addSource('climard-radar', {
+    type: 'raster',
+    tiles: frame.tiles,
+    tileSize: 256,
+    maxzoom: 7,
+    attribution: 'Radar: RainViewer',
+  })
+  const beforeId = map.getLayer('climard-clusters') ? 'climard-clusters' : undefined
+  map.addLayer(
+    { id: 'climard-radar-layer', type: 'raster', source: 'climard-radar', paint: { 'raster-opacity': 0.65 } },
+    beforeId
+  )
+}
+
+function startRadarAnimation() {
+  stopRadarAnimation()
+  if (radarFrames.value.length < 2) return
+  radarTimer = setInterval(() => {
+    const map = mapInstance
+    if (!map || !radarOn.value || !radarPlaying.value) return
+    showRadarFrame(map, (radarFrameIdx.value + 1) % radarFrames.value.length)
+  }, RADAR_FRAME_MS)
+}
 
 async function toggleRadar() {
   const map = mapInstance
   if (!map) return
   if (radarOn.value) {
     radarOn.value = false
+    stopRadarAnimation()
     if (map.getLayer('climard-radar-layer')) map.removeLayer('climard-radar-layer')
     if (map.getSource('climard-radar')) map.removeSource('climard-radar')
     return
   }
   radarLoading.value = true
   try {
-    if (!radarTiles.value.length) {
+    if (!radarFrames.value.length) {
       const data = await $fetch<{
         host: string
         radar: { past: Array<{ time: number; path: string }> }
       }>('https://api.rainviewer.com/public/weather-maps.json', { timeout: 10_000 })
-      const last = data.radar?.past?.at(-1)
-      if (!last) throw new Error('Sin frames de radar')
+      const past = data.radar?.past ?? []
+      if (!past.length) throw new Error('Sin frames de radar')
       const host = (data.host || 'https://tilecache.rainviewer.com').replace(/\/$/, '')
-      radarTiles.value = [`${host}${last.path}/256/{z}/{x}/{y}/2/1_1.png`]
+      radarFrames.value = past.slice(-RADAR_FRAME_COUNT).map(f => ({
+        time: f.time,
+        tiles: [`${host}${f.path}/256/{z}/{x}/{y}/2/1_1.png`],
+      }))
     }
-    if (!map.getSource('climard-radar')) {
-      // RainViewer solo sirve hasta zoom 7: con maxzoom el mapa reutiliza
-      // esos tiles al acercar en vez de pedir z8+ ("Zoom Level Not Supported").
-      map.addSource('climard-radar', {
-        type: 'raster',
-        tiles: radarTiles.value,
-        tileSize: 256,
-        maxzoom: 7,
-        attribution: 'Radar: RainViewer',
-      })
-    }
-    const beforeId = map.getLayer('climard-clusters') ? 'climard-clusters' : undefined
-    if (!map.getLayer('climard-radar-layer')) {
-      map.addLayer(
-        { id: 'climard-radar-layer', type: 'raster', source: 'climard-radar', paint: { 'raster-opacity': 0.65 } },
-        beforeId
-      )
-    }
+    // RainViewer solo sirve hasta zoom 7: con maxzoom el mapa reutiliza
+    // esos tiles al acercar en vez de pedir z8+ ("Zoom Level Not Supported").
+    showRadarFrame(map, radarFrames.value.length - 1)
+    radarPlaying.value = !window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+    startRadarAnimation()
     radarOn.value = true
   } catch (err) {
     console.warn('[radar] no disponible:', err)
@@ -971,6 +1038,10 @@ async function toggleRadar() {
   } finally {
     radarLoading.value = false
   }
+}
+
+function toggleRadarPlaying() {
+  radarPlaying.value = !radarPlaying.value
 }
 
 function incidentsToGeoJSON(list: MapaIncident[]): GeoJSON.FeatureCollection {
@@ -1156,14 +1227,9 @@ onMounted(() => {
     addCountryMask(map)
     renderOceanLabels(map)
     renderMarkers(map)
-    // El cambio de estilo base borra fuentes propias: restaurar radar si estaba activo.
-    if (radarOn.value && radarTiles.value.length && !map.getSource('climard-radar')) {
-      map.addSource('climard-radar', { type: 'raster', tiles: radarTiles.value, tileSize: 256, maxzoom: 7 })
-      const beforeId = map.getLayer('climard-clusters') ? 'climard-clusters' : undefined
-      map.addLayer(
-        { id: 'climard-radar-layer', type: 'raster', source: 'climard-radar', paint: { 'raster-opacity': 0.65 } },
-        beforeId
-      )
+    // El cambio de estilo base borra fuentes propias: restaurar frame actual si el radar estaba activo.
+    if (radarOn.value && radarFrames.value.length && !map.getSource('climard-radar')) {
+      showRadarFrame(map, radarFrameIdx.value)
     }
   })
 
@@ -1178,6 +1244,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  stopRadarAnimation()
   if (resizeObserver) {
     resizeObserver.disconnect()
     resizeObserver = null

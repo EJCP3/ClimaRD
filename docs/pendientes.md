@@ -10,8 +10,14 @@ Servidores expuestos a la WiFi según guía del chat (`0.0.0.0` + `NUXT_PUBLIC_A
 - [ ] Nota: GPS/push/PWA exigen HTTPS; si fallan en HTTP local, probar en deploy preview Vercel.
 
 ## Deuda frontend (futuro)
+- [x] Radar animado, analítica (/analitica) y ruta segura (/ruta-segura) — Fase 3 frontend hecha.
 - [ ] Extraer `EvidenceDetailModal.vue` (duplicado evidencias/provincia).
 - [ ] `NuxtImage` + `srcset` en galería y tarjetas.
 - [ ] i18n (al menos es-DO formalizado).
 - [ ] Smoke E2E con Playwright (`scripts/qa-shots.mjs` como base).
 - [ ] `pnpm typecheck` limpio (vue-tsc).
+
+## Fase 3 restante = backend (ver docs/backend-pendientes.md)
+- [ ] Procesado raster con Python (rasterio/Pillow) y capas WMS propias.
+- [ ] Envío push ante alertas (VAPID + worker).
+- [ ] Ruteo propio (sustituir OSRM público).

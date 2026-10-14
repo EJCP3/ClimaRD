@@ -91,6 +91,8 @@ export default defineNuxtConfig({
     '/alertas': { swr: 300 },
     '/provincia/**': { swr: 600 },
     '/evidencias': { swr: 120 },
+    '/analitica': { swr: 120 },
+    '/ruta-segura': { swr: 300 },
     '/mapa': { ssr: false },
   },
   nitro: {

@@ -6,6 +6,7 @@ import { haversineKm, formatDistance } from '~/composables/useNearby'
 import { groupAffectedRoads } from '~/composables/useAffectedRoads'
 import { countBySector, isFrequentSector } from '~/composables/useReportStats'
 import { canPublish, isLikelyDuplicate } from '~/composables/useRateLimit'
+import { summarizeReports } from '~/composables/useAnalytics'
 
 describe('useReportStatus', () => {
   const now = new Date('2026-10-13T12:00:00Z').getTime()
@@ -78,5 +79,31 @@ describe('useRateLimit (sin localStorage en node)', () => {
   it('permite publicar y no hay duplicado', () => {
     expect(canPublish().ok).toBe(true)
     expect(isLikelyDuplicate('inundacion', 'Piantini')).toBe(false)
+  })
+})
+
+describe('useAnalytics', () => {
+  const now = new Date('2026-10-14T12:00:00Z').getTime()
+  const iso = (h: number) => new Date(now - h * 3_600_000).toISOString()
+  it('resume totales, tipos y recurrencia', () => {
+    const s = summarizeReports([
+      { id: '1', tipo: 'inundacion', provincia: 'Santo Domingo', lugar: 'Av. Churchill, Piantini', creado_en: iso(2), votos_activo: 5, votos_resuelto: 0 },
+      { id: '2', tipo: 'inundacion', provincia: 'Santo Domingo', lugar: 'Av. Churchill, Naco', creado_en: iso(5), votos_activo: 2, votos_resuelto: 0 },
+      { id: '3', tipo: 'arbol', provincia: 'Azua', lugar: 'Centro, Azua', creado_en: iso(80), votos_activo: 1, votos_resuelto: 4 },
+    ])
+    expect(s.total).toBe(3)
+    expect(s.resueltos).toBe(1)
+    expect(s.activos).toBe(2)
+    expect(s.obsoletos).toBe(1)
+    expect(s.tasaResolucion).toBe(33)
+    expect(s.porTipo[0]).toMatchObject({ key: 'inundacion', count: 2 })
+    expect(s.porProvincia[0]).toMatchObject({ key: 'Santo Domingo', count: 2 })
+    expect(s.sectoresRecurrentes[0]).toMatchObject({ label: 'Av. Churchill', count: 2 })
+  })
+  it('vacío no rompe', () => {
+    const s = summarizeReports([])
+    expect(s.total).toBe(0)
+    expect(s.tasaResolucion).toBe(0)
+    expect(s.porTipo).toEqual([])
   })
 })
