@@ -10,6 +10,8 @@
 
     <!-- Bulletin Ticker Bar: Fixed at top or bottom, elevated above backdrops (z-[1050]) -->
     <div
+      role="marquee"
+      aria-label="Boletines oficiales COE e INDOMET"
       class="w-full bg-[#111113] text-white border-b border-zinc-800/80 select-none overflow-hidden transition-all duration-300"
       :class="[
         tickerPosition === 'top' ? 'fixed top-0 left-0 right-0 z-[1050]' : 'fixed bottom-0 md:bottom-0 left-0 right-0 z-[1050] mb-16 md:mb-0 border-t border-b-0 shadow-2xl',
@@ -21,6 +23,19 @@
       <div class="w-8 h-full bg-gradient-to-r from-[#111113] to-transparent pointer-events-none absolute left-0 top-0 z-10"></div>
       <div class="w-8 h-full bg-gradient-to-l from-[#111113] to-transparent pointer-events-none absolute right-0 top-0 z-10"></div>
 
+      <!-- Pause / resume (WCAG: el marquee no debe moverse sin control del usuario) -->
+      <button
+        type="button"
+        @click="isPaused = !isPaused"
+        :aria-pressed="isPaused"
+        :aria-label="isPaused ? 'Reanudar boletines' : 'Pausar boletines'"
+        title="Pausar / reanudar"
+        class="z-20 w-6 h-6 shrink-0 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-colors"
+      >
+        <span v-if="isPaused" aria-hidden="true" class="text-[10px]">▶</span>
+        <span v-else aria-hidden="true" class="text-[10px]">⏸</span>
+      </button>
+
       <!-- Center Animation Modes -->
       <!-- 1. Mode: Continuous Marquee (Slow, Smooth, Calm) -->
       <div
@@ -31,6 +46,7 @@
       >
         <div
           class="inline-flex items-center space-x-8 text-xs font-medium whitespace-nowrap will-change-transform animate-marquee group-hover:[animation-play-state:paused]"
+          :class="{ '[animation-play-state:paused]': isPaused }"
           :style="{ animationDuration: marqueeDuration }"
         >
           <!-- Duplicated track for seamless continuous infinite loop -->
@@ -143,96 +159,13 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
 import { useAppearance } from '~/composables/useAppearance'
+import { getTickerItems } from '~/composables/useCoeData'
 
 const { tickerPosition, tickerAnimation, tickerSpeed } = useAppearance()
 
-// Comprehensive, Rich Official Bulletins Feed
-const tickerItems = [
-  {
-    headline: '7 PROVINCIAS EN ALERTA ROJA',
-    text: 'San Juan, Azua, Barahona, Baoruco, Independencia, Elías Piña y Pedernales bajo evacuación preventiva ante crecidas repentinas de ríos y cañadas.',
-    dotColor: 'bg-rose-500 shadow-rose-500/50 shadow-sm',
-    textColor: 'text-rose-400'
-  },
-  {
-    headline: '8 PROVINCIAS EN ALERTA AMARILLA',
-    text: 'Distrito Nacional, Santo Domingo, San Cristóbal, Peravia, San José de Ocoa, Sánchez Ramírez, Duarte y Monseñor Nouel en vigilancia estricta.',
-    dotColor: 'bg-amber-400 shadow-amber-400/50 shadow-sm',
-    textColor: 'text-amber-300'
-  },
-  {
-    headline: '7 PROVINCIAS EN ALERTA VERDE',
-    text: 'La Vega, María Trinidad Sánchez, Monte Plata, Hato Mayor, San Pedro de Macorís, Samaná y La Altagracia bajo monitoreo continuo.',
-    dotColor: 'bg-emerald-400 shadow-emerald-400/50 shadow-sm',
-    textColor: 'text-emerald-300'
-  },
-  {
-    headline: 'INDOMET - VAGUADA EN NIVELES ALTOS',
-    text: 'Persisten aguaceros moderados a fuertes acompañados de tormentas eléctricas y ráfagas de viento sobre las regiones Cibao Central, Suroeste y litoral Caribeño.',
-    dotColor: 'bg-sky-400 shadow-sky-400/50 shadow-sm',
-    textColor: 'text-sky-300'
-  },
-  {
-    headline: 'CUENCA BAJA DEL RÍO YUNA',
-    text: 'Suelos saturados al 95%. Se registran más de 85 mm de lluvia acumulada en las últimas 12 horas. Poblaciones ribereñas de Villa Riva en máxima precaución.',
-    dotColor: 'bg-rose-400 shadow-rose-400/50 shadow-sm',
-    textColor: 'text-rose-300'
-  },
-  {
-    headline: 'PRESAS DE TAVERA & VALDESIA',
-    text: 'Comité de Operación de Presas (COPRE) e INDRHI mantienen vertido preventivo controlado para garantizar niveles de seguridad hídrica.',
-    dotColor: 'bg-amber-400',
-    textColor: 'text-amber-300'
-  },
-  {
-    headline: 'ALERTA MARÍTIMA COSTA ATLÁNTICA',
-    text: 'Oleaje anormal de 6 a 9 pies de altura. Se prohíbe la salida de frágiles y pequeñas embarcaciones desde Cabo San Rafael hasta Manzanillo.',
-    dotColor: 'bg-teal-400',
-    textColor: 'text-teal-300'
-  },
-  {
-    headline: 'DEFENSA CIVIL NACIONAL',
-    text: '42 albergues temporales habilitados en el Suroeste y Cibao Oriental con brigadas comunitarias y equipo de rescate acuático prestos al auxilio.',
-    dotColor: 'bg-emerald-400',
-    textColor: 'text-emerald-300'
-  },
-  {
-    headline: 'ASISTENCIA VIAL MOPC / COMIPOL',
-    text: '120 unidades de auxilio y grúas gratuitas patrullando la Autopista Duarte, 6 de Noviembre y Autovía del Este. Contacto directo: (809) 567-4920.',
-    dotColor: 'bg-zinc-300',
-    textColor: 'text-zinc-200'
-  },
-  {
-    headline: 'OPERACIONES AÉREAS AILA & STI',
-    text: 'Vuelos operando con demoras preventivas en aproximación por techos bajos de nubes y visibilidad reducida.',
-    dotColor: 'bg-amber-400',
-    textColor: 'text-amber-300'
-  },
-  {
-    headline: 'SISTEMA UNIFICADO 9-1-1',
-    text: 'Línea de emergencia prioritaria nacional disponible sin necesidad de saldo las 24 horas del día en todo el territorio dominicano.',
-    dotColor: 'bg-rose-500',
-    textColor: 'text-rose-400'
-  },
-  {
-    headline: 'CAASD & CORAASAN',
-    text: 'Monitoreo de turbidez en cuencas de los ríos Ozama e Isabela. Plantas potabilizadoras operando con brigadas de drenaje activo.',
-    dotColor: 'bg-sky-400',
-    textColor: 'text-sky-300'
-  },
-  {
-    headline: 'BOMBEROS DISTRITO NACIONAL',
-    text: 'Equipos de achique de agua y corte de ramas caídas sobre el tendido eléctrico desplegados en avenidas principales. Tel: (809) 682-2000.',
-    dotColor: 'bg-amber-400',
-    textColor: 'text-amber-300'
-  },
-  {
-    headline: 'PREVENCIÓN VIAL DIGESETT',
-    text: 'Se exhorta a todos los conductores reducir la velocidad a 40 km/h bajo lluvia, mantener intermitentes y no intentar cruzar pasos anegados.',
-    dotColor: 'bg-zinc-200',
-    textColor: 'text-zinc-200'
-  }
-]
+// Fuente única (useCoeData): conteos derivados de PROVINCES_DATA para no divergir del mapa.
+const tickerItems = getTickerItems()
+const isPaused = ref(false)
 
 // Speed Configuration
 const marqueeDuration = computed(() => {
@@ -249,7 +182,7 @@ const flipIntervalMs = computed(() => {
 
 // Flip Mode Timer
 const activeFlipIndex = ref(0)
-let flipTimer: any = null
+let flipTimer: ReturnType<typeof setInterval> | null = null
 
 const nextFlip = () => {
   activeFlipIndex.value = (activeFlipIndex.value + 1) % tickerItems.length
@@ -262,6 +195,7 @@ const prevFlip = () => {
 const setupFlipTimer = () => {
   if (flipTimer) clearInterval(flipTimer)
   flipTimer = setInterval(() => {
+    if (isPaused.value) return
     if (tickerAnimation.value === 'flip' || tickerAnimation.value === 'compact') {
       nextFlip()
     }

@@ -1,17 +1,14 @@
 <template>
-  <div class="bg-white rounded-[32px] border border-zinc-200/80 shadow-sm overflow-hidden flex flex-col">
+  <div class="coe-map-card bg-white rounded-[32px] border border-zinc-200/80 shadow-sm overflow-hidden flex flex-col">
     <!-- Map Card Header -->
-    <div class="p-5 md:p-6 pb-3 border-b border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-50/50">
+    <div class="coe-map-header p-5 md:p-6 pb-3 border-b border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-50/50">
       <div class="flex items-start space-x-3">
-        <AppShape name="flower" color="surface" size="small" class="shrink-0 mt-0.5">
-          <AppIcon name="cloud-rain" class="w-4 h-4 text-zinc-900" />
+        <AppShape name="flower" color="surface" size="small" class="shrink-0 mt-0.5 shape-alert-sin">
+          <AppIcon name="cloud-rain" class="w-4 h-4" />
         </AppShape>
         <div>
           <div class="flex items-center space-x-2">
             <h3 class="font-extrabold text-base text-zinc-950 tracking-tight">Mapa de Alerta por Ciclón / Vaguada</h3>
-            <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black uppercase tracking-wider animate-pulse">
-              En Vivo
-            </span>
           </div>
           <p class="text-xs text-zinc-500 mt-0.5">Centro de Operaciones de Emergencias (COE) • 32 Provincias</p>
         </div>
@@ -62,7 +59,7 @@
     </div>
 
     <!-- View 1: Graphical SVG Map (DominicanGo Cartographic Design) -->
-    <div v-show="activeView === 'mapa'" class="relative p-3 md:p-6 bg-slate-50/40 flex-1 flex flex-col justify-between">
+    <div v-show="activeView === 'mapa'" class="coe-map-body relative p-3 md:p-6 bg-slate-50/40 flex-1 flex flex-col justify-between">
       <!-- Top Map Controls & Quick Filter Chips -->
       <div class="flex flex-wrap items-center justify-between gap-2 mb-3 z-10">
         <!-- Interactive Alert Filter Chips -->
@@ -121,6 +118,7 @@
 
       <!-- DominicanGo Style Oceanic SVG Map Container -->
       <div
+        ref="mapContainerRef"
         class="relative w-full aspect-[960/500] max-h-[560px] mx-auto select-none rounded-[28px] overflow-hidden border border-sky-200/60 shadow-sm"
         style="background: linear-gradient(180deg, #e8f4f8 0%, #d4eef7 30%, #e2f0e8 60%, #eef6fa 100%);"
       >
@@ -246,12 +244,12 @@
           </g>
 
           <!-- Maritime Coordinates -->
-          <text x="940" y="24" text-anchor="end" class="font-mono text-[9px] fill-[#8aaec0] select-none pointer-events-none opacity-80">
+          <text x="940" y="24" text-anchor="end" class="font-mono text-[10px] fill-[#8aaec0] select-none pointer-events-none opacity-80">
             18°44' N • 70°09' W | REPUBLICA DOMINICANA
           </text>
 
           <!-- 32 Province Polygons (Official dr-optimized GeoJSON with Islands & Coastline) -->
-          <g class="provinces-group" filter="url(#island-shadow)">
+          <g class="provinces-group" filter="url(#island-shadow)" role="group" aria-label="Provincias por nivel de alerta">
             <path
               v-for="prov in provincesList"
               :key="prov.code"
@@ -269,10 +267,13 @@
               stroke-linejoin="round"
               stroke-linecap="round"
               tabindex="0"
+              role="button"
+              :aria-label="`${prov.name}: ${prov.alerta === 'NORMAL' ? 'sin alerta' : 'alerta ' + prov.alerta}`"
               @mouseenter="onHover(prov, $event)"
               @mouseleave="onLeave"
               @click.stop="selectProvince(prov, $event)"
               @keydown.enter="selectProvince(prov, $event)"
+              @keydown.space.prevent="selectProvince(prov, $event)"
             />
           </g>
 
@@ -317,7 +318,7 @@
             <div class="flex items-center justify-between space-x-2">
               <p class="font-extrabold text-xs text-white">{{ hoveredProvince.name }}</p>
               <span
-                class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider text-white"
+                class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider text-white"
                 :class="getBadgeColorClass(hoveredProvince.alerta)"
               >
                 {{ hoveredProvince.alerta === 'NORMAL' ? 'SIN ALERTA' : hoveredProvince.alerta }}
@@ -332,35 +333,18 @@
           </div>
         </div>
 
-        <!-- Official COE Bulletin Legend (Bottom right overlay) -->
-        <div class="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 z-20 bg-white/95 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-1.5 text-[11px]">
-          <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#E11D48] shadow-xs shrink-0"></span>
-            <span class="font-bold text-zinc-800">7 provincias en alerta roja</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#F59E0B] shadow-xs shrink-0"></span>
-            <span class="font-bold text-zinc-800">8 provincias en alerta amarilla</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#10B981] shadow-xs shrink-0"></span>
-            <span class="font-bold text-zinc-800">7 provincias en alerta verde</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <span class="w-3.5 h-3.5 rounded-md bg-[#94A3B8] shadow-xs shrink-0"></span>
-            <span class="font-semibold text-zinc-500">10 provincias sin alerta</span>
-          </div>
-        </div>
+
       </div>
 
       <!-- Selected Province Inspector Drawer -->
-      <div v-if="selectedProvince" class="mt-4 p-4 rounded-2xl bg-white border border-zinc-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
+      <div v-if="selectedProvince" class="coe-inspector mt-4 p-4 rounded-2xl bg-white border border-zinc-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
         <div class="space-y-1">
           <div class="flex items-center space-x-2.5">
             <AppShape
               :name="getProvinceShape(selectedProvince.alerta)"
               size="small"
               class="shrink-0"
+              :class="getShapeAlertClass(selectedProvince.alerta)"
               :style="getShapeColorStyle(selectedProvince.alerta)"
             >
               <AppIcon :name="getProvinceIcon(selectedProvince.alerta)" class="w-3.5 h-3.5" />
@@ -398,6 +382,30 @@
         </div>
       </div>
 
+      <!-- Export Actions -->
+      <div class="mt-4 flex justify-end">
+        <div class="coe-exportbar flex items-center space-x-1 bg-white p-1.5 rounded-full border border-zinc-200/80 text-xs shadow-sm">
+          <button
+            @click="downloadMap"
+            type="button"
+            class="px-3 py-1.5 rounded-full transition-all text-[11px] font-bold cursor-pointer text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 flex items-center space-x-1.5"
+            title="Descargar mapa como imagen"
+          >
+            <AppIcon name="download" class="w-4 h-4" />
+            <span>Descargar</span>
+          </button>
+          <button
+            @click="shareMap"
+            type="button"
+            class="px-3 py-1.5 rounded-full transition-all text-[11px] font-bold cursor-pointer text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 flex items-center space-x-1.5"
+            title="Compartir mapa"
+          >
+            <MorphIcon :icon="isShared ? Check : Share" class="w-4 h-4" />
+            <span>Compartir</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Institutional Footer Note matching COE image -->
       <div class="pt-3 mt-2 border-t border-zinc-200/60 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-zinc-500 gap-1">
         <span>Información técnica oficial en coordinación con INDOMET</span>
@@ -413,7 +421,7 @@
           :key="`grid-${prov.code}`"
           :id="`grid-${prov.code}`"
           @click.stop="selectProvince(prov, $event)"
-          class="py-2.5 px-3.5 rounded-2xl border transition-all cursor-pointer hover:shadow-md flex items-center justify-between gap-2.5 group select-none"
+          class="coe-grid-card py-2.5 px-3.5 rounded-2xl border transition-all cursor-pointer hover:shadow-md flex items-center justify-between gap-2.5 group select-none"
           :class="[
             getGridCardClass(prov.alerta),
             isProvinceDimmed(prov.alerta) ? 'opacity-30' : 'opacity-100'
@@ -430,6 +438,7 @@
             :name="getProvinceShape(prov.alerta)"
             size="small"
             class="shrink-0 transition-transform duration-300 group-hover:scale-110"
+            :class="getShapeAlertClass(prov.alerta)"
             :style="getShapeColorStyle(prov.alerta)"
           >
             <AppIcon :name="getProvinceIcon(prov.alerta)" class="w-3.5 h-3.5" />
@@ -442,7 +451,10 @@
     <AppModal
       v-model="isProvinceModalOpen"
       :origin-ref="selectedProvinceTrigger"
-      maxWidth="max-w-lg"
+      max-width="max-w-lg"
+      :overlay-blur="false"
+      :overlay-dark="false"
+      overlay-class="bg-transparent"
     >
       <template #header>
         <div class="flex items-center space-x-3" v-if="selectedProvince">
@@ -450,6 +462,7 @@
             :name="getProvinceShape(selectedProvince.alerta)"
             size="small"
             class="shrink-0"
+            :class="getShapeAlertClass(selectedProvince.alerta)"
             :style="getShapeColorStyle(selectedProvince.alerta)"
           >
             <AppIcon :name="getProvinceIcon(selectedProvince.alerta)" class="w-3.5 h-3.5" />
@@ -537,66 +550,102 @@
 </template>
 
 <script setup lang="ts">
+import { MorphIcon } from 'morphicons/vue'
+import { Share, Check } from 'lucide'
 import { ref, computed } from 'vue'
 import AppIcon from '~/components/AppIcon.vue'
 import AppButton from '~/components/AppButton.vue'
 import AppShape from '~/components/AppShape.vue'
 import AppModal from '~/components/AppModal.vue'
 import rawProvincesPaths from '~/assets/data/provincias-dr-paths.json'
+import { PROVINCES_DATA } from '~/composables/useWeatherEnrichment'
 
 const activeView = ref<'mapa' | 'tabla'>('mapa')
 const mapColorMode = ref<'dominicango' | 'alertas'>('dominicango')
 const activeAlertFilter = ref<'ALL' | 'ROJA' | 'AMARILLA' | 'VERDE' | 'NORMAL'>('ALL')
-const hoveredProvince = ref<any>(null)
-const selectedProvince = ref<any>(null)
+interface MiniProvincia { code: string; name: string; alerta: string }
+const hoveredProvince = ref<MiniProvincia | null>(null)
+const selectedProvince = ref<MiniProvincia | null>(null)
 const tooltipPos = ref({ x: 0, y: 0 })
 const isProvinceModalOpen = ref(false)
-const selectedProvinceTrigger = ref<any>(null)
+const selectedProvinceTrigger = ref<HTMLElement | SVGElement | string | null>(null)
+const mapContainerRef = ref<HTMLElement | null>(null)
+
+async function captureMap() {
+  if (!mapContainerRef.value) return null;
+  // Hide tooltip temporarily to avoid it appearing in capture if left active
+  const prevHovered = hoveredProvince.value;
+  hoveredProvince.value = null;
+
+  try {
+    // Lazy: html2canvas (~180KB) solo se descarga al pulsar Descargar/Compartir.
+    const { default: html2canvas } = await import('html2canvas')
+    const canvas = await html2canvas(mapContainerRef.value, {
+      useCORS: true,
+      scale: 2,
+      backgroundColor: null,
+    });
+    return canvas;
+  } catch (err) {
+    console.error('Error capturing map:', err);
+    return null;
+  } finally {
+    hoveredProvince.value = prevHovered;
+  }
+}
+
+async function downloadMap() {
+  const canvas = await captureMap();
+  if (!canvas) return;
+  
+  const link = document.createElement('a');
+  link.download = `mapa-alertas-${new Date().toISOString().slice(0, 10)}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+async function shareMap() {
+  const canvas = await captureMap();
+  if (!canvas) return;
+  
+  canvas.toBlob(async (blob) => {
+    if (!blob) return;
+    const file = new File([blob], 'mapa-alertas.png', { type: 'image/png' });
+    
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          title: 'Mapa de Alertas COE',
+          text: 'Consulta el mapa de alertas meteorológicas.',
+          files: [file]
+        });
+      } catch (err: any) {
+        // AbortError = el usuario cerró el sheet: no es error.
+        if (err?.name !== 'AbortError') console.error('Error sharing:', err);
+      }
+    } else {
+      // Fallback: download if share is not supported
+      downloadMap();
+    }
+  }, 'image/png');
+}
 
 function isProvinceDimmed(alerta: string): boolean {
   if (activeAlertFilter.value === 'ALL') return false
   return activeAlertFilter.value !== alerta
 }
 
-// Exact 32 Provinces COE Alert mapping from official bulletin
+// Alertas COE por provincia: fuente única PROVINCES_DATA (mock central).
+// Se indexa por nombre normalizado para cruzar con el SVG de provincias.
 const coeAlertasMap: Record<string, string> = {
-  // 7 ALERTA ROJA
-  'ELIAS PINA': 'ROJA',
-  'SAN JUAN': 'ROJA',
-  'AZUA': 'ROJA',
-  'BAHORUCO': 'ROJA',
-  'BAORUCO': 'ROJA',
-  'INDEPENDENCIA': 'ROJA',
-  'BARAHONA': 'ROJA',
-  'PEDERNALES': 'ROJA',
-  // 8 ALERTA AMARILLA
-  'DAJABON': 'AMARILLA',
-  'MONSENOR NOUEL': 'AMARILLA',
-  'SANCHEZ RAMIREZ': 'AMARILLA',
-  'SAN JOSE DE OCOA': 'AMARILLA',
-  'PERAVIA': 'AMARILLA',
-  'SAN CRISTOBAL': 'AMARILLA',
-  'SANTO DOMINGO': 'AMARILLA',
-  'DISTRITO NACIONAL': 'AMARILLA',
-  // 7 ALERTA VERDE
-  'LA VEGA': 'VERDE',
-  'DUARTE': 'VERDE',
-  'MARIA TRINIDAD SANCHEZ': 'VERDE',
-  'MONTE PLATA': 'VERDE',
-  'HATO MAYOR': 'VERDE',
-  'SAN PEDRO DE MACORIS': 'VERDE',
-  'LA ALTAGRACIA': 'VERDE',
-  // 10 SIN ALERTA (NORMAL)
-  'MONTE CRISTI': 'NORMAL',
-  'SANTIAGO RODRIGUEZ': 'NORMAL',
-  'VALVERDE': 'NORMAL',
-  'SANTIAGO': 'NORMAL',
-  'PUERTO PLATA': 'NORMAL',
-  'ESPAILLAT': 'NORMAL',
-  'HERMANAS MIRABAL': 'NORMAL',
-  'SAMANA': 'NORMAL',
-  'EL SEIBO': 'NORMAL',
-  'LA ROMANA': 'NORMAL'
+  ...Object.fromEntries(
+    Object.values(PROVINCES_DATA).map(p => [
+      p.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim(),
+      p.alerta,
+    ])
+  ),
+  // Alias de grafía del SVG oficial
+  'BAHORUCO': PROVINCES_DATA['baoruco']?.alerta ?? 'ROJA',
 }
 
 function normalizeName(str: string): string {
@@ -614,7 +663,7 @@ const provincesList = computed(() => {
   })
 })
 
-function getProvinceFill(prov: any): string {
+function getProvinceFill(prov: { color?: string; alerta: string }): string {
   if (mapColorMode.value === 'dominicango') {
     return prov.color || '#80BABA'
   }
@@ -702,7 +751,7 @@ function getLabelPixelSize(code: string): string {
   return '6px'
 }
 
-function getLabelStyle(prov: any): Record<string, string> {
+function getLabelStyle(prov: { alerta: string }): Record<string, string> {
   const fontSize = getLabelPixelSize(prov.code)
   const isDominicanGoMode = mapColorMode.value === 'dominicango'
 
@@ -747,7 +796,7 @@ function getLabelStyle(prov: any): Record<string, string> {
   }
 }
 
-function onHover(prov: any, evt: MouseEvent) {
+function onHover(prov: MiniProvincia, evt: MouseEvent) {
   hoveredProvince.value = prov
   const svgEl = (evt.target as SVGElement).closest('svg')
   if (svgEl) {
@@ -763,7 +812,7 @@ function onLeave() {
   hoveredProvince.value = null
 }
 
-function selectProvince(prov: any, event?: MouseEvent) {
+function selectProvince(prov: MiniProvincia, event?: MouseEvent | KeyboardEvent) {
   if (event) {
     event.stopPropagation()
     selectedProvinceTrigger.value = event.currentTarget || event.target || `#prov-path-${prov.code}`
@@ -791,28 +840,45 @@ function getShapeColorStyle(alerta: string): Record<string, string> {
   switch (alerta) {
     case 'ROJA':
       return {
+        '--shape-bg': '#FFE4E6',
+        '--shape-fg': '#E11D48',
         '--_shape-bg': '#FFE4E6',
         '--_shape-fg': '#E11D48',
         '--_shape-size': '2rem'
       }
     case 'AMARILLA':
       return {
+        '--shape-bg': '#FEF3C7',
+        '--shape-fg': '#D97706',
         '--_shape-bg': '#FEF3C7',
         '--_shape-fg': '#D97706',
         '--_shape-size': '2rem'
       }
     case 'VERDE':
       return {
+        '--shape-bg': '#D1FAE5',
+        '--shape-fg': '#059669',
         '--_shape-bg': '#D1FAE5',
         '--_shape-fg': '#059669',
         '--_shape-size': '2rem'
       }
     default:
       return {
+        '--shape-bg': '#F1F5F9',
+        '--shape-fg': '#64748B',
         '--_shape-bg': '#F1F5F9',
         '--_shape-fg': '#64748B',
         '--_shape-size': '2rem'
       }
+  }
+}
+
+function getShapeAlertClass(alerta: string): string {
+  switch (alerta) {
+    case 'ROJA': return 'shape-alert-roja'
+    case 'AMARILLA': return 'shape-alert-amarilla'
+    case 'VERDE': return 'shape-alert-verde'
+    default: return 'shape-alert-sin'
   }
 }
 

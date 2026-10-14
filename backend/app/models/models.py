@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import uuid
 from datetime import datetime
 from enum import Enum
+from typing import Optional
 
 from sqlalchemy import (
     Boolean,
@@ -34,7 +37,7 @@ class Provincia(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     nombre: Mapped[str] = mapped_column(String(100), unique=True, index=True)
-    codigo_postal: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    codigo_postal: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     alerta_actual: Mapped[str] = mapped_column(
         SqlEnum(NivelAlerta, native_enum=False), default=NivelAlerta.VERDE
     )
@@ -49,11 +52,11 @@ class Reporte(Base):
     tipo: Mapped[str] = mapped_column(
         SqlEnum(TipoIncidencia, native_enum=False), nullable=False
     )
-    lugar: Mapped[str | None] = mapped_column(String(300), nullable=True)
-    descripcion: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    lugar: Mapped[Optional[str]] = mapped_column(String(300), nullable=True)
+    descripcion: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     latitud: Mapped[float] = mapped_column(Float, nullable=False)
     longitud: Mapped[float] = mapped_column(Float, nullable=False)
-    foto_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    foto_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     provincia_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("provincias.id"), nullable=False
     )

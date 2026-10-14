@@ -1,6 +1,6 @@
 <template>
   <div
-    class="inline-flex items-center justify-center shrink-0 transition-transform select-none overflow-hidden"
+    class="app-shape inline-flex items-center justify-center shrink-0 transition-transform select-none overflow-hidden"
     :class="[sizeClass, shapeClass]"
     :style="shapeStyle"
   >
@@ -23,6 +23,20 @@ const props = withDefaults(
     color: 'surface'
   }
 )
+
+// Paleta semántica por alerta. Se aplica solo si el padre NO fijó
+// --shape-bg/--shape-fg por :style o clase (el inline/clase gana al var).
+const COLOR_MAP: Record<string, { bg: string; fg: string }> = {
+  roja: { bg: '#FFE4E6', fg: '#E11D48' },
+  red: { bg: '#FFE4E6', fg: '#E11D48' },
+  amarilla: { bg: '#FEF3C7', fg: '#D97706' },
+  yellow: { bg: '#FEF3C7', fg: '#D97706' },
+  verde: { bg: '#D1FAE5', fg: '#059669' },
+  green: { bg: '#D1FAE5', fg: '#059669' },
+  sin: { bg: '#F1F5F9', fg: '#64748B' },
+  normal: { bg: '#F1F5F9', fg: '#64748B' },
+  surface: { bg: '', fg: '' }
+}
 
 const sizeClass = computed(() => {
   switch (props.size) {
@@ -53,13 +67,34 @@ const shapeClass = computed(() => {
 })
 
 const shapeStyle = computed(() => {
+  const palette = COLOR_MAP[props.color?.toLowerCase?.() ?? 'surface']
   const baseStyle: Record<string, string> = {
-    backgroundColor: 'var(--shape-bg, var(--primary-container, #EAEAEB))',
-    color: 'var(--shape-fg, var(--on-primary-container, #18181B))'
+    // --shape-bg es la API oficial; --_shape-bg se acepta como alias
+    // legacy (MiniMapaCOE/MapaOperativo la usaban con guion bajo).
+    // Si se pasa color="roja|amarilla|..." se usa como fallback final.
+    backgroundColor:
+      'var(--shape-bg, var(--_shape-bg, ' + (palette?.bg || 'var(--primary-container, #EAEAEB)') + '))',
+    color:
+      'var(--shape-fg, var(--_shape-fg, ' + (palette?.fg || 'var(--on-primary-container, #18181B)') + '))'
   }
 
   // Exact Material 3 Expressive organic clip-paths
   switch (props.name) {
+    case 'circle':
+    case 'round':
+      baseStyle.borderRadius = '50%'
+      break
+    case 'flower-4':
+    case 'clover':
+      baseStyle.clipPath =
+        'polygon(50% 0%, 75% 10%, 100% 50%, 75% 90%, 50% 100%, 25% 90%, 0% 50%, 25% 10%)'
+      baseStyle.borderRadius = '32%'
+      break
+    case 'flower-8':
+      baseStyle.clipPath =
+        'polygon(50.0% 0.0%, 58.88% 5.37%, 65.69% 12.12%, 75.28% 12.17%, 85.36% 14.64%, 87.83% 24.72%, 87.88% 34.31%, 94.63% 41.12%, 100.0% 50.0%, 94.63% 58.88%, 87.88% 65.69%, 87.83% 75.28%, 85.36% 85.36%, 75.28% 87.83%, 65.69% 87.88%, 58.88% 94.63%, 50.0% 100.0%, 41.12% 94.63%, 34.31% 87.88%, 24.72% 87.83%, 14.64% 85.36%, 12.17% 75.28%, 12.12% 65.69%, 5.37% 58.88%, 0.0% 50.0%, 5.37% 41.12%, 12.12% 34.31%, 12.17% 24.72%, 14.64% 14.64%, 24.72% 12.17%, 34.31% 12.12%, 41.12% 5.37%)'
+      baseStyle.borderRadius = '20%'
+      break
     case 'flower':
       baseStyle.clipPath =
         'polygon(50% 0%, 65% 10%, 80% 6%, 86% 21%, 98% 30%, 94% 45%, 100% 60%, 89% 72%, 88% 88%, 73% 89%, 60% 98%, 46% 93%, 32% 98%, 23% 86%, 8% 82%, 10% 66%, 0% 54%, 8% 39%, 6% 23%, 21% 17%, 27% 3%, 43% 8%)'
@@ -67,8 +102,8 @@ const shapeStyle = computed(() => {
       break
     case '12-sided-cookie':
       baseStyle.clipPath =
-        'polygon(50% 0%, 62% 3%, 73% 9%, 83% 18%, 91% 29%, 97% 41%, 100% 54%, 97% 67%, 91% 79%, 81% 88%, 70% 95%, 57% 99%, 44% 99%, 31% 95%, 20% 88%, 10% 79%, 4% 67%, 1% 54%, 4% 41%, 10% 29%, 19% 18%, 29% 9%, 40% 3%)'
-      baseStyle.borderRadius = '24%'
+        'polygon(50.0% 0.0%, 55.81% 5.88%, 60.09% 12.33%, 67.03% 8.89%, 75.0% 6.7%, 77.09% 14.7%, 77.58% 22.42%, 85.3% 22.91%, 93.3% 25.0%, 91.11% 32.97%, 87.67% 39.91%, 94.12% 44.19%, 100.0% 50.0%, 94.12% 55.81%, 87.67% 60.09%, 91.11% 67.03%, 93.3% 75.0%, 85.3% 77.09%, 77.58% 77.58%, 77.09% 85.3%, 75.0% 93.3%, 67.03% 91.11%, 60.09% 87.67%, 55.81% 94.12%, 50.0% 100.0%, 44.19% 94.12%, 39.91% 87.67%, 32.97% 91.11%, 25.0% 93.3%, 22.91% 85.3%, 22.42% 77.58%, 14.7% 77.09%, 6.7% 75.0%, 8.89% 67.03%, 12.33% 60.09%, 5.88% 55.81%, 0.0% 50.0%, 5.88% 44.19%, 12.33% 39.91%, 8.89% 32.97%, 6.7% 25.0%, 14.7% 22.91%, 22.42% 22.42%, 22.91% 14.7%, 25.0% 6.7%, 32.97% 8.89%, 39.91% 12.33%, 44.19% 5.88%)'
+      baseStyle.borderRadius = '16%'
       break
     case 'soft-burst':
       baseStyle.clipPath =

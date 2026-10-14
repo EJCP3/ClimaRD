@@ -1,9 +1,16 @@
 <template>
   <div class="relative w-full h-full overflow-hidden font-sans">
     <!-- Centered Material 3 Pill Search Bar -->
-    <div class="absolute top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-[480px] z-20 space-y-2">
+    <div
+      class="absolute top-4 left-4 right-4 z-20 space-y-2 pointer-events-none"
+      :class="[
+        isBonita
+          ? 'md:left-1/2 md:-translate-x-1/2 md:w-[380px] lg:w-[440px] xl:w-[480px]'
+          : 'md:left-1/2 md:-translate-x-1/2 md:w-[480px]'
+      ]"
+    >
       <div
-        class="bg-white/95 backdrop-blur-xl shadow-xl rounded-full p-2 pl-4 border border-zinc-200/80 flex items-center space-x-3 transition-all focus-within:ring-2 focus-within:ring-zinc-900/10 focus-within:border-zinc-300"
+        class="pointer-events-auto bg-white/95 backdrop-blur-xl shadow-xl rounded-full p-2 pl-4 border border-zinc-200/80 flex items-center space-x-3 transition-all focus-within:ring-2 focus-within:ring-zinc-900/10 focus-within:border-zinc-300"
       >
         <AppIcon name="search" class="w-5 h-5 text-zinc-400 shrink-0" />
         <input
@@ -26,7 +33,7 @@
       <!-- Autocomplete Dropdown (M3 Card Container) -->
       <ul
         v-if="filteredPlaces.length > 0"
-        class="bg-white/95 backdrop-blur-xl rounded-[22px] shadow-2xl border border-zinc-200/80 max-h-64 overflow-y-auto divide-y divide-zinc-100 text-xs p-1.5 animate-fadeIn"
+        class="pointer-events-auto bg-white/95 backdrop-blur-xl rounded-[22px] shadow-2xl border border-zinc-200/80 max-h-64 overflow-y-auto divide-y divide-zinc-100 text-xs p-1.5 animate-fadeIn"
       >
         <li
           v-for="item in filteredPlaces"
@@ -47,23 +54,63 @@
       </ul>
     </div>
 
-    <!-- Map Layers Selector Pill (Bottom-Left) -->
+    <!-- Map Layers Selector Pill -->
     <div
       class="absolute z-20 hidden sm:flex items-center space-x-1 bg-white/95 backdrop-blur-xl p-1 rounded-full border border-zinc-200/80 shadow-lg transition-all duration-300"
-      :class="tickerPosition === 'bottom' ? 'bottom-16 left-4 sm:left-6' : 'bottom-6 sm:bottom-7 left-4 sm:left-6'"
+      :class="[
+        isBonita
+          ? 'top-4 left-4 sm:left-6'
+          : (tickerPosition === 'bottom' ? 'bottom-16 left-4 sm:left-6' : 'bottom-6 sm:bottom-7 left-4 sm:left-6')
+      ]"
     >
       <button
         v-for="layer in layerOptions"
         :key="layer.id"
         type="button"
         @click="switchLayer(layer.id)"
-        class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
+        class="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
         :style="currentLayer === layer.id ? { backgroundColor: 'var(--primary, #18181b)', color: 'var(--on-primary, #ffffff)' } : {}"
         :class="currentLayer === layer.id ? 'shadow-sm' : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'"
       >
         <AppIcon :name="layer.icon" class="w-3.5 h-3.5" />
-        <span>{{ layer.label }}</span>
+        <span :class="isBonita ? 'hidden md:inline' : 'inline'">{{ layer.label }}</span>
       </button>
+
+      <span class="w-px h-3.5 bg-zinc-200 mx-0.5"></span>
+
+      <!-- Radar de lluvia (RainViewer, gratuito y sin clave) -->
+      <button
+        type="button"
+        @click="toggleRadar"
+        :aria-pressed="radarOn"
+        :disabled="radarLoading"
+        class="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+        :style="radarOn ? { backgroundColor: '#0284C7', color: '#ffffff' } : {}"
+        :class="radarOn ? 'shadow-sm' : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'"
+        title="Mostrar lluvia actual sobre el mapa"
+      >
+        <AppIcon name="cloud-rain" class="w-3.5 h-3.5" />
+        <span :class="isBonita ? 'hidden md:inline' : 'inline'">{{ radarLoading ? 'Cargando…' : 'Lluvia' }}</span>
+      </button>
+
+      <!-- Controles de animación del radar (hora del frame + play/pausa) -->
+      <template v-if="radarOn && radarFrames.length > 1">
+        <button
+          type="button"
+          @click="toggleRadarPlaying"
+          :aria-pressed="radarPlaying"
+          :aria-label="radarPlaying ? 'Pausar animación del radar' : 'Reanudar animación del radar'"
+          class="w-7 h-7 rounded-full text-white flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+          style="background-color: #0284C7"
+          title="Pausar / reanudar lluvia"
+        >
+          <span v-if="radarPlaying" aria-hidden="true" class="text-[10px]">⏸</span>
+          <span v-else aria-hidden="true" class="text-[10px]">▶</span>
+        </button>
+        <span class="text-[11px] font-mono font-bold text-sky-700 tabular-nums hidden xl:inline" :title="`Frame del radar: ${radarFrameIdx + 1} de ${radarFrames.length}`">
+          {{ radarFrameTime }}
+        </span>
+      </template>
 
       <span class="w-px h-3.5 bg-zinc-200 mx-0.5"></span>
 
@@ -75,22 +122,102 @@
         title="Ver toda la República Dominicana"
       >
         <AppIcon name="maximize" class="w-3.5 h-3.5" />
-        <span class="hidden md:inline">Enfocar RD</span>
+        <span :class="isBonita ? 'hidden lg:inline' : 'hidden md:inline'">Enfocar RD</span>
       </button>
     </div>
 
-    <!-- Live Emergency Legend / Incidents Status Pill (Bottom-Right) -->
+    <!-- Live Emergency Legend / Incidents Status Pill -->
     <div
-      class="absolute z-20 hidden sm:flex items-center space-x-2 bg-white/95 backdrop-blur-xl px-3.5 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300"
-      :class="tickerPosition === 'bottom' ? 'bottom-16 right-4 sm:right-6' : 'bottom-7 sm:bottom-8 right-4 sm:right-6'"
+      class="absolute z-20 hidden sm:flex items-center space-x-2 bg-white/95 backdrop-blur-xl px-3 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300"
+      :class="[
+        isBonita
+          ? 'top-4 right-16 sm:right-18'
+          : (tickerPosition === 'bottom' ? 'bottom-16 right-4 sm:right-6' : 'bottom-7 sm:bottom-8 right-4 sm:right-6')
+      ]"
     >
       <span class="relative flex h-2.5 w-2.5">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
       </span>
-      <span class="text-xs font-extrabold text-zinc-900">4 Incidencias en Vivo</span>
-      <span class="w-px h-3 bg-zinc-200"></span>
-      <span class="text-[10px] font-mono text-zinc-500 font-bold uppercase">Gran Santo Domingo</span>
+      <span class="text-xs font-extrabold text-zinc-900 whitespace-nowrap">
+        {{ isBonita ? mockIncidents.length + ' en Vivo' : mockIncidents.length + ' Incidencias en Vivo' }}
+      </span>
+      <span class="w-px h-3 bg-zinc-200" :class="isBonita ? 'hidden xl:inline' : ''"></span>
+      <span class="text-[10px] font-mono text-zinc-500 font-bold uppercase whitespace-nowrap" :class="isBonita ? 'hidden xl:inline' : ''">
+        Gran Santo Domingo
+      </span>
+    </div>
+
+    <!-- Vías a evitar (Fase 3): agregación por sector con vuelo de cámara -->
+    <div
+      class="absolute z-20 left-4 sm:left-6 w-[240px] bg-white/95 backdrop-blur-xl rounded-[20px] border border-zinc-200/80 shadow-lg overflow-hidden"
+      :class="isBonita ? 'bottom-6 sm:bottom-7' : 'bottom-24 sm:bottom-24'"
+    >
+      <button
+        type="button"
+        @click="showRoads = !showRoads"
+        :aria-expanded="showRoads"
+        class="w-full flex items-center justify-between px-3.5 py-2.5 cursor-pointer"
+      >
+        <span class="flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+          <span class="text-xs font-extrabold text-zinc-900">Vías a evitar ({{ affectedRoads.length }})</span>
+        </span>
+        <AppIcon name="chevron-down" class="w-3.5 h-3.5 text-zinc-500 transition-transform" :class="showRoads ? 'rotate-180' : ''" />
+      </button>
+      <div v-if="showRoads" class="px-3 pb-1">
+        <NuxtLink
+          to="/ruta-segura"
+          class="flex items-center justify-center space-x-1.5 w-full py-2 rounded-xl text-[11px] font-black uppercase tracking-wider text-white transition-all hover:opacity-90"
+          style="background-color: #0284C7"
+        >
+          <span>Planificar ruta segura</span>
+          <AppIcon name="arrow-right" class="w-3.5 h-3.5" />
+        </NuxtLink>
+      </div>
+      <ul v-if="showRoads" class="max-h-48 overflow-y-auto divide-y divide-zinc-100 px-1.5 pb-1.5">
+        <li v-for="road in affectedRoads" :key="road.sector">
+          <button
+            type="button"
+            @click="flyToRoad(road)"
+            class="w-full flex items-center justify-between gap-2 px-2 py-2 rounded-xl hover:bg-zinc-100 text-left transition-colors cursor-pointer"
+            :title="`Ver ${road.sector} en el mapa`"
+          >
+            <span class="flex items-center space-x-2 min-w-0">
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" :style="{ backgroundColor: SEVERITY_COLOR[road.maxSeverity] }"></span>
+              <span class="min-w-0">
+                <span class="block text-xs font-bold text-zinc-900 truncate">{{ road.sector }}</span>
+                <span class="block text-[10px] text-zinc-500 font-semibold">{{ road.count }} reporte{{ road.count === 1 ? '' : 's' }} · {{ road.maxSeverity }}</span>
+              </span>
+            </span>
+            <AppIcon name="chevron-right" class="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- User Zone Focus Pill -->
+    <div
+      v-if="userProfile.hasCompletedOnboarding"
+      class="absolute z-20 flex items-center space-x-2 bg-white/95 backdrop-blur-xl px-3 py-1.5 rounded-full border border-zinc-200/80 shadow-md transition-all duration-300"
+      :class="[
+        isBonita
+          ? 'top-16 left-4 sm:left-6'
+          : (tickerPosition === 'top' ? 'top-16 sm:top-20 left-4 sm:left-6' : 'top-4 left-4 sm:left-6')
+      ]"
+    >
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="text-xs font-bold text-zinc-900 truncate max-w-[140px] sm:max-w-[200px]">
+        {{ userProfile.zone }}, {{ userProfile.provinceName }}
+      </span>
+      <button
+        type="button"
+        @click="focusUserZone"
+        class="text-[10px] font-black uppercase text-zinc-600 hover:text-zinc-950 bg-zinc-100 hover:bg-zinc-200 px-2 py-0.5 rounded-full transition-colors cursor-pointer"
+        title="Reenfocar cámara en mi zona"
+      >
+        Enfocar
+      </button>
     </div>
 
     <!-- Map Container -->
@@ -104,120 +231,145 @@
     <AppModal
       v-model="isIncidentModalOpen"
       :origin-ref="selectedIncidentTrigger"
-      max-width="max-w-lg"
-      overlay-blur
+      max-width="max-w-lg md:max-w-2xl"
+      modal-class="!p-4 sm:!p-5"
+      :overlay-blur="false"
+      :overlay-dark="false"
+      overlay-class="bg-transparent"
       @close="closeIncidentModal"
     >
       <template #header>
         <div v-if="selectedIncident" class="flex items-center space-x-3 select-none">
           <AppShape
             :name="selectedIncident.shape || 'flower'"
-            size="medium"
+            size="small"
             class="shrink-0"
             :style="getModalShapeStyle(selectedIncident)"
           >
-            <AppIcon :name="selectedIncident.icon || 'alert-triangle'" class="w-6 h-6" />
+            <AppIcon :name="selectedIncident.icon || 'alert-triangle'" class="w-5 h-5" />
           </AppShape>
           <div>
             <div class="flex items-center space-x-2">
-              <span class="text-[11px] font-black uppercase tracking-wider text-zinc-500">
+              <span class="text-[10px] font-black uppercase tracking-wider text-zinc-500">
                 {{ selectedIncident.category }}
               </span>
               <span
-                class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full"
+                class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full"
                 :class="getSeverityBadgeClass(selectedIncident.severity)"
               >
                 {{ selectedIncident.severity }}
               </span>
             </div>
-            <h3 class="font-black text-lg text-zinc-950 tracking-tight leading-tight mt-0.5">
+            <h3 class="font-black text-base text-zinc-950 tracking-tight leading-tight mt-0.5">
               {{ selectedIncident.title }}
             </h3>
           </div>
         </div>
       </template>
 
-      <!-- Body Content -->
-      <div v-if="selectedIncident" class="space-y-4 py-2 text-xs select-none">
-        <!-- Media Preview (Image or Video) -->
-        <div
-          v-if="selectedIncident.image"
-          class="relative w-full rounded-2xl overflow-hidden aspect-[16/10] bg-zinc-100 border border-zinc-200/80 shadow-sm group/img"
-        >
-          <img
-            :src="selectedIncident.image"
-            :alt="selectedIncident.title"
-            class="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
-            loading="lazy"
-          />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
-          <div class="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-white flex items-center space-x-1.5 pointer-events-none">
-            <AppIcon name="camera" class="w-3.5 h-3.5 text-white" />
-            <span>{{ selectedIncident.mediaCaption || 'Fotografía en el lugar' }}</span>
+      <!-- Body Content (Compact 2 Columns on PC) -->
+      <div
+        v-if="selectedIncident"
+        class="py-1 text-xs select-none"
+        :class="(selectedIncident.image || selectedIncident.video) ? 'grid grid-cols-1 md:grid-cols-[220px_1fr] lg:grid-cols-[240px_1fr] gap-3.5' : 'space-y-2.5'"
+      >
+        <!-- Column 1: Media Preview (Image or Video) -->
+        <div v-if="selectedIncident.image || selectedIncident.video" class="w-full h-full flex flex-col">
+          <!-- Image -->
+          <div
+            v-if="selectedIncident.image"
+            class="relative w-full h-[180px] md:h-full md:min-h-[220px] md:max-h-[260px] rounded-xl overflow-hidden bg-zinc-100 border border-zinc-200/80 shadow-sm group/img"
+          >
+            <img
+              :src="selectedIncident.image"
+              :alt="selectedIncident.title"
+              class="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
+              loading="lazy"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent pointer-events-none"></div>
+            <div class="absolute bottom-2 left-2 right-2 flex items-center space-x-1.5 px-2 py-1 rounded-lg bg-black/65 backdrop-blur-md text-[10px] font-bold text-white pointer-events-none">
+              <AppIcon name="camera" class="w-3 h-3 text-white shrink-0" />
+              <span class="truncate">{{ selectedIncident.mediaCaption || 'Fotografía en el lugar' }}</span>
+            </div>
           </div>
-        </div>
 
-        <div
-          v-else-if="selectedIncident.video"
-          class="relative w-full rounded-2xl overflow-hidden aspect-[16/10] bg-zinc-950 border border-zinc-200/80 shadow-sm"
-        >
-          <video
-            :src="selectedIncident.video"
-            controls
-            playsinline
-            preload="metadata"
-            class="w-full h-full object-cover"
-          ></video>
-          <div class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md text-[10px] font-bold text-white flex items-center space-x-1.5 pointer-events-none shadow-sm">
-            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-            <span>{{ selectedIncident.mediaCaption || 'Video del reporte en vivo' }}</span>
-          </div>
-        </div>
-
-        <!-- Description Box -->
-        <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="inline-flex items-center space-x-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span>Reporte Ciudadano Verificado</span>
-            </span>
-            <span class="text-[11px] text-zinc-500 font-medium">{{ selectedIncident.time }}</span>
-          </div>
-          <p class="text-sm text-zinc-800 leading-relaxed font-normal">{{ selectedIncident.desc }}</p>
-        </div>
-
-        <!-- Location Information Box -->
-        <div class="bg-zinc-50 rounded-2xl p-3.5 space-y-2 border border-zinc-200/80">
-          <div class="flex items-center justify-between">
-            <span class="text-zinc-500 font-medium flex items-center space-x-1.5">
-              <AppIcon name="map-pin" class="w-4 h-4 text-zinc-700 shrink-0" />
-              <span class="text-xs font-semibold text-zinc-800">{{ selectedIncident.sector || 'Ubicación' }}</span>
-            </span>
-            <div class="flex items-center space-x-1.5">
-              <span class="font-mono font-bold text-zinc-950 text-xs">
-                {{ selectedIncident.lat.toFixed(4) }}° N, {{ Math.abs(selectedIncident.lng).toFixed(4) }}° W
-              </span>
-              <button
-                type="button"
-                @click="copyCoordinates(selectedIncident)"
-                class="p-1.5 rounded-lg hover:bg-zinc-200 text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer"
-                title="Copiar coordenadas GPS"
-              >
-                <AppIcon name="copy" class="w-3.5 h-3.5" />
-              </button>
+          <!-- Video -->
+          <div
+            v-else-if="selectedIncident.video"
+            class="relative w-full h-[180px] md:h-full md:min-h-[220px] md:max-h-[260px] rounded-xl overflow-hidden bg-zinc-950 border border-zinc-200/80 shadow-sm flex items-center justify-center"
+          >
+            <video
+              :src="selectedIncident.video"
+              controls
+              playsinline
+              preload="metadata"
+              class="w-full h-full object-cover"
+            ></video>
+            <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-[10px] font-bold text-white flex items-center space-x-1.5 pointer-events-none shadow-sm">
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+              <span>{{ selectedIncident.mediaCaption || 'Video del reporte en vivo' }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Official Civil Protection Advisory -->
-        <div class="p-3.5 rounded-2xl border space-y-1.5" :class="getAdvisoryCardClass(selectedIncident.severity)">
-          <div class="flex items-center space-x-1.5">
-            <AppIcon name="shield" class="w-4 h-4 shrink-0 text-zinc-900" />
-            <span class="text-xs font-black uppercase tracking-wider">Aviso y Prevención Ciudadana</span>
+        <!-- Column 2: Content Container (Description, Location, Civil Advisory) -->
+        <div class="flex flex-col space-y-2.5">
+          <!-- Description Box -->
+          <div class="p-2.5 sm:p-3 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center space-x-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-full">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>Reporte Ciudadano Verificado</span>
+              </span>
+              <span class="text-[10px] text-zinc-500 font-medium">{{ selectedIncident.time }}</span>
+            </div>
+            <p class="text-xs text-zinc-800 leading-relaxed font-normal">{{ selectedIncident.desc }}</p>
           </div>
-          <p class="text-[11px] text-zinc-700 leading-relaxed">
-            {{ selectedIncident.recommendation || 'Manténgase informado y siga las indicaciones de las autoridades del COE y Defensa Civil.' }}
-          </p>
+
+          <!-- Location Information Box -->
+          <div class="bg-zinc-50 rounded-xl p-2.5 space-y-1.5 border border-zinc-200/80">
+            <div class="flex items-center space-x-1.5 text-zinc-500">
+              <AppIcon name="map-pin" class="w-3.5 h-3.5 text-zinc-700 shrink-0" />
+              <span class="text-[11px] font-semibold text-zinc-800 leading-tight truncate">{{ selectedIncident.sector || 'Ubicación' }}</span>
+            </div>
+            <div class="flex items-center justify-between pt-1 border-t border-zinc-200/60 text-[11px]">
+              <span class="font-mono font-bold text-zinc-950">
+                {{ selectedIncident.lat.toFixed(4) }}° N, {{ Math.abs(selectedIncident.lng).toFixed(4) }}° W
+              </span>
+              <div class="flex items-center space-x-1">
+                <button
+                  type="button"
+                  @click="copyCoordinates(selectedIncident)"
+                  class="p-1 rounded-md transition-all cursor-pointer flex items-center space-x-1 text-[10px]"
+                  :class="isCopied ? 'bg-emerald-100 text-emerald-700 font-bold' : 'hover:bg-zinc-200 text-zinc-500 hover:text-zinc-800'"
+                  :title="isCopied ? '¡Coordenadas GPS copiadas!' : 'Copiar coordenadas GPS'"
+                >
+                  <MorphIcon :icon="isCopied ? Check : Copy" class="w-3 h-3" />
+                  <span v-if="isCopied">Copiado</span>
+                </button>
+                <a
+                  :href="`https://www.google.com/maps/search/?api=1&query=${selectedIncident.lat},${selectedIncident.lng}`"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="p-1 rounded-md hover:bg-zinc-200 text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer inline-flex items-center"
+                  title="Abrir ubicación en Google Maps"
+                >
+                  <AppIcon name="external-link" class="w-3 h-3" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Official Civil Protection Advisory -->
+          <div class="p-2.5 rounded-xl border space-y-1" :class="getAdvisoryCardClass(selectedIncident.severity)">
+            <div class="flex items-center space-x-1.5">
+              <AppIcon name="shield" class="w-3.5 h-3.5 shrink-0 text-zinc-900" />
+              <span class="text-[10px] font-black uppercase tracking-wider">Aviso y Prevención Ciudadana</span>
+            </div>
+            <p class="text-[10px] text-zinc-700 leading-snug">
+              {{ selectedIncident.recommendation || 'Manténgase informado y siga las indicaciones de las autoridades del COE y Defensa Civil.' }}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -243,6 +395,8 @@
 </template>
 
 <script setup lang="ts">
+import { MorphIcon } from 'morphicons/vue'
+import { Copy, Check } from 'lucide'
 import { ref, computed, onMounted, onUnmounted, markRaw } from 'vue'
 import maplibregl from 'maplibre-gl'
 import AppIcon from '~/components/AppIcon.vue'
@@ -253,9 +407,33 @@ import postalCodes from '~/assets/data/codigos-postales-rd.json'
 import drMaskData from '~/assets/data/dr-mask.json'
 import drBorderData from '~/assets/data/dr-border.json'
 import { useAppearance } from '~/composables/useAppearance'
+import { useUserProfile } from '~/composables/useUserProfile'
+import { useShare } from '~/composables/useShare'
+import { groupAffectedRoads, type AffectedRoad } from '~/composables/useAffectedRoads'
 import { toast } from 'super-beautiful-toast'
 
-const { tickerPosition } = useAppearance()
+export interface MapaIncident {
+  id: string
+  category: string
+  title: string
+  desc: string
+  sector: string
+  lng: number
+  lat: number
+  severity: 'EXTREMO' | 'ALTO' | 'MEDIO'
+  time: string
+  shape: string
+  icon: string
+  recommendation: string
+  image?: string
+  video?: string
+  mediaCaption?: string
+  svgIcon: string
+}
+
+const { navStyle, tickerPosition } = useAppearance()
+const { userProfile, initProfile } = useUserProfile()
+const isBonita = computed(() => navStyle.value === 'bonita')
 
 const mapContainer = ref<HTMLElement | null>(null)
 let mapInstance: maplibregl.Map | null = null
@@ -263,10 +441,14 @@ let resizeObserver: ResizeObserver | null = null
 let activeMarkers: maplibregl.Marker[] = []
 
 const isIncidentModalOpen = ref(false)
-const selectedIncident = ref<any>(null)
+const selectedIncident = ref<MapaIncident | null>(null)
 const selectedIncidentTrigger = ref<HTMLElement | null>(null)
+const isCopied = ref(false)
+const { copyCoordinates: copyCoords } = useShare()
+let copyTimeout: ReturnType<typeof setTimeout> | null = null
 
-function openIncidentDetails(inc: any, el: HTMLElement) {
+function openIncidentDetails(inc: MapaIncident, el: HTMLElement | null) {
+  isCopied.value = false
   selectedIncident.value = inc
   selectedIncidentTrigger.value = el
   isIncidentModalOpen.value = true
@@ -275,15 +457,20 @@ function openIncidentDetails(inc: any, el: HTMLElement) {
 function closeIncidentModal() {
   isIncidentModalOpen.value = false
   selectedIncidentTrigger.value = null
+  isCopied.value = false
 }
 
-function copyCoordinates(inc: any) {
+function copyCoordinates(inc: MapaIncident | null) {
   if (!inc) return
-  const text = `${inc.lat.toFixed(4)}, ${inc.lng.toFixed(4)}`
-  if (typeof navigator !== 'undefined' && navigator.clipboard) {
-    navigator.clipboard.writeText(text)
-    toast.success('Coordenadas GPS copiadas al portapapeles')
-  }
+  copyCoords(inc.lat, inc.lng).then((ok) => {
+    if (ok) {
+      isCopied.value = true
+      if (copyTimeout) clearTimeout(copyTimeout)
+      copyTimeout = setTimeout(() => {
+        isCopied.value = false
+      }, 2000)
+    }
+  })
 }
 
 function getSeverityBadgeClass(sev: string) {
@@ -310,7 +497,7 @@ function getAdvisoryCardClass(sev: string) {
   }
 }
 
-function getModalShapeStyle(inc: any) {
+function getModalShapeStyle(inc: MapaIncident | null) {
   if (!inc) return {}
   if (inc.severity === 'EXTREMO') {
     return {
@@ -560,6 +747,17 @@ function fitDominicanRepublic() {
   )
 }
 
+function focusUserZone() {
+  if (!mapInstance || !userProfile.value.coordinates) return
+  mapInstance.flyTo({
+    center: [userProfile.value.coordinates.lng, userProfile.value.coordinates.lat],
+    zoom: 14.2,
+    essential: true,
+    speed: 1.2
+  })
+  toast.info(`Enfocando en ${userProfile.value.zone || 'tu sector'}, ${userProfile.value.provinceName}`)
+}
+
 function getMaskColors() {
   if (currentLayer.value === 'dark') {
     return {
@@ -667,7 +865,9 @@ function addCountryMask(map: maplibregl.Map) {
   }
 }
 
-const mockIncidents = [
+// MOCK (solo frontend): la persona de backend expondrá GET /reportes con lat/lng.
+// Cuando esté listo, sustituir por useFetch a apiBaseUrl y borrar este array.
+const mockIncidents: MapaIncident[] = [
   {
     id: 'inc-1',
     category: 'Inundación Callejera',
@@ -738,89 +938,267 @@ const mockIncidents = [
   }
 ]
 
+const SEVERITY_RANK: Record<MapaIncident['severity'], number> = { EXTREMO: 3, ALTO: 2, MEDIO: 1 }
+const SEVERITY_COLOR: Record<MapaIncident['severity'], string> = { EXTREMO: '#E11D48', ALTO: '#D97706', MEDIO: '#18181B' }
+
+// Vías a evitar: agregación por sector (v1 cliente; backend: GET /vias-afectadas).
+const showRoads = ref(false)
+const affectedRoads = computed<AffectedRoad[]>(() => groupAffectedRoads(mockIncidents))
+
+function flyToRoad(road: AffectedRoad) {
+  mapInstance?.easeTo({ center: [road.lng, road.lat], zoom: 14, duration: 900 })
+}
+
+// Radar de lluvia RainViewer (tiles públicos gratuitos, sin clave).
+// Anima los últimos 6 frames (~1 h) como pide la Fase 3 del doc.
+const RADAR_FRAME_COUNT = 6
+const RADAR_FRAME_MS = 900
+const radarOn = ref(false)
+const radarLoading = ref(false)
+const radarFrames = ref<Array<{ time: number; tiles: string[] }>>([])
+const radarFrameIdx = ref(0)
+const radarPlaying = ref(true)
+let radarTimer: ReturnType<typeof setInterval> | null = null
+
+const radarFrameTime = computed(() => {
+  const f = radarFrames.value[radarFrameIdx.value]
+  if (!f) return ''
+  return new Date(f.time * 1000).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' })
+})
+
+function stopRadarAnimation() {
+  if (radarTimer) clearInterval(radarTimer)
+  radarTimer = null
+}
+
+function showRadarFrame(map: maplibregl.Map, idx: number) {
+  const frame = radarFrames.value[idx]
+  if (!frame) return
+  radarFrameIdx.value = idx
+  if (map.getLayer('climard-radar-layer')) map.removeLayer('climard-radar-layer')
+  if (map.getSource('climard-radar')) map.removeSource('climard-radar')
+  map.addSource('climard-radar', {
+    type: 'raster',
+    tiles: frame.tiles,
+    tileSize: 256,
+    maxzoom: 7,
+    attribution: 'Radar: RainViewer',
+  })
+  const beforeId = map.getLayer('climard-clusters') ? 'climard-clusters' : undefined
+  map.addLayer(
+    { id: 'climard-radar-layer', type: 'raster', source: 'climard-radar', paint: { 'raster-opacity': 0.65 } },
+    beforeId
+  )
+}
+
+function startRadarAnimation() {
+  stopRadarAnimation()
+  if (radarFrames.value.length < 2) return
+  radarTimer = setInterval(() => {
+    const map = mapInstance
+    if (!map || !radarOn.value || !radarPlaying.value) return
+    showRadarFrame(map, (radarFrameIdx.value + 1) % radarFrames.value.length)
+  }, RADAR_FRAME_MS)
+}
+
+async function toggleRadar() {
+  const map = mapInstance
+  if (!map) return
+  if (radarOn.value) {
+    radarOn.value = false
+    stopRadarAnimation()
+    if (map.getLayer('climard-radar-layer')) map.removeLayer('climard-radar-layer')
+    if (map.getSource('climard-radar')) map.removeSource('climard-radar')
+    return
+  }
+  radarLoading.value = true
+  try {
+    if (!radarFrames.value.length) {
+      const data = await $fetch<{
+        host: string
+        radar: { past: Array<{ time: number; path: string }> }
+      }>('https://api.rainviewer.com/public/weather-maps.json', { timeout: 10_000 })
+      const past = data.radar?.past ?? []
+      if (!past.length) throw new Error('Sin frames de radar')
+      const host = (data.host || 'https://tilecache.rainviewer.com').replace(/\/$/, '')
+      radarFrames.value = past.slice(-RADAR_FRAME_COUNT).map(f => ({
+        time: f.time,
+        tiles: [`${host}${f.path}/256/{z}/{x}/{y}/2/1_1.png`],
+      }))
+    }
+    // RainViewer solo sirve hasta zoom 7: con maxzoom el mapa reutiliza
+    // esos tiles al acercar en vez de pedir z8+ ("Zoom Level Not Supported").
+    showRadarFrame(map, radarFrames.value.length - 1)
+    radarPlaying.value = !window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+    startRadarAnimation()
+    radarOn.value = true
+  } catch (err) {
+    console.warn('[radar] no disponible:', err)
+    toast.error('No se pudo cargar el radar de lluvia.')
+  } finally {
+    radarLoading.value = false
+  }
+}
+
+function toggleRadarPlaying() {
+  radarPlaying.value = !radarPlaying.value
+}
+
+function incidentsToGeoJSON(list: MapaIncident[]): GeoJSON.FeatureCollection {
+  return {
+    type: 'FeatureCollection',
+    features: list.map(inc => ({
+      type: 'Feature',
+      properties: {
+        id: inc.id,
+        title: inc.title,
+        category: inc.category,
+        severity: inc.severity,
+        sevRank: SEVERITY_RANK[inc.severity] ?? 1,
+      },
+      geometry: { type: 'Point', coordinates: [inc.lng, inc.lat] },
+    })),
+  }
+}
+
+/**
+ * Clustering (Fase 2 del doc): los pines se agrupan en círculos con conteo.
+ * El color del cluster refleja la severidad máxima contenida. Clic en cluster
+ * = zoom; clic en punto = abre el detalle (origen morph = fallback del mapa).
+ */
 function renderMarkers(map: maplibregl.Map) {
-  // Clear any existing markers
+  // Clear any existing HTML markers (legacy) and cluster layers/sources.
+  // Se quitan los handlers previos: renderMarkers corre en cada style.load.
+  for (const layerId of ['climard-clusters', 'climard-unclustered']) {
+    try { map.off('click', layerId, layerId === 'climard-clusters' ? onClusterClick : onPointClick) } catch {}
+    try { map.off('mouseenter', layerId, onLayerHoverIn) } catch {}
+    try { map.off('mouseleave', layerId, onLayerHoverOut) } catch {}
+  }
   activeMarkers.forEach(m => m.remove())
   activeMarkers = []
+  for (const layerId of ['climard-clusters', 'climard-cluster-count', 'climard-unclustered']) {
+    if (map.getLayer(layerId)) map.removeLayer(layerId)
+  }
+  if (map.getSource('climard-incidentes')) map.removeSource('climard-incidentes')
 
-  mockIncidents.forEach(inc => {
-    const shapeDef = FLOWER_SHAPES[inc.shape] || FLOWER_SHAPES.flower
-
-    // Severity styling (Red/Rose for EXTREMO, Amber for ALTO, Dark/Primary for MEDIO)
-    const severityColors = inc.severity === 'EXTREMO'
-      ? { bg: '#E11D48', fg: '#FFFFFF', halo: 'rgba(225, 29, 72, 0.18)', ping: '#E11D48' }
-      : inc.severity === 'ALTO'
-        ? { bg: '#D97706', fg: '#FFFFFF', halo: 'rgba(217, 119, 6, 0.18)', ping: '#D97706' }
-        : { bg: 'var(--primary, #18181b)', fg: 'var(--on-primary, #ffffff)', halo: 'rgba(24, 24, 27, 0.14)', ping: 'var(--primary, #18181b)' }
-
-    const el = document.createElement('div')
-    el.className = 'marker-pin-wrapper relative group cursor-pointer select-none'
-    el.setAttribute('role', 'button')
-    el.setAttribute('tabindex', '0')
-    el.setAttribute('aria-label', `${inc.title} - ${inc.category}`)
-
-    // Organic Flower div pin with radar aura halo matching Material 3 Expressive design
-    el.innerHTML = `
-      <div class="relative flex flex-col items-center filter drop-shadow-[0_4px_10px_rgba(0,0,0,0.25)] group-hover:drop-shadow-[0_8px_18px_rgba(0,0,0,0.32)] transition-all duration-300">
-        <!-- Radar / Aura Halo (Translucent ring matching Reference Map Image 2) -->
-        <div class="absolute -top-3.5 w-18 h-18 rounded-full pointer-events-none transition-all duration-300 group-hover:scale-115"
-             style="background-color: ${severityColors.halo};"></div>
-
-        <!-- Pulse Ping -->
-        <span class="absolute top-1 w-10 h-10 rounded-full animate-ping opacity-45 pointer-events-none"
-              style="background-color: ${severityColors.ping};"></span>
-
-        <!-- Flower Div Body (AppShape Material 3 Expressive floral shape matching Image 1) -->
-        <div class="flower-pin-body relative w-11 h-11 flex items-center justify-center transition-all duration-300 ease-out group-hover:scale-125 border border-white/40"
-             style="clip-path: ${shapeDef.clipPath}; border-radius: ${shapeDef.borderRadius}; background-color: ${severityColors.bg}; color: ${severityColors.fg};">
-          <svg class="w-5 h-5 fill-none stroke-current" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-            ${inc.svgIcon}
-          </svg>
-        </div>
-
-        <!-- Pin Bottom Arrow Indicator -->
-        <div class="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] -mt-0.5"
-             style="border-t-color: ${severityColors.bg};"></div>
-
-        <!-- Floating Category Pill on Hover -->
-        <div class="absolute -top-8 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap bg-zinc-950/90 text-white backdrop-blur-md text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-lg border border-white/20 z-30 transform -translate-y-1 group-hover:translate-y-0">
-          ${inc.category}
-        </div>
-      </div>
-    `
-
-    // Click handler: opens WissPop modal with this exact marker element as origin
-    el.addEventListener('click', (e) => {
-      e.stopPropagation()
-      openIncidentDetails(inc, el)
-    })
-
-    // Keyboard support for accessibility
-    el.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault()
-        e.stopPropagation()
-        openIncidentDetails(inc, el)
-      }
-    })
-
-    const marker = new maplibregl.Marker({ element: el, anchor: 'bottom' })
-      .setLngLat([inc.lng, inc.lat])
-      .addTo(map)
-
-    activeMarkers.push(marker)
+  map.addSource('climard-incidentes', {
+    type: 'geojson',
+    data: incidentsToGeoJSON(mockIncidents),
+    cluster: true,
+    clusterMaxZoom: 14,
+    clusterRadius: 50,
+    clusterProperties: {
+      maxSev: ['max', ['get', 'sevRank']],
+    },
   })
+
+  // Clusters: color por severidad máxima, tamaño por conteo
+  map.addLayer({
+    id: 'climard-clusters',
+    type: 'circle',
+    source: 'climard-incidentes',
+    filter: ['has', 'point_count'],
+    paint: {
+      'circle-color': [
+        'case',
+        ['>=', ['get', 'maxSev'], 3], SEVERITY_COLOR.EXTREMO,
+        ['==', ['get', 'maxSev'], 2], SEVERITY_COLOR.ALTO,
+        SEVERITY_COLOR.MEDIO,
+      ],
+      'circle-radius': ['step', ['get', 'point_count'], 18, 10, 24, 30, 30],
+      'circle-stroke-width': 3,
+      'circle-stroke-color': '#ffffff',
+      'circle-opacity': 0.92,
+    },
+  })
+
+  map.addLayer({
+    id: 'climard-cluster-count',
+    type: 'symbol',
+    source: 'climard-incidentes',
+    filter: ['has', 'point_count'],
+    layout: {
+      'text-field': ['get', 'point_count_abbreviated'],
+      'text-font': ['Noto Sans Bold'],
+      'text-size': 12,
+    },
+    paint: { 'text-color': '#ffffff' },
+  })
+
+  // Puntos individuales: color por severidad
+  map.addLayer({
+    id: 'climard-unclustered',
+    type: 'circle',
+    source: 'climard-incidentes',
+    filter: ['!', ['has', 'point_count']],
+    paint: {
+      'circle-color': [
+        'match', ['get', 'severity'],
+        'EXTREMO', SEVERITY_COLOR.EXTREMO,
+        'ALTO', SEVERITY_COLOR.ALTO,
+        SEVERITY_COLOR.MEDIO,
+      ],
+      'circle-radius': 11,
+      'circle-stroke-width': 2.5,
+      'circle-stroke-color': '#ffffff',
+    },
+  })
+
+  map.on('click', 'climard-clusters', onClusterClick)
+  map.on('click', 'climard-unclustered', onPointClick)
+
+  for (const layerId of ['climard-clusters', 'climard-unclustered']) {
+    map.on('mouseenter', layerId, onLayerHoverIn)
+    map.on('mouseleave', layerId, onLayerHoverOut)
+  }
+}
+
+function onClusterClick(e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }) {
+  const map = mapInstance
+  if (!map) return
+  const features = map.queryRenderedFeatures(e.point, { layers: ['climard-clusters'] })
+  const cluster = features[0]
+  if (!cluster) return
+  const clusterId = cluster.properties.cluster_id as number
+  const source = map.getSource('climard-incidentes') as maplibregl.GeoJSONSource
+  source.getClusterExpansionZoom(clusterId)
+    .then((zoom) => {
+      const coords = (cluster.geometry as GeoJSON.Point).coordinates as [number, number]
+      map.easeTo({ center: coords, zoom })
+    })
+    .catch(() => {})
+}
+
+function onPointClick(e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }) {
+  const id = e.features?.[0]?.properties?.id as string | undefined
+  const inc = mockIncidents.find(i => i.id === id)
+  if (inc) openIncidentDetails(inc, null)
+}
+
+function onLayerHoverIn() {
+  mapInstance?.getCanvas().style.setProperty('cursor', 'pointer')
+}
+
+function onLayerHoverOut() {
+  mapInstance?.getCanvas().style.setProperty('cursor', '')
 }
 
 onMounted(() => {
   if (!mapContainer.value) return
 
+  initProfile()
+  const hasCustomLocation = userProfile.value.coordinates && userProfile.value.hasCompletedOnboarding
+  const startCenter: [number, number] = hasCustomLocation
+    ? [userProfile.value.coordinates.lng, userProfile.value.coordinates.lat]
+    : [-69.942, 18.485]
+  const startZoom = hasCustomLocation ? 14.0 : 12.0
+
   // Initialize MapLibre with strict Dominican Republic boundaries & mask
   const map = new maplibregl.Map({
     container: mapContainer.value,
     style: MAP_STYLES.light as any,
-    center: [-69.942, 18.485], // Santo Domingo
-    zoom: 12.0,
+    center: startCenter,
+    zoom: startZoom,
     minZoom: 7.2,              // No permite alejarse más allá del territorio dominicano
     maxZoom: 19,
     maxBounds: [
@@ -849,6 +1227,10 @@ onMounted(() => {
     addCountryMask(map)
     renderOceanLabels(map)
     renderMarkers(map)
+    // El cambio de estilo base borra fuentes propias: restaurar frame actual si el radar estaba activo.
+    if (radarOn.value && radarFrames.value.length && !map.getSource('climard-radar')) {
+      showRadarFrame(map, radarFrameIdx.value)
+    }
   })
 
   mapInstance = markRaw(map)
@@ -862,6 +1244,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  stopRadarAnimation()
   if (resizeObserver) {
     resizeObserver.disconnect()
     resizeObserver = null
