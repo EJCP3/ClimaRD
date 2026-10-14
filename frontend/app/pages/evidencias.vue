@@ -21,8 +21,19 @@
     <!-- Empty State -->
     <div v-else-if="!visibleImages.length" class="py-16 text-center space-y-2">
       <AppIcon name="camera" class="w-8 h-8 mx-auto text-zinc-300" />
-      <p class="text-sm font-bold text-zinc-700">Aún no hay evidencias publicadas</p>
-      <p class="text-xs text-zinc-500">Sé el primero en reportar una situación: pulsa «Subir Nueva Evidencia».</p>
+      <template v-if="images.length">
+        <p class="text-sm font-bold text-zinc-700">Filtros ocultan {{ images.length }} reporte{{ images.length === 1 ? '' : 's' }}</p>
+        <p class="text-xs text-zinc-500">Son resueltos, antiguos o fuera de tu radio. Desactívalos para verlos.</p>
+        <div class="flex items-center justify-center gap-2 pt-1">
+          <AppButton variant="tonal" shape="round" size="small" @click="hideStale = false; nearbyOnly = false">
+            Mostrar todos
+          </AppButton>
+        </div>
+      </template>
+      <template v-else>
+        <p class="text-sm font-bold text-zinc-700">Aún no hay evidencias publicadas</p>
+        <p class="text-xs text-zinc-500">Sé el primero en reportar una situación: pulsa «Subir Nueva Evidencia».</p>
+      </template>
     </div>
 
     <!-- Filtro de vigencia -->
@@ -831,7 +842,7 @@ import { MorphIcon } from 'morphicons/vue'
 import { Copy, Share, Check } from 'lucide'
 import { useApi } from '~/composables/useApi'
 import { useShare } from '~/composables/useShare'
-import { getFreshness, freshnessMeta, isResolved, OBSOLETE_AFTER_HOURS } from '~/composables/useReportStatus'
+import { getFreshness, freshnessMeta, isResolved } from '~/composables/useReportStatus'
 import { haversineKm, formatDistance, NEARBY_PRESETS_KM } from '~/composables/useNearby'
 import { countBySector, isFrequentSector, getAbuseReported, markAbuseReported } from '~/composables/useReportStats'
 import { canPublish, isLikelyDuplicate, recordPublish, saveLastReport, MAX_REPORTS_PER_HOUR } from '~/composables/useRateLimit'
@@ -1002,10 +1013,6 @@ function distanceTo(item: { lat: number; lng: number }): number | null {
 const sectorCounts = computed(() => countBySector(images.value))
 const abuseReported = ref<Set<string | number>>(new Set())
 
-onMounted(async () => {
-  abuseReported.value = getAbuseReported() as Set<string | number>
-})
-
 function sectorReportCount(item: { ubicacionShort?: string; ubicacion: string }): number {
   const key = (item.ubicacionShort || item.ubicacion || '').trim()
   return sectorCounts.value.get(key) ?? 0
@@ -1163,6 +1170,7 @@ onMounted(async () => {
   if (typeof window !== 'undefined') {
     window.addEventListener('keydown', handleKeydown)
   }
+  abuseReported.value = getAbuseReported() as Set<string | number>
   await nextTick()
   initGalleryClasses()
   loadEvidencias()

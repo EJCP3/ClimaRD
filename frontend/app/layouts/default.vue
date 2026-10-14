@@ -532,12 +532,10 @@ import { useCardTheme, useReactiveTheme } from '~/composables/useCardTheme'
 const route = useRoute()
 const isMapPage = computed(() => route.path === '/mapa')
 const {
-  userProfile,
   initProfile,
   isActionsDropdownOpen,
   openActionsDropdown,
-  closeActionsDropdown,
-  openProfileModal
+  closeActionsDropdown
 } = useUserProfile()
 
 const {
@@ -712,11 +710,8 @@ onMounted(() => {
   initCardTheme()
   syncBodyDarkClass()
 
-  // Auto-launch mini-onboarding gently if new user
-  if (!userProfile.value.hasCompletedOnboarding) {
-    setTimeout(() => {
-      openProfileModal('#nav-dropdown-btn-bonita')
-    }, 700)
-  }
+  // Sin auto-apertura del onboarding: en una emergencia el mapa debe estar
+  // visible de inmediato. El CTA "Configurar mi zona" (index) y el menú
+  // "Opciones" abren el modal a demanda vía openProfileModal().
 })
 </script>

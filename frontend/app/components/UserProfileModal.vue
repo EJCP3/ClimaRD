@@ -170,7 +170,7 @@
                       Correo
                     </span>
                     <h2 class="text-xl sm:text-2xl md:text-3xl font-black tracking-tight leading-snug break-all mt-0.5 text-white">
-                      {{ userProfile.emailOrPhone || formEmailOrPhone || 'euddy.javier@gmail.com' }}
+                      {{ userProfile.emailOrPhone || formEmailOrPhone || 'tu@correo.com' }}
                     </h2>
                   </div>
 
@@ -180,7 +180,7 @@
                       Nombre
                     </span>
                     <h2 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-snug mt-0.5 text-white">
-                      {{ userProfile.name || formName || 'Euddy Javier' }}
+                      {{ userProfile.name || formName || 'Tu nombre' }}
                     </h2>
                   </div>
                 </div>
@@ -192,7 +192,7 @@
                       Zona Monitoreada
                     </span>
                     <p class="text-xs sm:text-sm font-black mt-0.5 text-white">
-                      {{ userProfile.zone || formZone || 'Piantini' }}<template v-if="currentProvinceName">, {{ currentProvinceName }}</template>
+                      {{ userProfile.zone || formZone || 'Tu sector' }}<template v-if="currentProvinceName">, {{ currentProvinceName }}</template>
                     </p>
                   </div>
                 </div>
@@ -240,7 +240,7 @@
                   <input
                     v-model="formName"
                     type="text"
-                    placeholder="Euddy Javier"
+                    placeholder="Tu nombre"
                     class="w-full px-3 py-1.5 bg-[#0B110E] border border-white/10 rounded-xl text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500"
                   />
                 </div>
@@ -249,7 +249,7 @@
                   <input
                     v-model="formEmailOrPhone"
                     type="text"
-                    placeholder="euddy.javier@gmail.com"
+                    placeholder="tu@correo.com"
                     class="w-full px-3 py-1.5 bg-[#0B110E] border border-white/10 rounded-xl text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500"
                   />
                 </div>
@@ -704,11 +704,11 @@ const { cardTheme, initCardTheme, setCardTheme } = useCardTheme()
 const activeTab = ref<'cuenta' | 'ubicacion' | 'problematicas' | 'tema'>('cuenta')
 const isEditing = ref(false)
 
-const formName = ref('Euddy Javier')
-const formEmailOrPhone = ref('euddy.javier@gmail.com')
+const formName = ref('')
+const formEmailOrPhone = ref('')
 const formProvinceSlug = ref('distrito-nacional')
-const formZone = ref('Piantini')
-const formZipcode = ref('10149')
+const formZone = ref('')
+const formZipcode = ref('')
 const formIssues = ref<string[]>(['inundaciones', 'apagones'])
 
 // Province Autocomplete & WissPop Anchoring
@@ -1108,13 +1108,13 @@ function removeCustomIssue(text: string) {
 }
 
 function syncForm() {
-  formName.value = userProfile.value.name || 'Euddy Javier'
-  formEmailOrPhone.value = userProfile.value.emailOrPhone || 'euddy.javier@gmail.com'
+  formName.value = userProfile.value.name || ''
+  formEmailOrPhone.value = userProfile.value.emailOrPhone || ''
   formProvinceSlug.value = userProfile.value.provinceSlug || 'distrito-nacional'
   provinceSearchQuery.value = currentProvinceName.value
   isProvinceDropdownOpen.value = false
-  formZone.value = userProfile.value.zone || 'Piantini'
-  formZipcode.value = userProfile.value.zipcode || '10149'
+  formZone.value = userProfile.value.zone || ''
+  formZipcode.value = userProfile.value.zipcode || ''
   formIssues.value = [...(userProfile.value.frequentIssues || ['inundaciones', 'apagones'])]
 
   // Extract any custom issues that were previously saved in profile
@@ -1231,10 +1231,10 @@ function toggleIssue(id: string) {
 
 function saveProfileData() {
   saveProfile({
-    name: formName.value.trim() || 'Euddy Javier',
-    emailOrPhone: formEmailOrPhone.value.trim() || 'euddy.javier@gmail.com',
+    name: formName.value.trim(),
+    emailOrPhone: formEmailOrPhone.value.trim(),
     provinceSlug: formProvinceSlug.value,
-    zone: formZone.value.trim() || 'Piantini',
+    zone: formZone.value.trim(),
     zipcode: formZipcode.value || '',
     coordinates: detectedCoords.value,
     frequentIssues: formIssues.value,

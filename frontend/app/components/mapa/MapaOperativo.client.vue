@@ -131,7 +131,8 @@
 
     <!-- Vías a evitar (Fase 3): agregación por sector con vuelo de cámara -->
     <div
-      class="absolute z-20 left-4 sm:left-6 bottom-6 sm:bottom-7 w-[240px] bg-white/95 backdrop-blur-xl rounded-[20px] border border-zinc-200/80 shadow-lg overflow-hidden"
+      class="absolute z-20 left-4 sm:left-6 w-[240px] bg-white/95 backdrop-blur-xl rounded-[20px] border border-zinc-200/80 shadow-lg overflow-hidden"
+      :class="isBonita ? 'bottom-6 sm:bottom-7' : 'bottom-24 sm:bottom-24'"
     >
       <button
         type="button"
@@ -995,7 +996,13 @@ function incidentsToGeoJSON(list: MapaIncident[]): GeoJSON.FeatureCollection {
  * = zoom; clic en punto = abre el detalle (origen morph = fallback del mapa).
  */
 function renderMarkers(map: maplibregl.Map) {
-  // Clear any existing HTML markers (legacy) and cluster layers/sources
+  // Clear any existing HTML markers (legacy) and cluster layers/sources.
+  // Se quitan los handlers previos: renderMarkers corre en cada style.load.
+  for (const layerId of ['climard-clusters', 'climard-unclustered']) {
+    try { map.off('click', layerId, layerId === 'climard-clusters' ? onClusterClick : onPointClick) } catch {}
+    try { map.off('mouseenter', layerId, onLayerHoverIn) } catch {}
+    try { map.off('mouseleave', layerId, onLayerHoverOut) } catch {}
+  }
   activeMarkers.forEach(m => m.remove())
   activeMarkers = []
   for (const layerId of ['climard-clusters', 'climard-cluster-count', 'climard-unclustered']) {
@@ -1066,30 +1073,43 @@ function renderMarkers(map: maplibregl.Map) {
     },
   })
 
-  map.on('click', 'climard-clusters', async (e) => {
-    const features = map.queryRenderedFeatures(e.point, { layers: ['climard-clusters'] })
-    const cluster = features[0]
-    if (!cluster) return
-    const clusterId = cluster.properties.cluster_id as number
-    const source = map.getSource('climard-incidentes') as maplibregl.GeoJSONSource
-    try {
-      const zoom = await source.getClusterExpansionZoom(clusterId)
-      const coords = (cluster.geometry as GeoJSON.Point).coordinates as [number, number]
-      map.easeTo({ center: coords, zoom })
-    } catch {}
-  })
-
-  map.on('click', 'climard-unclustered', (e) => {
-    const feature = e.features?.[0]
-    const id = feature?.properties?.id as string | undefined
-    const inc = mockIncidents.find(i => i.id === id)
-    if (inc) openIncidentDetails(inc, null)
-  })
+  map.on('click', 'climard-clusters', onClusterClick)
+  map.on('click', 'climard-unclustered', onPointClick)
 
   for (const layerId of ['climard-clusters', 'climard-unclustered']) {
-    map.on('mouseenter', layerId, () => { map.getCanvas().style.cursor = 'pointer' })
-    map.on('mouseleave', layerId, () => { map.getCanvas().style.cursor = '' })
+    map.on('mouseenter', layerId, onLayerHoverIn)
+    map.on('mouseleave', layerId, onLayerHoverOut)
   }
+}
+
+function onClusterClick(e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }) {
+  const map = mapInstance
+  if (!map) return
+  const features = map.queryRenderedFeatures(e.point, { layers: ['climard-clusters'] })
+  const cluster = features[0]
+  if (!cluster) return
+  const clusterId = cluster.properties.cluster_id as number
+  const source = map.getSource('climard-incidentes') as maplibregl.GeoJSONSource
+  source.getClusterExpansionZoom(clusterId)
+    .then((zoom) => {
+      const coords = (cluster.geometry as GeoJSON.Point).coordinates as [number, number]
+      map.easeTo({ center: coords, zoom })
+    })
+    .catch(() => {})
+}
+
+function onPointClick(e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }) {
+  const id = e.features?.[0]?.properties?.id as string | undefined
+  const inc = mockIncidents.find(i => i.id === id)
+  if (inc) openIncidentDetails(inc, null)
+}
+
+function onLayerHoverIn() {
+  mapInstance?.getCanvas().style.setProperty('cursor', 'pointer')
+}
+
+function onLayerHoverOut() {
+  mapInstance?.getCanvas().style.setProperty('cursor', '')
 }
 
 onMounted(() => {

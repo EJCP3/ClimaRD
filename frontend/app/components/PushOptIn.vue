@@ -7,7 +7,8 @@
       <div class="min-w-0">
         <h4 class="text-sm font-extrabold text-zinc-950">Alertas push en tu zona</h4>
         <p class="text-[11px] text-zinc-500 leading-snug">
-          <span v-if="!isSupported">Tu navegador no soporta notificaciones push.</span>
+          <span v-if="!mounted">Activa las alertas push para {{ provinceName }}.</span>
+          <span v-else-if="!isSupported">Tu navegador no soporta notificaciones push.</span>
           <span v-else-if="isSubscribed">Activas para {{ provinceName }}. Te avisaremos ante alerta roja o amarilla.</span>
           <span v-else-if="!vapidKey">Disponible próximamente (el servidor aún no lo configura).</span>
           <span v-else>Recibe aviso inmediato ante alerta roja o amarilla en {{ provinceName }}.</span>
@@ -20,7 +21,7 @@
         variant="tonal"
         shape="round"
         size="small"
-        :disabled="!isSupported || isWorking"
+        :disabled="!mounted || !isSupported || isWorking"
         @click="subscribe(provinceSlug, lat, lng)"
       >
         {{ isWorking ? 'Activando…' : 'Activar' }}
@@ -48,5 +49,10 @@ defineProps<{ provinceSlug: string; provinceName: string; lat?: number; lng?: nu
 
 const { isSupported, isSubscribed, isWorking, vapidKey, refreshPermission, subscribe, unsubscribe, sendTest } = usePush()
 
-onMounted(() => refreshPermission())
+// SSR-safe: mismo HTML en servidor y cliente hasta montar (evita hydration mismatch).
+const mounted = ref(false)
+onMounted(() => {
+  mounted.value = true
+  refreshPermission()
+})
 </script>

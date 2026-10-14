@@ -48,7 +48,7 @@
       <MiniMapaCOE />
     </div>
 
-    <!-- Push opt-in geolocalizado (Fase 3) -->
+    <!-- Push opt-in geolocalizado (Fase 3; SSR-safe: contenido estático hasta montar) -->
     <PushOptIn
       :province-slug="userProfile.provinceSlug || 'distrito-nacional'"
       :province-name="userProfile.provinceName || 'tu zona'"
